@@ -6,10 +6,12 @@ let checks=JSON.parse(localStorage.getItem("its_checklists")||"{}");
 let videoGroup="Alle";
 let uid=0;
 const nextId=p=>(p||"x")+(++uid);
+LIVE_SETS.push({id:"mandatory1",name:"Mandatory opgave 1",items:MANDATORY_1});
 
 /* ---------- view wiring (wraps the original functions) ---------- */
 const _origSetView=setView, _origSync=syncSubject, _origChange=changeSubject, _origHome=renderHome;
 setView=function(view){
+  document.body.dataset.view=view;
   $("#topnav")?.classList.remove("menu-open");
   if(view!=="learn"&&location.hash)history.replaceState(null,"",location.pathname+location.search);
   if(EXT_VIEWS.includes(view)){
@@ -42,7 +44,7 @@ renderHome=function(){
   const cards=subject==="Python"?[
     ["◧","Lær","Visuelle guides til hele Python-pensum: datatyper, slicing, loops, funktioner, filer, exceptions, sockets og Linux — med interaktive værktøjer.",`<button class="btn primary" data-go2="learn">Åbn guides (${g})</button>`],
     ["◫","Flashcards","Ét kort ad gangen med let og teknisk forklaring. Marker Kan / Usikker / Øv igen.",`<button class="btn" data-go2="study">Start flashcards</button>`],
-    ["⌘","Python Lab","70 live-coding-opgaver med automatiske tests — plus en fri sandbox, hvor du kan køre din egen kode.",`<button class="btn" data-go2="live">Live Coding</button><button class="btn" data-go2="sandbox">Sandbox</button>`],
+    ["⌘","Python Lab",`${LIVE_CHALLENGES.length} øvelser og de ${MANDATORY_1.length} spørgsmål fra Mandatory opgave 1 med automatiske tests — plus en fri sandbox, hvor du kan køre din egen kode.`,`<button class="btn" data-go2="live">Live Coding</button><button class="btn" data-go2="sandbox">Sandbox</button>`],
     ["▶","Videoer",`${v} udvalgte videoer (Corey Schafer, NetworkChuck m.fl.) sorteret efter emne.`,`<button class="btn" data-go2="videos">Se videoer</button>`]
   ]:[
     ["◧","Lær","Visuelle guides for hvert lag: interaktive headers, sekvensdiagrammer, subnet- og fragmenteringsberegner og et header-galleri til eksamen.",`<button class="btn primary" data-go2="learn">Åbn guides (${g})</button>`],
@@ -111,7 +113,7 @@ function showGuide(id){
   hydrate($("#guideBody"));
   $$("#guideBody [data-g2]").forEach(b=>b.onclick=()=>openGuide(b.dataset.g2));
   $$("#guideBody [data-cards]").forEach(b=>b.onclick=()=>{category=b.dataset.cards;difficulty="all";typeFilter="all";statusFilter="all";sortMode="default";search="";studyIndex=0;setView("study")});
-  $$("#guideBody [data-livecat]").forEach(b=>b.onclick=()=>{liveCategory=b.dataset.livecat;liveIndex=0;setView("live");closeSandbox()});
+  $$("#guideBody [data-livecat]").forEach(b=>b.onclick=()=>{liveSet="ovelser";liveCategory=b.dataset.livecat;liveIndex=0;setView("live");closeSandbox()});
   $$("#guideBody [data-pod]").forEach(b=>b.onclick=()=>{setView("podcasts");setTimeout(()=>document.getElementById("pod-"+b.dataset.pod)?.scrollIntoView({behavior:"smooth",block:"start"}),60)});
 }
 function hydrate(root){
@@ -284,35 +286,27 @@ function renderPodcasts(){
 function openSandbox(code,inputs){
   $("#liveMain").classList.add("hidden");$("#sandboxPanel").classList.remove("hidden");
   $("#sandboxBtn").textContent="← Tilbage til opgaver";
-  if(code!==undefined){$("#sbCode").value=code;$("#sbInput").value=inputs||"";$("#sbOut").textContent="Tryk ▶ Kør for at se output.";$("#sbOut").classList.remove("err")}
+  if(code!==undefined){$("#sbCode").value=code;$("#sbInput").value=inputs||"";$("#sbOut").innerHTML=consoleHTML("",{label:"Output"})}
   else if(!$("#sbCode").value)$("#sbCode").value=localStorage.getItem("its_sandbox")||"# Skriv frit Python her og tryk ▶ Kør (Ctrl+Enter)\nname = input('Hvad hedder du? ')\nprint('Hej', name)\n\nfor i in range(3):\n    print(i, i ** 2)";
 }
 function closeSandbox(){$("#liveMain").classList.remove("hidden");$("#sandboxPanel").classList.add("hidden");$("#sandboxBtn").textContent="🧪 Fri sandbox"}
 async function runSandbox(){
   const code=$("#sbCode").value;localStorage.setItem("its_sandbox",code);
   const inputs=$("#sbInput").value.split("\n");while(inputs.length&&inputs[inputs.length-1]==="")inputs.pop();
-  const out=$("#sbOut");out.classList.remove("err");out.textContent="Kører…";$("#sbRun").disabled=true;
+  const out=$("#sbOut");out.innerHTML=`<div class="test">Kører…</div>`;$("#sbRun").disabled=true;
   try{
-    await ensureWorker();
-    const prev=pyWorker.onmessage;
-    const res=await new Promise(resolve=>{
-      const to=setTimeout(()=>{pyWorker.terminate();pyWorker=null;pyReady=false;setEngine("error","Timeout");resolve({timeout:true})},8000);
-      pyWorker.onmessage=e=>{if(e.data.type==="result"||e.data.type==="error"){clearTimeout(to);resolve(e.data)}};
-      pyWorker.postMessage({code,tests:[{name:"Kørsel",inputs,check:"True"}]});
-    });
-    if(pyWorker)pyWorker.onmessage=prev;
-    if(res.timeout){out.classList.add("err");out.textContent="Stoppet efter 8 sekunder — har du en uendelig løkke, eller mangler der input?";}
-    else if(res.type==="error"){out.classList.add("err");out.textContent=res.error}
-    else{const r=res.data[0];
-      let txt=r.output||"";
-      if(r.error){const eof=r.error.includes("EOFError");txt+=(txt?"\n":"")+(eof?"⚠ Programmet kaldte input() flere gange, end der er linjer i input-feltet. Tilføj en linje pr. input().":r.error.trim());out.classList.add("err")}
-      out.textContent=txt||"(intet output)";}
-  }catch(e){out.classList.add("err");out.textContent=String(e)}
+    const res=await pyExec(code,[{name:"Kørsel",inputs,check:"True",echo:true}]);
+    if(res.type!=="result"){out.innerHTML=runFailHTML(res,"kørslen");return}
+    const r=res.data[0];
+    if(r.err&&r.err.type==="EOFError")r.err.msg="Programmet kaldte input() flere gange, end der er linjer i input-feltet. Tilføj en linje pr. input().";
+    out.innerHTML=consoleHTML(r.output,{label:r.err?"Output før fejlen":"Output"})+pyErrorHTML(r.err);
+    bindGotoLines(out,$("#sbCode"));
+  }catch(e){out.innerHTML=`<div class="test fail"><b>Fejl</b><p>${esc(String(e.message||e))}</p></div>`}
   finally{$("#sbRun").disabled=false}
 }
 $("#sandboxBtn").onclick=()=>$("#sandboxPanel").classList.contains("hidden")?openSandbox():closeSandbox();
 $("#sbRun").onclick=runSandbox;
-$("#sbClear").onclick=()=>{$("#sbCode").value="";$("#sbOut").textContent=""};
+$("#sbClear").onclick=()=>{$("#sbCode").value="";$("#sbOut").innerHTML=""};
 $("#sbCode").addEventListener("keydown",e=>{
   if(e.key==="Tab"){e.preventDefault();const t=e.target,s=t.selectionStart,en=t.selectionEnd;t.value=t.value.slice(0,s)+"    "+t.value.slice(en);t.selectionStart=t.selectionEnd=s+4}
   if((e.ctrlKey||e.metaKey)&&e.key==="Enter"){e.preventDefault();runSandbox()}

@@ -38,6 +38,57 @@ media = ('const VIDEOS=' + json.dumps(vids, ensure_ascii=False) + ';\n'
          'const VIDEO_GROUPS=' + json.dumps(VIDEO_GROUPS, ensure_ascii=False) + ';\n'
          'const PODCASTS=' + json.dumps(pods, ensure_ascii=False) + ';\n')
 
+# Mandatory opgave 1: question text, my_data and model solution come from the exam file;
+# the expected answer is computed by running the model solution and only stored as a test.
+from mandatory1_meta import M1, M1_SOURCE, PCAP_NOTE
+from html import escape
+def parse_mandatory(path):
+    src = open(os.path.join(SCR, path), encoding='utf-8').read()
+    blocks = re.split(r'^# Question (\d+): ', src, flags=re.M)[1:]
+    out = []
+    for num, body in zip(blocks[::2], blocks[1::2]):
+        lines = body.rstrip('\n').split('\n')
+        prompt = [lines.pop(0)]
+        while lines and lines[0].startswith('#'):          # multi-line question text
+            prompt.append(lines.pop(0)[1:].strip())
+        start = next(i for i, l in enumerate(lines) if l.startswith('my_data ='))
+        end = next(i for i in range(start, len(lines)) if not lines[i].strip())
+        data_code = '\n'.join(lines[start:end])
+        code = lines[end:]
+        pr = next(i for i, l in enumerate(code) if l.strip() == 'print(result)')
+        sol = '\n'.join(code[:pr]).strip('\n')
+        imports = ''.join(s for k, s in (('hashlib', 'import hashlib\n'), ('product(', 'from itertools import product\n')) if k in sol)
+        ns = {}
+        exec(imports + data_code + '\n' + sol, ns)
+        assert ns.get('result') is not None, 'no result for question ' + num
+        out.append(dict(num=int(num), prompt=' '.join(prompt).strip(), data=data_code, imports=imports,
+                        solution=sol, answer=repr(ns['result']), atype=type(ns['result']).__name__))
+    return out
+mand = []
+for q in parse_mandatory(M1_SOURCE):
+    n, m = q['num'], M1[q['num']]
+    head = q['imports'] + ('\n' if q['imports'] else '') + q['data']
+    req = (f'Gem svaret i variablen <code>result</code>. Svaret skal være af typen <code>{q["atype"]}</code>. '
+           'Testen sammenligner med det rigtige svar uden at vise det. Brug <b>▶ Kør</b> for at se dit output.')
+    if m.get('pcap'): req += '<br>' + PCAP_NOTE
+    annotated = (q['data'] if 'import ' in m.get('annotated', '') else head) + '\n\n' + m.get('annotated', q['solution'] + '\nprint(result)')
+    if 'annotated' in m:   # the explained solution must reach the same answer as the model solution
+        ns = {'print': lambda *a, **k: None}
+        exec(annotated, ns)
+        assert repr(ns['result']) == q['answer'] or ns['result'] == eval(q['answer']), 'annotated answer differs for question %d' % n
+    mand.append(dict(
+        id=f'm1-{n:02d}', set='mandatory1', num=n, category=m['cat'], difficulty=m['diff'], title=m['title'],
+        prompt=f'<span class="q-label">Question {n}</span>' + escape(q['prompt']),
+        requirements=req, source=f'Mandatory opgave 1 · Question {n}',
+        starter=head + '\n\n# Skriv din løsning her og gem svaret i result\nresult = None\n\nprint(result)\n',
+        hint=m['hint'], why=m['why'],
+        solution=head + '\n\n' + q['solution'] + '\n\nprint(result)',
+        annotatedSolution=annotated,
+        tests=[dict(name='Svar', answer=q['answer'], atype=q['atype'], setup=head,
+                    expect=f'result skal være det rigtige svar (type {q["atype"]}).')]))
+assert len(mand) == len(M1), (len(mand), len(M1))
+media += 'const MANDATORY_1=' + json.dumps(mand, ensure_ascii=False) + ';\n'
+
 boot = '''
 syncSubject();
 (function(){const g=new URLSearchParams(location.hash.slice(1)).get("guide");
@@ -69,10 +120,10 @@ sandbox = '''
       <div class="sandbox-io">
         <textarea class="code-input" id="sbCode" spellcheck="false" autocapitalize="off"></textarea>
         <div class="sandbox-side"><label>Input (én linje pr. input())</label><textarea id="sbInput" spellcheck="false" placeholder="25"></textarea>
-          <label>Output</label><pre class="sandbox-out" id="sbOut">Tryk ▶ Kør for at se output.</pre></div>
+          <label>Output</label><div class="sandbox-out" id="sbOut"></div></div>
       </div>
       <div class="lab-bottom"><div class="group"><button class="btn primary" id="sbRun">▶ Kør</button><button class="btn" id="sbClear">Ryd</button></div>
-        <span style="font-size:10px;color:var(--muted)">Kører Python 3 i browseren (Pyodide) · stoppes efter 8 sek.</span></div>
+        <span style="font-size:10px;color:var(--muted)">Kører Python 3 i browseren (Pyodide) · stoppes efter 10 sek.</span></div>
     </section>
 '''
 end_live = '</section>\n</main>'
