@@ -404,14 +404,14 @@ code{font-family:"SFMono-Regular",Consolas,monospace;background:var(--code-bg);b
     <button class="navbtn" data-view="live">Python Lab</button>
   </nav>
 
-  <button class="download-btn" id="downloadOffline" title="Download hele siden som én HTML-fil. Flashcards virker uden internet; Python Lab kræver internet til Python-motoren.">⬇<span>Download offline</span></button>
+  <button class="download-btn" id="downloadOffline" title="Download hele siden som én HTML-fil. Flashcards virker uden internet; Python Lab kræver internet til Python-motoren."><i data-icon="download"></i><span>Download offline</span></button>
 
   <div class="theme-toggle" role="group" aria-label="Vælg tema">
-    <button data-theme-btn="light" title="Lyst tema">☀<span>Lys</span></button>
-    <button data-theme-btn="dark" title="Mørkt tema">☾<span>Mørk</span></button>
+    <button data-theme-btn="light" title="Lyst tema"><i data-icon="sun"></i><span>Lys</span></button>
+    <button data-theme-btn="dark" title="Mørkt tema"><i data-icon="moon"></i><span>Mørk</span></button>
   </div>
 
-  <button class="mobile-menu" id="mobileMenu">Menu</button>
+  <button class="mobile-menu" id="mobileMenu" aria-label="Menu"><i data-icon="menu"></i><span>Menu</span></button>
 </header>
 
 <section class="subject-focus-bar" aria-label="Vælg fag">
@@ -422,14 +422,14 @@ code{font-family:"SFMono-Regular",Consolas,monospace;background:var(--code-bg);b
     </div>
     <div class="subject-switch subject-switch-large">
       <button class="active" data-subject="Python">
-        <span class="subject-icon">⌘</span>
+        <span class="subject-icon"><i data-icon="braces"></i></span>
         <span>
           <b>Python</b>
           <small>Kode · datastrukturer · live coding</small>
         </span>
       </button>
       <button data-subject="Netværk">
-        <span class="subject-icon">◎</span>
+        <span class="subject-icon"><i data-icon="network"></i></span>
         <span>
           <b>Netværk</b>
           <small>TCP/IP · protokoller · headers</small>
@@ -448,27 +448,27 @@ code{font-family:"SFMono-Regular",Consolas,monospace;background:var(--code-bg);b
         <p id="homeText">Start roligt fra fundamentet. Vælg et emne nedenfor, eller fortsæt direkte med flashcards. Kortoversigten er nu sekundær i stedet for det første, du møder.</p>
       </div>
       <div class="hero-actions">
-        <button class="btn primary" id="continueBtn">Fortsæt flashcards</button>
-        <button class="btn home-saved-btn" id="savedCardsBtn">★ Gemte kort</button>
-        <button class="btn" id="homeLiveBtn">Python Lab</button>
+        <button class="btn primary" id="continueBtn"><i data-icon="cards"></i>Fortsæt flashcards</button>
+        <button class="btn home-saved-btn" id="savedCardsBtn"><i data-icon="star"></i>Gemte kort</button>
+        <button class="btn" id="homeLiveBtn"><i data-icon="code"></i>Python Lab</button>
       </div>
     </div>
 
     <div class="quickstart">
       <div class="start-card">
-        <div class="icon">◫</div>
+        <div class="icon"><i data-icon="cards"></i></div>
         <h3>Flashcards</h3>
         <p>Ét kort ad gangen. God til teori og mundtlig træning uden at blive mødt af hele pensummet på én gang.</p>
         <button class="btn primary" data-go="study">Start flashcards</button>
       </div>
       <div class="start-card">
-        <div class="icon">⌘</div>
+        <div class="icon"><i data-icon="code"></i></div>
         <h3>Python Lab</h3>
         <p>Python-opgaver med rigtig kodekørsel og automatiske tests. Kun tilgængelig under Python.</p>
         <button class="btn" id="quickLive">Åbn Python Lab</button>
       </div>
       <div class="start-card">
-        <div class="icon">▦</div>
+        <div class="icon"><i data-icon="grid"></i></div>
         <h3>Alle kort</h3>
         <p>Brug oversigten når du specifikt vil browse, søge eller filtrere i hele materialet.</p>
         <button class="btn" data-go="browse">Åbn oversigt</button>
@@ -499,7 +499,7 @@ code{font-family:"SFMono-Regular",Consolas,monospace;background:var(--code-bg);b
         <div class="breadcrumb"><b id="studySubject"></b> / <span id="studyCategoryCrumb">Alle emner</span></div>
         <span class="filter-summary" id="studyFilterSummary"></span>
       </div>
-      <button class="btn" id="studyFiltersBtn">Filtre</button>
+      <button class="btn" id="studyFiltersBtn"><i data-icon="filter"></i>Filtre</button>
     </div>
     <div class="drawer" id="studyDrawer"></div>
 
@@ -507,9 +507,9 @@ code{font-family:"SFMono-Regular",Consolas,monospace;background:var(--code-bg);b
       <div class="study-top"><span id="studyCounter"></span><span id="studyTopic"></span></div>
       <div id="studyCardHost"></div>
       <div class="study-controls">
-        <button class="btn" id="prevCard">← Forrige</button>
-        <button class="btn primary" id="flipCard">Vend kort</button>
-        <button class="btn" id="nextCard">Næste →</button>
+        <button class="btn" id="prevCard"><i data-icon="arrowLeft"></i>Forrige</button>
+        <button class="btn primary" id="flipCard"><i data-icon="rotate"></i>Vend kort</button>
+        <button class="btn" id="nextCard">Næste<i data-icon="arrowRight"></i></button>
       </div>
       <div class="status-row" id="statusRow"></div>
       <div class="shortcuts">Mellemrum = vend · ←/→ = navigér · 1 = Kan · 2 = Usikker · 3 = Øv igen</div>
@@ -522,12 +522,12 @@ code{font-family:"SFMono-Regular",Consolas,monospace;background:var(--code-bg);b
         <div class="breadcrumb"><b id="browseSubject"></b> / <span id="browseCategoryCrumb">Alle emner</span></div>
         <span class="filter-summary" id="browseFilterSummary"></span>
       </div>
-      <button class="btn" id="browseFiltersBtn">Filtre</button>
+      <button class="btn" id="browseFiltersBtn"><i data-icon="filter"></i>Filtre</button>
     </div>
     <div class="drawer" id="browseDrawer"></div>
     <div class="browse-toolbar">
       <span class="filter-summary" id="browseCount"></span>
-      <button class="btn" id="browseToStudy">Studér dette udvalg</button>
+      <button class="btn" id="browseToStudy"><i data-icon="cards"></i>Studér dette udvalg</button>
     </div>
     <div class="cards-grid" id="browseGrid"></div>
   </section>
@@ -551,7 +551,7 @@ code{font-family:"SFMono-Regular",Consolas,monospace;background:var(--code-bg);b
         <option value="3">3 · Mellem</option>
         <option value="4">4 · Eksamensdybde</option>
       </select>
-      <button class="btn" id="randomLive">Tilfældig opgave</button>
+      <button class="btn" id="randomLive"><i data-icon="shuffle"></i>Tilfældig opgave</button>
     </div>
 
     <div class="live-layout">
@@ -571,22 +571,22 @@ code{font-family:"SFMono-Regular",Consolas,monospace;background:var(--code-bg);b
         </div>
         <div class="editorbar">
           <div class="engine"><i class="light" id="engineLight"></i><span id="engineText">Python-motor ikke indlæst</span></div>
-          <div><button class="btn" id="resetCode">Nulstil kode</button> <button class="btn" id="clearCode">Ryd</button></div>
+          <div><button class="btn" id="resetCode"><i data-icon="reset"></i>Nulstil kode</button> <button class="btn" id="clearCode"><i data-icon="trash"></i>Ryd</button></div>
         </div>
         <textarea class="code-input" id="codeInput" spellcheck="false" autocapitalize="off" aria-label="Din kode"></textarea>
         <div class="lab-bottom">
           <div class="group">
-            <button class="btn run" id="runCode" title="Kør koden og se output (Ctrl+Shift+Enter)">▶ Kør</button>
-            <button class="btn primary" id="runTests" title="Tjek løsningen med testene (Ctrl+Enter)">✓ Kør tests</button>
-            <button class="btn" id="hintBtn">Hint</button>
-            <button class="btn" id="solutionBtn">Model-svar</button>
-            <button class="btn" id="annotatedBtn">Forklaret løsning</button>
+            <button class="btn run" id="runCode" title="Kør koden og se output (Ctrl+Shift+Enter)"><i data-icon="play"></i>Kør</button>
+            <button class="btn primary" id="runTests" title="Tjek løsningen med testene (Ctrl+Enter)"><i data-icon="checkCircle"></i>Kør tests</button>
+            <button class="btn" id="hintBtn"><i data-icon="bulb"></i>Hint</button>
+            <button class="btn" id="solutionBtn"><i data-icon="fileCode"></i>Model-svar</button>
+            <button class="btn" id="annotatedBtn"><i data-icon="message"></i>Forklaret løsning</button>
           </div>
           <div class="group">
             <span class="timer" id="codingTimer">00:00</span>
-            <button class="btn" id="timerBtn">Start timer</button>
-            <button class="btn" id="livePrev" aria-label="Forrige opgave">←</button>
-            <button class="btn" id="liveNext" aria-label="Næste opgave">→</button>
+            <button class="btn" id="timerBtn"><i data-icon="timer"></i><span>Start timer</span></button>
+            <button class="btn" id="livePrev" aria-label="Forrige opgave"><i data-icon="arrowLeft"></i></button>
+            <button class="btn" id="liveNext" aria-label="Næste opgave"><i data-icon="arrowRight"></i></button>
           </div>
         </div>
         <div class="panel" id="hintPanel"></div>
@@ -759,7 +759,7 @@ function summaryText(){
 function statusButtons(id){
   const s=statusMap[id]||"", saved=!!savedMap[id];
   return `<span class="status-label">Status:</span>
-  <button class="status-btn saved-btn ${saved?"active":""}" data-save="1">${saved?"★ Gemt":"☆ Gem"}</button>
+  <button class="status-btn saved-btn ${saved?"active":""}" data-save="1">${icon("star")}${saved?"Gemt":"Gem"}</button>
   <button class="status-btn known ${s==="known"?"active":""}" data-st="known">Kan</button>
   <button class="status-btn unsure ${s==="unsure"?"active":""}" data-st="unsure">Usikker</button>
   <button class="status-btn review ${s==="review"?"active":""}" data-st="review">Øv igen</button>`;
@@ -781,7 +781,7 @@ function renderStudy(){
   $("#studyCardHost").innerHTML=`<article class="card" id="focusCard"><div class="card-inner">
     <div class="face front"><div class="meta"><span class="badge">${esc(c.type)}</span><span class="badge d${c.difficulty}">${c.difficulty} · ${diffNames[c.difficulty]}</span></div>
       <div class="topic">${esc(c.topic)}</div><h3>${c.question}</h3><div class="flip-note">Klik på kortet eller “Vend kort” for svar</div></div>
-    <div class="face back"><div class="meta"><span class="badge">${esc(c.category)}</span><span class="badge d${c.difficulty}">${c.difficulty} · ${diffNames[c.difficulty]}</span>${savedMap[c.id]?'<span class="badge saved-marker">★ Gemt</span>':''}</div>
+    <div class="face back"><div class="meta"><span class="badge">${esc(c.category)}</span><span class="badge d${c.difficulty}">${c.difficulty} · ${diffNames[c.difficulty]}</span>${savedMap[c.id]?`<span class="badge saved-marker">${icon("star")} Gemt</span>`:''}</div>
       <div class="explain-tabs">
         <button class="explain-tab active" data-mode="easy">Let forståeligt</button>
         <button class="explain-tab" data-mode="technical">Teknisk</button>
@@ -819,7 +819,7 @@ function renderBrowse(){
   $("#browseGrid").innerHTML=arr.length?arr.map((c,i)=>`<button class="mini-card" data-idx="${i}">
     <div class="meta"><span class="badge d${c.difficulty}">${c.difficulty}</span><span class="badge">${esc(c.type)}</span></div>
     <div class="topic">${esc(c.category)} · ${esc(c.topic)}</div><h3>${c.question}</h3>
-    <div class="source">${savedMap[c.id]?'<span class="saved-marker">★ Gemt</span> · ':''}${statusMap[c.id]==="known"?"✓ Kan":statusMap[c.id]==="review"?"Øv igen":statusMap[c.id]==="unsure"?"Usikker":"Ikke markeret"}</div>
+    <div class="source">${savedMap[c.id]?`<span class="saved-marker">${icon("star")} Gemt</span> · `:''}${statusMap[c.id]==="known"?"✓ Kan":statusMap[c.id]==="review"?"Øv igen":statusMap[c.id]==="unsure"?"Usikker":"Ikke markeret"}</div>
   </button>`).join(""):`<div class="empty">Ingen kort matcher filtrene.</div>`;
   $("#browseGrid").querySelectorAll(".mini-card").forEach(b=>b.onclick=()=>{studyIndex=Number(b.dataset.idx);setView("study")});
 }
@@ -873,7 +873,7 @@ function renderLive(){
   $("#codeInput").value=(c.id in liveCode)?liveCode[c.id]:c.starter;
   $("#hintPanel").classList.remove("open");$("#solutionPanel").classList.remove("open");$("#annotatedPanel").classList.remove("open");
   stopTerminal($("#results"));
-  $("#results").innerHTML=`<div class="test idle">Tryk <b>▶ Kør</b> for at køre koden (input() skriver du direkte i terminalen), eller <b>✓ Kør tests</b> for at tjekke løsningen.</div>`;
+  $("#results").innerHTML=`<div class="test idle">Tryk <b><i data-icon="play"></i> Kør</b> for at køre koden (input() skriver du direkte i terminalen), eller <b><i data-icon="checkCircle"></i> Kør tests</b> for at tjekke løsningen.</div>`;
 }
 function setEngine(st,txt){$("#engineLight").className="light"+(st?" "+st:"");$("#engineText").textContent=txt}
 /* Python runner: user code is compiled as "main.py" so errors can point at the user's own line.
@@ -1177,7 +1177,7 @@ function gotoLine(ta,n){
 }
 function setLiveBusy(b){$("#runTests").disabled=b;$("#runCode").disabled=b}
 function runFailHTML(res,what){
-  if(res.timeout)return `<div class="test fail"><b>⏱ Stoppet efter ${PY_TIMEOUT/1000} sekunder</b><p>Har du en uendelig løkke (fx en while, der aldrig bliver falsk)?</p></div>`;
+  if(res.timeout)return `<div class="test fail"><b><i data-icon="timer"></i> Stoppet efter ${PY_TIMEOUT/1000} sekunder</b><p>Har du en uendelig løkke (fx en while, der aldrig bliver falsk)?</p></div>`;
   return `<div class="test fail"><b>Fejl i ${what}</b><p>${esc(res.error||"Ukendt fejl")}</p></div>`;
 }
 /* Interactive terminal. The browser can't pause Python mid-run, so input() stops the program and
@@ -1213,11 +1213,11 @@ async function runInteractive(host,code,{setup="",textarea=null,busy=()=>{},extr
 function readTerminalLine(host,output,alive){
   return new Promise(resolve=>{
     host.innerHTML=`<div class="console waiting"><div class="console-head"><span>Terminal</span><span>Venter på input. Skriv og tryk Enter
-      <button type="button" class="term-stop" title="Stop programmet (Esc)">■ Stop</button></span></div>
+      <button type="button" class="term-stop" title="Stop programmet (Esc)"><i data-icon="stop"></i>Stop</button></span></div>
       <pre class="console-out">${esc(output)}<input class="term-in" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Input til programmet"></pre></div>`;
     const inp=host.querySelector(".term-in");
     const stop=()=>{if(!alive())return;stopTerminal(host);
-      host.innerHTML=consoleHTML(output,{label:"Output"})+`<div class="test"><b>■ Programmet blev stoppet</b><p>Det ventede på input. Tryk ▶ Kør for at starte forfra.</p></div>`;resolve(null)};
+      host.innerHTML=consoleHTML(output,{label:"Output"})+`<div class="test"><b><i data-icon="stop"></i> Programmet blev stoppet</b><p>Det ventede på input. Tryk Kør for at starte forfra.</p></div>`;resolve(null)};
     host.querySelector(".term-stop").onclick=stop;
     host.querySelector(".console-out").onclick=()=>inp.focus();
     inp.onkeydown=e=>{
@@ -1235,7 +1235,7 @@ async function runCode(){
     extra:r=>c.set!=="mandatory1"?"":r.result!==undefined
       ?`<div class="result-line"><b>result</b> = <code>${esc(r.result)}</code> <span>(${esc(r.resultType)})</span></div>`
       :`<div class="result-line warn">Der er ingen variabel med navnet <code>result</code> endnu.</div>`,
-    foot:`<p class="results-foot">Tryk <b>✓ Kør tests</b> for at tjekke, om løsningen er rigtig.</p>`});
+    foot:`<p class="results-foot">Tryk <b><i data-icon="checkCircle"></i> Kør tests</b> for at tjekke, om løsningen er rigtig.</p>`});
 }
 async function runTests(){
   const c=currentLive();if(!c)return;saveCurrentCode();stopTerminal($("#results"));setLiveBusy(true);
@@ -1249,17 +1249,17 @@ async function runTests(){
 }
 function showResults(rs){
   const c=currentLive(),ok=rs.filter(x=>x.ok).length,all=ok===rs.length&&rs.length>0;
-  const head=`<div class="results-sum ${all?"ok":"fail"}">${all?"✓ Alle tests bestået":`✕ ${ok} af ${rs.length} tests bestået`}</div>`;
+  const head=`<div class="results-sum ${all?"ok":"fail"}">${all?icon("checkCircle")+" Alle tests bestået":`${icon("xCircle")} ${ok} af ${rs.length} tests bestået`}</div>`;
   const firstErr=rs.find(r=>r.err&&r.err.phase==="run");   // same code error in every test: show it once
   $("#results").innerHTML=head+rs.map(r=>{
-    if(r.ok)return `<div class="test ok"><b>✓ ${esc(r.name)}</b>${r.note?`<p>${esc(r.note)}</p>`:""}</div>`;
+    if(r.ok)return `<div class="test ok"><b>${icon("check")} ${esc(r.name)}</b>${r.note?`<p>${esc(r.note)}</p>`:""}</div>`;
     let body=`<p>${esc(r.expect||"Ikke bestået")}</p>`;
     if(r.note)body+=`<p class="test-note">${esc(r.note)}</p>`;
     if(r.result!==undefined&&c.set==="mandatory1")body+=`<div class="result-line"><b>Din result</b> = <code>${esc(r.result)}</code> <span>(${esc(r.resultType)})</span></div>`;
     if(r.output||!r.err)body+=consoleHTML(r.output,{label:"Dit output"});
     if(r.err&&(r.err.phase!=="run"||r===firstErr))body+=pyErrorHTML(r.err);
     else if(r.err)body+=`<p class="test-note">Samme fejl som ovenfor (${esc(r.err.type)}).</p>`;
-    return `<div class="test fail"><b>✕ ${esc(r.name)}</b>${body}</div>`;
+    return `<div class="test fail"><b>${icon("x")} ${esc(r.name)}</b>${body}</div>`;
   }).join("");
   bindGotoLines($("#results"),$("#codeInput"));
   if(all){liveProgress[c.id]="passed";saveAll();renderLiveListOnly();renderSetTabs()}
@@ -1277,7 +1277,7 @@ function renderLiveListOnly(){
   if(a&&(a.offsetTop<box.scrollTop||a.offsetTop+a.offsetHeight>box.scrollTop+box.clientHeight))box.scrollTop=a.offsetTop-8;
 }
 function formatTimer(){$("#codingTimer").textContent=String(Math.floor(timerSec/60)).padStart(2,"0")+":"+String(timerSec%60).padStart(2,"0")}
-function toggleTimer(){if(timerInt){clearInterval(timerInt);timerInt=null;$("#timerBtn").textContent="Start timer"}else{$("#timerBtn").textContent="Pause timer";timerInt=setInterval(()=>{timerSec++;formatTimer()},1000)}}
+function toggleTimer(){if(timerInt){clearInterval(timerInt);timerInt=null;$("#timerBtn span").textContent="Start timer"}else{$("#timerBtn span").textContent="Pause timer";timerInt=setInterval(()=>{timerSec++;formatTimer()},1000)}}
 
 /* bindings */
 $$(".navbtn").forEach(b=>b.onclick=()=>setView(b.dataset.view));

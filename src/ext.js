@@ -34,7 +34,43 @@ setView=function(view){
 syncSubject=function(){
   _origSync();
   $$('.navbtn[data-view="podcasts"],.navbtn[data-view="netlab"]').forEach(b=>b.style.display=subject==="Netværk"?"":"none");
+  $$(".subject-switch-large").forEach(s=>s.dataset.active=subject);
+  requestAnimationFrame(moveNavInd);
 };
+
+/* ---------- motion: nav icons, sliding indicator, page transitions ---------- */
+const NAV_ICONS={home:"home",learn:"book",study:"cards",browse:"grid",live:"code",netlab:"target",podcasts:"headphones",videos:"playCircle"};
+$$(".navbtn[data-view]").forEach(b=>{if(NAV_ICONS[b.dataset.view]&&!b.querySelector(".ic"))b.insertAdjacentHTML("afterbegin",icon(NAV_ICONS[b.dataset.view]))});
+const navInd=document.createElement("span");navInd.className="nav-ind";$(".nav-center")?.prepend(navInd);
+function moveNavInd(){
+  const a=$(".nav-center .navbtn.active");
+  if(!a||!a.offsetWidth){navInd.style.opacity="0";return;}
+  navInd.style.width=a.offsetWidth+"px";
+  navInd.style.transform=`translateX(${a.offsetLeft}px)`;
+  navInd.style.opacity="1";
+}
+window.addEventListener("resize",moveNavInd);
+document.fonts?.ready.then(moveNavInd);
+const _innerSetView=setView;
+setView=function(view){
+  const prev=currentView;
+  _innerSetView(view);
+  moveNavInd();
+  const sec=$("#"+currentView+"View");
+  if(!sec||(prev===currentView&&sec.classList.contains("view-enter")))return;
+  sec.classList.remove("view-enter");void sec.offsetWidth;sec.classList.add("view-enter");
+  clearTimeout(sec._ve);sec._ve=setTimeout(()=>sec.classList.remove("view-enter"),1200);
+};
+const _origTheme=applyTheme;
+applyTheme=function(t){
+  const r=document.documentElement;r.classList.add("theme-anim");
+  _origTheme(t);clearTimeout(r._ta);r._ta=setTimeout(()=>r.classList.remove("theme-anim"),500);
+};
+document.addEventListener("pointermove",e=>{
+  const c=e.target.closest?.(".start-card,.nq-topic,.category-card");if(!c)return;
+  const r=c.getBoundingClientRect();
+  c.style.setProperty("--mx",e.clientX-r.left+"px");c.style.setProperty("--my",e.clientY-r.top+"px");
+},{passive:true});
 changeSubject=function(s){
   if((currentView==="podcasts"||currentView==="netlab")&&s!=="Netværk")currentView="home";
   _origChange(s);
@@ -43,19 +79,19 @@ renderHome=function(){
   _origHome();
   const g=GUIDES.filter(x=>x.subject===subject).length, v=VIDEOS.filter(x=>x.subject===subject).length;
   const cards=subject==="Python"?[
-    ["◧","Lær","Visuelle guides til hele Python-pensum: datatyper, slicing, loops, funktioner, filer, exceptions, sockets og Linux — med interaktive værktøjer.",`<button class="btn primary" data-go2="learn">Åbn guides (${g})</button>`],
-    ["◫","Flashcards","Ét kort ad gangen med let og teknisk forklaring. Marker Kan / Usikker / Øv igen.",`<button class="btn" data-go2="study">Start flashcards</button>`],
-    ["⌘","Python Lab",`${LIVE_CHALLENGES.length} øvelser og de ${MANDATORY_1.length} spørgsmål fra Mandatory opgave 1 med automatiske tests — plus en fri sandbox, hvor du kan køre din egen kode.`,`<button class="btn" data-go2="live">Åbn Python Lab</button><button class="btn" data-go2="sandbox">Sandbox</button>`],
-    ["▶","Videoer",`${v} udvalgte videoer (Corey Schafer, NetworkChuck m.fl.) sorteret efter emne.`,`<button class="btn" data-go2="videos">Se videoer</button>`]
+    ["book","Lær","Visuelle guides til hele Python-pensum: datatyper, slicing, loops, funktioner, filer, exceptions, sockets og Linux — med interaktive værktøjer.",`<button class="btn primary" data-go2="learn">Åbn guides (${g})</button>`],
+    ["cards","Flashcards","Ét kort ad gangen med let og teknisk forklaring. Marker Kan / Usikker / Øv igen.",`<button class="btn" data-go2="study">Start flashcards</button>`],
+    ["code","Python Lab",`${LIVE_CHALLENGES.length} øvelser og de ${MANDATORY_1.length} spørgsmål fra Mandatory opgave 1 med automatiske tests — plus en fri sandbox, hvor du kan køre din egen kode.`,`<button class="btn" data-go2="live">Åbn Python Lab</button><button class="btn" data-go2="sandbox">Sandbox</button>`],
+    ["playCircle","Videoer",`${v} udvalgte videoer (Corey Schafer, NetworkChuck m.fl.) sorteret efter emne.`,`<button class="btn" data-go2="videos">Se videoer</button>`]
   ]:[
-    ["◧","Lær","Visuelle guides for hvert lag: interaktive headers, sekvensdiagrammer, subnet- og fragmenteringsberegner og et header-galleri til eksamen.",`<button class="btn primary" data-go2="learn">Åbn guides (${g})</button>`],
-    ["◫","Flashcards","Ét kort ad gangen med let og teknisk forklaring. Marker Kan / Usikker / Øv igen.",`<button class="btn" data-go2="study">Start flashcards</button>`],
-    ["✓","Netværk Lab","Multiple choice pr. lag: peg på felter i headerne, find det manglende trin i diagrammer, sæt ting i rækkefølge og regn subnets.",`<button class="btn primary" data-go2="netlab">Test dig selv</button>`],
-    ["♫","Podcasts","4 lydafsnit (ca. 90 min) om lagene — med klikbar transskription, så du kan læse med.",`<button class="btn" data-go2="podcasts">Lyt</button>`],
-    ["▶","Videoer",`${v} udvalgte videoer, bl.a. Jim Kurose (forfatteren til jeres lærebog) og Daniels Wireshark-serie.`,`<button class="btn" data-go2="videos">Se videoer</button>`]
+    ["book","Lær","Visuelle guides for hvert lag: interaktive headers, sekvensdiagrammer, subnet- og fragmenteringsberegner og et header-galleri til eksamen.",`<button class="btn primary" data-go2="learn">Åbn guides (${g})</button>`],
+    ["cards","Flashcards","Ét kort ad gangen med let og teknisk forklaring. Marker Kan / Usikker / Øv igen.",`<button class="btn" data-go2="study">Start flashcards</button>`],
+    ["target","Netværk Lab","Multiple choice pr. lag: peg på felter i headerne, find det manglende trin i diagrammer, sæt ting i rækkefølge og regn subnets.",`<button class="btn primary" data-go2="netlab">Test dig selv</button>`],
+    ["headphones","Podcasts","4 lydafsnit (ca. 90 min) om lagene — med klikbar transskription, så du kan læse med.",`<button class="btn" data-go2="podcasts">Lyt</button>`],
+    ["playCircle","Videoer",`${v} udvalgte videoer, bl.a. Jim Kurose (forfatteren til jeres lærebog) og Daniels Wireshark-serie.`,`<button class="btn" data-go2="videos">Se videoer</button>`]
   ];
   /* #quickLive is kept (hidden) because the original syncSubject() toggles it */
-  $(".quickstart").innerHTML=cards.map(c=>`<div class="start-card"><div class="icon">${c[0]}</div><h3>${c[1]}</h3><p>${c[2]}</p>${c[3]}</div>`).join("")+`<span id="quickLive" hidden></span>`;
+  $(".quickstart").innerHTML=cards.map(c=>`<div class="start-card"><div class="icon">${icon(c[0])}</div><h3>${c[1]}</h3><p>${c[2]}</p><div class="sc-actions">${c[3]}</div></div>`).join("")+`<span id="quickLive" hidden></span>`;
   $$("[data-go2]").forEach(b=>b.onclick=()=>{const t=b.dataset.go2;if(t==="sandbox"){setView("live");openSandbox();}else setView(t)});
 };
 
@@ -137,7 +173,7 @@ function hydrate(root){
   root.querySelectorAll("[data-viz]").forEach(el=>{const f=VIZ[el.dataset.viz];if(f)f(el)});
   root.querySelectorAll("[data-chk]").forEach(el=>renderChecklist(el,el.dataset.chk));
   root.querySelectorAll("pre[data-run]").forEach(pre=>{
-    const b=document.createElement("button");b.className="btn";b.textContent="▶ Prøv i sandbox";b.style.margin="-8px 0 14px";
+    const b=document.createElement("button");b.className="btn";b.innerHTML=icon("flask")+"Prøv i sandbox";b.style.margin="-8px 0 14px";
     b.onclick=()=>{setView("live");openSandbox(pre.innerText.replace(/\n$/,""))};
     pre.after(b);
   });
@@ -274,9 +310,9 @@ function renderPodcasts(){
   $("#podList").innerHTML=PODCASTS.map((p,i)=>`<article class="pod" id="pod-${p.id}">
     <div class="pod-head"><div class="pod-num">${i+1}</div><div><h3>${esc(p.title)}</h3><div class="pod-sub">${p.mins} min · ${esc(p.layers)}</div></div></div>
     <p>${p.desc}</p>
-    ${POD_VIDEO[p.id]?`<div class="pv-mode" role="group" aria-label="Vælg visning"><button data-mode="video">▶ Video</button><button data-mode="audio">♪ Kun lyd</button></div>`:""}
+    ${POD_VIDEO[p.id]?`<div class="pv-mode" role="group" aria-label="Vælg visning"><button data-mode="video">${icon("video")}Video</button><button data-mode="audio">${icon("headphones")}Kun lyd</button></div>`:""}
     <div class="pv-wrap">
-      ${POD_VIDEO[p.id]?`<div class="pv-stage unstarted"><div class="pv-scene"></div><div class="pv-playbig" aria-hidden="true"><span>▶</span></div><button class="pv-fs" title="Fuld skærm" aria-label="Fuld skærm">⛶</button></div>`:""}
+      ${POD_VIDEO[p.id]?`<div class="pv-stage unstarted"><div class="pv-scene"></div><div class="pv-playbig" aria-hidden="true"><span>${icon("play")}</span></div><button class="pv-fs" title="Fuld skærm" aria-label="Fuld skærm">${icon("maximize")}</button></div>`:""}
       <div class="pod-cc idle" aria-hidden="true"><div class="cc-prev"></div><div class="cc-now">Underteksterne vises her, når du trykker afspil.</div></div>
       <audio controls preload="none" src="${MEDIA_BASE}podcasts/${p.file}"></audio>
       ${POD_VIDEO[p.id]?`<div class="pv-chapters" aria-label="Kapitler"></div>`:""}
@@ -284,15 +320,15 @@ function renderPodcasts(){
     <b style="font-size:12px">Hovedpointer</b>
     <ul class="pod-take">${p.take.map(t=>`<li>${t}</li>`).join("")}</ul>
     ${p.caveat?`<div class="g-box warn" style="margin-top:10px"><b class="t">Vær kritisk</b><p>${p.caveat}</p></div>`:""}
-    <div class="pod-tools"><button class="btn" data-cc aria-pressed="true">Undertekster: til</button><button class="btn" data-tr="${p.id}">Vis transskription</button>${(p.guides||[]).map(g=>{const gg=GUIDES.find(x=>x.id===g);return gg?`<button class="btn" data-pg="${g}">Guide: ${esc(gg.title)}</button>`:""}).join("")}</div>
+    <div class="pod-tools"><button class="btn" data-cc aria-pressed="true">Undertekster: til</button><button class="btn" data-tr="${p.id}">${icon("fileText")}<span>Vis transskription</span></button>${(p.guides||[]).map(g=>{const gg=GUIDES.find(x=>x.id===g);return gg?`<button class="btn" data-pg="${g}">Guide: ${esc(gg.title)}</button>`:""}).join("")}</div>
     <div class="transcript" id="tr-${p.id}"><input class="input tr-search" placeholder="Søg i transskriptionen…"><div class="tr-lines">${p.lines.map(l=>`<div class="tl" data-t="${l[0]}"><button data-seek="${l[0]}">${fmt(l[0])}</button><span>${esc(l[1])}</span></div>`).join("")}</div></div>
   </article>`).join("");
-  $$("#podList [data-tr]").forEach(b=>b.onclick=()=>{const t=$("#tr-"+b.dataset.tr);t.classList.toggle("open");b.textContent=t.classList.contains("open")?"Skjul transskription":"Vis transskription"});
+  $$("#podList [data-tr]").forEach(b=>b.onclick=()=>{const t=$("#tr-"+b.dataset.tr);t.classList.toggle("open");b.querySelector("span").textContent=t.classList.contains("open")?"Skjul transskription":"Vis transskription"});
   $$("#podList [data-pg]").forEach(b=>b.onclick=()=>openGuide(b.dataset.pg));
   /* subtitles under the player: on/off is remembered for all episodes */
   const setCC=on=>{try{localStorage.setItem("its_pod_cc",on?"1":"0")}catch{}
     $$("#podList .pod").forEach(p=>p.classList.toggle("cc-off",!on));
-    $$("#podList [data-cc]").forEach(b=>{b.textContent=`Undertekster: ${on?"til":"fra"}`;b.setAttribute("aria-pressed",String(on))})};
+    $$("#podList [data-cc]").forEach(b=>{b.innerHTML=`${icon("captions")}Undertekster: ${on?"til":"fra"}`;b.setAttribute("aria-pressed",String(on))})};
   setCC(localStorage.getItem("its_pod_cc")!=="0");
   /* episodes with visual scenes can be watched as video or listened to as audio only (remembered) */
   const setMode=mode=>{try{localStorage.setItem("its_pod_mode",mode)}catch{}
@@ -326,11 +362,11 @@ function renderPodcasts(){
 /* ---------- sandbox ---------- */
 function openSandbox(code){
   $("#liveMain").classList.add("hidden");$("#sandboxPanel").classList.remove("hidden");
-  $("#sandboxBtn").textContent="← Tilbage til opgaver";
+  $("#sandboxBtn").innerHTML=icon("arrowLeft")+"<span>Tilbage til opgaver</span>";
   if(code!==undefined){$("#sbCode").value=code;stopTerminal($("#sbOut"));$("#sbOut").innerHTML=""}
   else if(!$("#sbCode").value)$("#sbCode").value=localStorage.getItem("its_sandbox")||"# Skriv frit Python her og tryk ▶ Kør (Ctrl+Enter)\nname = input('Hvad hedder du? ')\nprint('Hej', name)\n\nfor i in range(3):\n    print(i, i ** 2)";
 }
-function closeSandbox(){$("#liveMain").classList.remove("hidden");$("#sandboxPanel").classList.add("hidden");$("#sandboxBtn").textContent="🧪 Fri sandbox"}
+function closeSandbox(){$("#liveMain").classList.remove("hidden");$("#sandboxPanel").classList.add("hidden");$("#sandboxBtn").innerHTML=icon("flask")+"<span>Fri sandbox</span>"}
 async function runSandbox(){
   const code=$("#sbCode").value;localStorage.setItem("its_sandbox",code);
   await runInteractive($("#sbOut"),code,{textarea:$("#sbCode"),busy:b=>$("#sbRun").disabled=b});

@@ -11,7 +11,8 @@ from media_meta import VIDEOS, VIDEO_GROUPS, PODCASTS
 rd = lambda n: open(os.path.join(EXT, n), encoding='utf-8').read()
 css, data, gnet, gpy, extjs, accjs = rd('ext.css'), rd('data.js'), rd('guides_net.js'), rd('guides_py.js'), rd('ext.js'), rd('account.js')
 quizjs, netlabjs, podvjs = rd('quiz_net.js'), rd('netlab.js'), rd('podvideo.js')
-css += '\n' + rd('podvideo.css')
+css += '\n' + rd('podvideo.css') + '\n' + rd('theme.css')
+iconsjs = rd('icons.js')
 
 # Python-guides: every backslash is meant literally (code shown/run as Python)
 gpy = gpy.replace('\\', '\\\\')
@@ -105,10 +106,15 @@ def rep(old, new, count=1):
     assert html.count(old) == count, (old, html.count(old))
     html = html.replace(old, new)
 
+fonts = ('<link rel="preconnect" href="https://fonts.googleapis.com">\n<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>\n'
+         '<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">\n')
+rep('<title>', fonts + '<title>')
+# icon() must exist before the page's own scripts and templates run
+rep('</script>\n</head>', '</script>\n<script>\n' + iconsjs + '\n</script>\n</head>')
 rep('</style>\n<script>', '\n' + css + '</style>\n<script>')
 rep('<header class="topnav">', '<header class="topnav" id="topnav">')
 account_ui = '''<div class="account-wrap">
-    <button class="account-btn" id="accountBtn" aria-haspopup="true" aria-expanded="false"><i class="acc-dot"></i>👤<span>Log ind</span></button>
+    <button class="account-btn" id="accountBtn" aria-haspopup="true" aria-expanded="false"><i class="acc-dot"></i><i data-icon="user"></i><span>Log ind</span></button>
     <div class="account-menu" id="accountMenu" hidden></div>
   </div>
   '''
@@ -116,9 +122,9 @@ rep('<button class="download-btn" id="downloadOffline"', account_ui + '<button c
 rep('<button class="navbtn active" data-view="home">Start</button>',
     '<button class="navbtn active" data-view="home">Start</button>\n    <button class="navbtn" data-view="learn">Lær</button>')
 rep('<button class="navbtn" data-view="live">Python Lab</button>',
-    '<button class="navbtn" data-view="live">Python Lab</button>\n    <button class="navbtn" data-view="netlab">Netværk Lab</button>\n    <button class="navbtn" data-view="podcasts">Podcasts</button>\n    <button class="navbtn" data-view="videos">Videoer</button>\n    <button class="navbtn nav-mobile-only" id="menuDownload">⬇ Download offline</button>')
-rep('<button class="btn" id="randomLive">Tilfældig opgave</button>',
-    '<button class="btn" id="randomLive">Tilfældig opgave</button>\n        <button class="btn primary" id="sandboxBtn">🧪 Fri sandbox</button>')
+    '<button class="navbtn" data-view="live">Python Lab</button>\n    <button class="navbtn" data-view="netlab">Netværk Lab</button>\n    <button class="navbtn" data-view="podcasts">Podcasts</button>\n    <button class="navbtn" data-view="videos">Videoer</button>\n    <button class="navbtn nav-mobile-only" id="menuDownload"><i data-icon="download"></i>Download offline</button>')
+rep('<button class="btn" id="randomLive"><i data-icon="shuffle"></i>Tilfældig opgave</button>',
+    '<button class="btn" id="randomLive"><i data-icon="shuffle"></i>Tilfældig opgave</button>\n        <button class="btn primary" id="sandboxBtn"><i data-icon="flask"></i><span>Fri sandbox</span></button>')
 rep('<div class="live-layout">', '<div class="live-layout" id="liveMain">')
 
 sandbox = '''
@@ -126,7 +132,7 @@ sandbox = '''
       <div class="lab-head"><div class="meta"><span class="badge d2">Sandbox</span></div><h2>Fri Python-sandbox</h2>
         <p>Skriv og kør din egen kode, fx eksamensopgaverne. Når programmet kalder <code>input()</code>, skriver du svaret direkte i terminalen og trykker Enter. Ctrl+Enter kører. Koden gemmes i browseren.</p></div>
       <textarea class="code-input" id="sbCode" spellcheck="false" autocapitalize="off" aria-label="Din kode"></textarea>
-      <div class="lab-bottom"><div class="group"><button class="btn run" id="sbRun">▶ Kør</button><button class="btn" id="sbClear">Ryd</button></div>
+      <div class="lab-bottom"><div class="group"><button class="btn run" id="sbRun"><i data-icon="play"></i>Kør</button><button class="btn" id="sbClear"><i data-icon="trash"></i>Ryd</button></div>
         <span class="lab-note">Kører Python 3 i browseren (Pyodide) · stoppes efter 10 sek.</span></div>
       <div class="results" id="sbOut" aria-live="polite"></div>
     </section>
@@ -160,7 +166,7 @@ html = html.replace('</main>', views + '</main>', 1)
 account_dialog = '''
 <dialog class="account-dialog" id="accountDialog" data-mode="login" aria-labelledby="accTitle">
   <form id="accForm" method="dialog" novalidate>
-    <button type="button" class="acc-close" id="accClose" aria-label="Luk">✕</button>
+    <button type="button" class="acc-close" id="accClose" aria-label="Luk"><i data-icon="x"></i></button>
     <h2 id="accTitle">Din konto</h2>
     <div class="acc-tabs" role="tablist"><button type="button" class="acc-tab" role="tab" data-mode="login">Log ind</button><button type="button" class="acc-tab" role="tab" data-mode="register">Opret konto</button></div>
     <p class="acc-intro" id="accIntro"></p>

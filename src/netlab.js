@@ -286,17 +286,17 @@ function nqShowHome(){
   $("#nqBody").innerHTML=`
     <p class="nq-lead">Multiple choice med rigtige headere, sekvensdiagrammer, rækkefølger og beregninger. Du får svar og forklaring med det samme. Det, du svarer forkert på, kommer oftere igen.</p>
     <div class="nq-actions">
-      <button class="btn run" id="nqExam">Eksamensøvelse · ${NQ_EXAM} blandede</button>
-      <button class="btn" id="nqWeakBtn" ${weak?"":"disabled"}>Øv svage punkter${weak?` (${weak})`:""}</button>
+      <button class="btn run" id="nqExam">${icon("trophy")}Eksamensøvelse · ${NQ_EXAM} blandede</button>
+      <button class="btn" id="nqWeakBtn" ${weak?"":"disabled"}>${icon("target")}Øv svage punkter${weak?` (${weak})`:""}</button>
     </div>
     <div class="nq-topics">${NQ_TOPICS.map(t=>{
       const m=nqMastery(t.id),c=nqTopicCounts(t.id);
       return `<button class="nq-topic" data-topic="${t.id}">
-        <span class="nq-topic-icon">${t.icon}</span>
+        <span class="nq-topic-icon">${icon(t.icon)}</span>
         <b>${esc(t.name)}</b><small>${esc(t.desc)}</small>
         <span class="nq-bar"><i style="width:${m}%"></i></span>
         <span class="nq-topic-meta"><span>${m}% mestret</span><span>${c.answered?`${c.pct}% rigtige svar`:`${c.pool} spørgsmål`}</span></span>
-        <span class="nq-topic-go">Start runde →</span>
+        <span class="nq-topic-go">Start runde ${icon("arrowRight")}</span>
       </button>`}).join("")}</div>
     <div class="nq-types"><b>Spørgsmålstyper:</b> tekstspørgsmål · hvad hedder feltet? · peg på feltet i headeren · hvad bruges feltet til? · feltstørrelser · hvad mangler i diagrammet? · sæt i rækkefølge · subnetting, fragmentering og seq/ack-beregninger</div>`;
   $$("#nqBody [data-topic]").forEach(b=>b.onclick=()=>nqStart(b.dataset.topic));
@@ -328,7 +328,7 @@ function nqShowQuestion(){
   const r=nqRound,q=r.q,n=r.items.length,topic=nqTopic(q.topic||q.spec.t);
   $("#nqBody").innerHTML=`
     <div class="nq-top">
-      <button class="btn" id="nqQuit">← Emner</button>
+      <button class="btn" id="nqQuit">${icon("arrowLeft")}Emner</button>
       <div class="nq-progress" aria-label="Fremdrift"><i style="width:${Math.round(100*r.i/n)}%"></i></div>
       <span class="nq-count">${r.i+1} / ${n}</span>
     </div>
@@ -349,7 +349,7 @@ function nqShowQuestion(){
 function nqDrawAnswer(){
   const r=nqRound,q=r.q,box=$("#nqAnswer"),done=r.answered;
   if(q.kind==="hpoint"||q.kind==="hclue"){
-    box.innerHTML=done?"":`<div class="nq-pointhint">☝ Klik på feltet i headeren ovenfor.</div><button class="btn nq-skip" id="nqSkip">Jeg ved det ikke</button>`;
+    box.innerHTML=done?"":`<div class="nq-pointhint">${icon("pointer")} Klik på feltet i headeren ovenfor.</div><button class="btn nq-skip" id="nqSkip">Jeg ved det ikke</button>`;
     if(!done)$("#nqSkip").onclick=()=>nqAnswerPoint(-1);
     return;
   }
@@ -373,7 +373,7 @@ function nqDrawAnswer(){
       let cls="nq-opt";
       if(done){if(o.ok)cls+=" ok";else if(sel.has(i))cls+=" bad";else cls+=" dim"}
       else if(sel.has(i))cls+=" sel";
-      return `<button class="${cls}" data-o="${i}" ${done?"disabled":""}><span class="nq-key">${q.multi?(sel.has(i)?"✓":""):i+1}</span><span>${esc(o.label)}</span></button>`}).join("")}</div>
+      return `<button class="${cls}" data-o="${i}" ${done?"disabled":""}><span class="nq-key">${q.multi?(sel.has(i)?icon("check"):""):i+1}</span><span>${esc(o.label)}</span></button>`}).join("")}</div>
     ${done?"":`<div class="nq-row">${q.multi?`<button class="btn primary" id="nqSubmit" ${sel.size?"":"disabled"}>Svar</button>`:""}<button class="btn nq-skip" id="nqSkip">Jeg ved det ikke</button></div>`}`;
   if(done)return;
   box.querySelectorAll("[data-o]").forEach(b=>b.onclick=()=>nqPickOption(+b.dataset.o));
@@ -406,7 +406,7 @@ function nqShowFeedback(){
   const guide=q.g&&GUIDES.find(g=>g.id===q.g);
   const orderList=q.kind==="order"?`<ol class="nq-solution">${q.items.map(t=>`<li>${esc(t)}</li>`).join("")}</ol>`:"";
   fb.hidden=false;fb.className=`nq-feedback ${r.ok?"ok":"bad"}`;
-  fb.innerHTML=`<div class="nq-verdict">${r.ok?"✓ Rigtigt":"✕ Ikke helt"}</div>
+  fb.innerHTML=`<div class="nq-verdict">${r.ok?icon("checkCircle")+" Rigtigt":icon("xCircle")+" Ikke helt"}</div>
     ${orderList}<div class="nq-ex">${q.exHTML||q.ex||""}</div>
     <div class="nq-row">${guide?`<button class="btn" id="nqGuide">Læs: ${esc(guide.title)}</button>`:""}<span style="flex:1"></span>
     <button class="btn primary nq-next" id="nqNextBtn">${r.i+1<r.items.length?"Næste →":"Se resultat →"}</button></div>`;
@@ -428,7 +428,7 @@ function nqShowDone(){
       <button class="btn ${wrong.length?"":"run"}" id="nqAgain">Ny runde</button>
       <button class="btn" id="nqHome">Til emner</button>
     </div>
-    <ol class="nq-review">${r.results.map(x=>`<li class="${x.ok?"ok":"bad"}"><span>${x.ok?"✓":"✕"}</span><div>${x.prompt}</div></li>`).join("")}</ol>
+    <ol class="nq-review">${r.results.map(x=>`<li class="${x.ok?"ok":"bad"}"><span>${icon(x.ok?"check":"x")}</span><div>${x.prompt}</div></li>`).join("")}</ol>
   </article>`;
   if(wrong.length)$("#nqRetry").onclick=()=>nqStart("retry",wrong);
   $("#nqAgain").onclick=()=>nqStart(r.mode==="retry"?"weak":r.mode);

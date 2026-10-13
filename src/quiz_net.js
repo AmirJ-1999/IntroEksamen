@@ -2,12 +2,12 @@
 /* Håndskrevne spørgsmål: a[0..c-1] er de rigtige svar (c = 1 hvis udeladt); rækkefølgen blandes ved visning.
    v = visuel: {h: header, m: feltnavn} markerer et felt, {seq: diagram} viser et sekvensdiagram. g = guide-id. */
 const NQ_TOPICS=[
-  {id:"grundlag",name:"Grundlag",icon:"◫",desc:"Lagmodellen, PDU'er, indkapsling og forsinkelser",guide:"net-model"},
-  {id:"app",name:"Application",icon:"✉",desc:"HTTP, DNS, SMTP og sockets",guide:"net-dns"},
-  {id:"transport",name:"Transport",icon:"⇄",desc:"UDP, TCP, handshake, seq/ack, flow og congestion control",guide:"net-tcphdr"},
-  {id:"network",name:"Network",icon:"◎",desc:"IPv4/IPv6, subnetting, fragmentering, DHCP, NAT og ICMP",guide:"net-ipv4"},
-  {id:"link",name:"Link & WiFi",icon:"⌁",desc:"Ethernet, MAC, ARP, switches, CSMA og 802.11",guide:"net-ethernet"},
-  {id:"tools",name:"Wireshark & værktøjer",icon:"⌕",desc:"Filtre, ping, traceroute og kommandoer",guide:"net-wireshark"}
+  {id:"grundlag",name:"Grundlag",icon:"layers",desc:"Lagmodellen, PDU'er, indkapsling og forsinkelser",guide:"net-model"},
+  {id:"app",name:"Application",icon:"globe",desc:"HTTP, DNS, SMTP og sockets",guide:"net-dns"},
+  {id:"transport",name:"Transport",icon:"transfer",desc:"UDP, TCP, handshake, seq/ack, flow og congestion control",guide:"net-tcphdr"},
+  {id:"network",name:"Network",icon:"share",desc:"IPv4/IPv6, subnetting, fragmentering, DHCP, NAT og ICMP",guide:"net-ipv4"},
+  {id:"link",name:"Link & WiFi",icon:"wifi",desc:"Ethernet, MAC, ARP, switches, CSMA og 802.11",guide:"net-ethernet"},
+  {id:"tools",name:"Wireshark & værktøjer",icon:"search",desc:"Filtre, ping, traceroute og kommandoer",guide:"net-wireshark"}
 ];
 /* guide-gruppe → emne (knap "test dig selv" i guiderne) */
 const NQ_GUIDE_TOPIC={"Grundlag":"grundlag","Application":"app","Transport":"transport","Network":"network","Data Link & WiFi":"link","Værktøjer":"tools"};

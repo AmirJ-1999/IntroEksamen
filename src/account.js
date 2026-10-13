@@ -175,7 +175,7 @@ function fillAccountMenu(){
   $("#accountMenu").innerHTML=`<div class="acc-who">Logget ind som<b>${esc(account.username)}</b></div>
     <div class="acc-status" data-sync="${syncState}"><i></i>${esc(syncLabel())}</div>
     <p class="acc-note">Du ser kontoens fremgang. Den gemmes online. Når du logger ud, vises denne browsers egen fremgang igen.</p>
-    <button class="btn" id="accSyncNow">⟳ Synkronisér nu</button><button class="btn" id="accLogout">Log ud</button>`;
+    <button class="btn" id="accSyncNow">${icon("sync")}Synkronisér nu</button><button class="btn" id="accLogout">${icon("logout")}Log ud</button>`;
   $("#accSyncNow").onclick=()=>{syncMeta.dirty?pushSync():pullSync()};
   $("#accLogout").onclick=logout;
 }
