@@ -61,6 +61,11 @@ renderHome=function(){
 
 /* ---------- mobile dropdown menu ---------- */
 $("#mobileMenu").onclick=()=>$("#topnav").classList.toggle("menu-open");
+// the logo takes you back to the start page (plain clicks only, so ctrl/middle-click still opens a new tab)
+$("#brandHome").onclick=e=>{
+  if(e.button!==0||e.ctrlKey||e.metaKey||e.shiftKey||e.altKey)return;
+  e.preventDefault();setView("home");
+};
 // on phones the download button lives in the menu
 $("#menuDownload").onclick=()=>{$("#topnav").classList.remove("menu-open");$("#downloadOffline").click()};
 if(location.protocol==="file:")$("#menuDownload").remove();
