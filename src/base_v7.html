@@ -372,10 +372,10 @@ code{font-family:"SFMono-Regular",Consolas,monospace;background:var(--code-bg);b
     <button class="navbtn active" data-view="home">Start</button>
     <button class="navbtn" data-view="study">Flashcards</button>
     <button class="navbtn" data-view="browse">Alle kort</button>
-    <button class="navbtn" data-view="live">Live Coding</button>
+    <button class="navbtn" data-view="live">Python Lab</button>
   </nav>
 
-  <button class="download-btn" id="downloadOffline" title="Download hele siden som én HTML-fil. Flashcards virker uden internet; Live Coding kræver internet til Python-motoren.">⬇<span>Download offline</span></button>
+  <button class="download-btn" id="downloadOffline" title="Download hele siden som én HTML-fil. Flashcards virker uden internet; Python Lab kræver internet til Python-motoren.">⬇<span>Download offline</span></button>
 
   <div class="theme-toggle" role="group" aria-label="Vælg tema">
     <button data-theme-btn="light" title="Lyst tema">☀<span>Lys</span></button>
@@ -421,7 +421,7 @@ code{font-family:"SFMono-Regular",Consolas,monospace;background:var(--code-bg);b
       <div class="hero-actions">
         <button class="btn primary" id="continueBtn">Fortsæt flashcards</button>
         <button class="btn home-saved-btn" id="savedCardsBtn">★ Gemte kort</button>
-        <button class="btn" id="homeLiveBtn">Live Coding</button>
+        <button class="btn" id="homeLiveBtn">Python Lab</button>
       </div>
     </div>
 
@@ -434,9 +434,9 @@ code{font-family:"SFMono-Regular",Consolas,monospace;background:var(--code-bg);b
       </div>
       <div class="start-card">
         <div class="icon">⌘</div>
-        <h3>Live Coding</h3>
+        <h3>Python Lab</h3>
         <p>Python-opgaver med rigtig kodekørsel og automatiske tests. Kun tilgængelig under Python.</p>
-        <button class="btn" id="quickLive">Åbn Live Coding</button>
+        <button class="btn" id="quickLive">Åbn Python Lab</button>
       </div>
       <div class="start-card">
         <div class="icon">▦</div>
@@ -660,7 +660,7 @@ function renderHome(){
   syncSubject();
   $("#homeTitle").textContent=subject;
   $("#homeText").textContent=subject==="Python"
-    ?"Start med fundamentet, vælg et emne og arbejd dig gradvist op. Live Coding ligger som en separat træningsform."
+    ?"Start med fundamentet, vælg et emne og arbejd dig gradvist op. Python Lab ligger som en separat træningsform."
     :"Start med TCP/IP-modellen og arbejd dig ned gennem lagene. Vælg et emne direkte uden først at åbne hele kortoversigten.";
   const all=subjectCards(), stats=statusStats(all);
   $("#statTotal").textContent=all.length;$("#statKnown").textContent=stats.known;$("#statReview").textContent=stats.review;$("#statSaved").textContent=stats.saved;$("#statPct").textContent=stats.pct+"%";
@@ -842,16 +842,72 @@ function renderLive(){
   $("#liveTitle").textContent=c.title;$("#livePrompt").innerHTML=c.prompt;$("#liveReq").innerHTML=`<b>Krav:</b> ${c.requirements}<br><b>Kilde:</b> ${esc(c.source)}`;
   $("#codeInput").value=(c.id in liveCode)?liveCode[c.id]:c.starter;
   $("#hintPanel").classList.remove("open");$("#solutionPanel").classList.remove("open");$("#annotatedPanel").classList.remove("open");
-  $("#results").innerHTML=`<div class="test idle">Tryk <b>▶ Kør</b> for at se dit output, eller <b>✓ Kør tests</b> for at tjekke løsningen.</div>`;
+  stopTerminal($("#results"));
+  $("#results").innerHTML=`<div class="test idle">Tryk <b>▶ Kør</b> for at køre koden (input() skriver du direkte i terminalen), eller <b>✓ Kør tests</b> for at tjekke løsningen.</div>`;
 }
 function setEngine(st,txt){$("#engineLight").className="light"+(st?" "+st:"");$("#engineText").textContent=txt}
 /* Python runner: user code is compiled as "main.py" so errors can point at the user's own line.
    Each test returns output, a structured error (type/msg/line) and — for answer tests — a note. */
 const PY_RUNNER=String.raw`
-import json, io, contextlib, builtins, traceback, ast
+import json, io, contextlib, builtins, traceback, ast, os, random
 user_code = __USER_CODE__
 tests = json.loads(__TESTS_JSON__)
 MAX_OUT = 20000
+if "_ROOT" not in globals():
+    _ROOT = os.getcwd()
+
+class NeedInput(BaseException):
+    """Raised by input() in interactive runs when the user still has to type the next line."""
+
+# Interactive runs are replayed with all answers so far, so files are reset to how they
+# were when the run started (a replay must not find the file it wrote "last time").
+def snapshot(root):
+    snap, total = {"dirs": set(), "files": {}}, 0
+    for d, dirs, files in os.walk(root):
+        snap["dirs"].add(d)
+        for f in files:
+            p = os.path.join(d, f)
+            try:
+                with open(p, "rb") as fh:
+                    b = fh.read()
+            except Exception:
+                continue
+            total += len(b)
+            if total > 5000000:
+                return None
+            snap["files"][p] = b
+    return snap
+
+# A bare "except:" (or "except BaseException") would swallow NeedInput and keep looping, so in
+# interactive runs such handlers first re-raise it while the program is waiting for input.
+class WaitGuard(ast.NodeTransformer):
+    def visit_ExceptHandler(self, node):
+        self.generic_visit(node)
+        t = node.type
+        if t is None or (isinstance(t, ast.Name) and t.id == "BaseException"):
+            chk = ast.Expr(ast.Call(ast.Name("__stdin_wait__", ast.Load()), [], []))
+            ast.copy_location(chk, node.body[0])
+            node.body.insert(0, ast.fix_missing_locations(chk))
+        return node
+
+def restore(root, snap):
+    for d, dirs, files in os.walk(root, topdown=False):
+        for f in files:
+            p = os.path.join(d, f)
+            if p not in snap["files"]:
+                try: os.remove(p)
+                except Exception: pass
+        if d not in snap["dirs"]:
+            try: os.rmdir(d)
+            except Exception: pass
+    for d in sorted(snap["dirs"]):
+        os.makedirs(d, exist_ok=True)
+    for p, b in snap["files"].items():
+        try:
+            with open(p, "wb") as fh:
+                fh.write(b)
+        except Exception:
+            pass
 
 def err_info(e, phase):
     info = {"type": type(e).__name__, "msg": str(e), "line": None, "code": "", "offset": None, "phase": phase}
@@ -905,28 +961,55 @@ def run_one(test):
     inputs = list(test.get("inputs", []))
     idx = {"i": 0}
     echo = test.get("echo", False)
+    interactive = test.get("interactive", False)
+    wait = {"on": False, "cut": 0}
     out = io.StringIO()
     def fake_input(prompt=""):
+        if wait["on"]:
+            raise NeedInput()
         if idx["i"] >= len(inputs):
+            if interactive:     # pause here: show the prompt and let the user type the next line
+                out.write(str(prompt))
+                wait["on"], wait["cut"] = True, len(out.getvalue())
+                raise NeedInput()
             raise EOFError("input() blev kaldt, men der er ikke mere input")
         v = str(inputs[idx["i"]]); idx["i"] += 1
-        if echo: print(str(prompt) + v)
+        if echo: out.write(str(prompt) + v + "\n")
         return v
     res = {"ok": False, "output": "", "err": None, "expect": test.get("expect", ""), "note": ""}
+    os.chdir(_ROOT)
+    if interactive:
+        g = globals()
+        if test.get("fresh") or "_SNAP" not in g:
+            g["_SNAP"] = snapshot(_ROOT)
+        elif g["_SNAP"] is not None:
+            restore(_ROOT, g["_SNAP"])
+        random.seed(test.get("seed", 0))   # same random numbers on every replay of one run
     old = builtins.input
     builtins.input = fake_input
     try:
         try:
-            code = compile(user_code, "main.py", "exec")
+            if interactive:
+                def stdin_wait():
+                    if wait["on"]: raise NeedInput()
+                ns["__stdin_wait__"] = stdin_wait
+                code = compile(WaitGuard().visit(ast.parse(user_code, "main.py")), "main.py", "exec")
+            else:
+                code = compile(user_code, "main.py", "exec")
             with contextlib.redirect_stdout(out), contextlib.redirect_stderr(out):
                 if test.get("setup"): exec(test["setup"], ns)
                 exec(code, ns)
-        except SystemExit:
+        except (SystemExit, NeedInput):
             pass
         except BaseException as e:
             res["err"] = err_info(e, "run")
     finally:
         builtins.input = old
+    if wait["on"]:              # even if the code swallowed NeedInput, it is waiting for input
+        res["waiting"] = True
+        res["err"] = None
+        res["output"] = out.getvalue()[:wait["cut"]][-MAX_OUT:]
+        return res
     output = out.getvalue()
     res["output"] = output[:MAX_OUT] + ("\n… (output afkortet)" if len(output) > MAX_OUT else "")
     if "result" in ns:
@@ -988,6 +1071,7 @@ async function ensureWorker(){
 let pyJob=null;
 const PY_TIMEOUT=10000;
 async function pyExec(code,tests){
+  if(pyJob)throw new Error("Python kører allerede. Vent et øjeblik.");
   await ensureWorker();
   return new Promise(resolve=>{
     const to=setTimeout(()=>{pyJob=null;pyWorker.terminate();pyWorker=null;pyReady=false;setEngine("error","Stoppet (timeout) — genstarter ved næste kørsel");resolve({timeout:true})},PY_TIMEOUT);
@@ -1064,28 +1148,65 @@ function runFailHTML(res,what){
   if(res.timeout)return `<div class="test fail"><b>⏱ Stoppet efter ${PY_TIMEOUT/1000} sekunder</b><p>Har du en uendelig løkke (fx en while, der aldrig bliver falsk)?</p></div>`;
   return `<div class="test fail"><b>Fejl i ${what}</b><p>${esc(res.error||"Ukendt fejl")}</p></div>`;
 }
-/* ▶ Kør: run the code once (with the first test's input/setup) and show the console output. */
+/* Interactive terminal. The browser can't pause Python mid-run, so input() stops the program and
+   shows the prompt with a line to type on; Enter replays the program with every answer so far
+   (same random seed, files reset), which looks and feels like a normal terminal. */
+let termSeq=0;
+function stopTerminal(host){host.dataset.term=""}
+async function runInteractive(host,code,{setup="",textarea=null,busy=()=>{},extra=()=>"",foot=""}={}){
+  const s={id:String(++termSeq),inputs:[],seed:Math.floor(Math.random()*1e9)};
+  const alive=()=>host.dataset.term===s.id;
+  host.dataset.term=s.id;
+  host.innerHTML=`<div class="test">Kører din kode…</div>`;
+  for(;;){
+    let res,t=performance.now();
+    busy(true);
+    try{res=await pyExec(code,[{name:"Kørsel",inputs:s.inputs,setup,check:"True",echo:true,interactive:true,fresh:!s.inputs.length,seed:s.seed}])}
+    catch(e){if(alive())host.innerHTML=`<div class="test fail"><b>Fejl</b><p>${esc(String(e.message||e))}</p></div>`;return}
+    finally{busy(false)}
+    if(!alive())return;
+    if(res.type!=="result"){host.innerHTML=runFailHTML(res,"kørslen");return}
+    const r=res.data[0];
+    if(!r.waiting){
+      const meta=s.inputs.length?"":`${Math.round(performance.now()-t)} ms`;
+      host.innerHTML=consoleHTML(r.output,{label:r.err?"Output før fejlen":"Output",meta})+pyErrorHTML(r.err)+(r.err?"":extra(r))+foot;
+      if(textarea)bindGotoLines(host,textarea);
+      return;
+    }
+    const line=await readTerminalLine(host,r.output,alive);
+    if(line===null)return;
+    s.inputs.push(line);
+  }
+}
+function readTerminalLine(host,output,alive){
+  return new Promise(resolve=>{
+    host.innerHTML=`<div class="console waiting"><div class="console-head"><span>Terminal</span><span>Venter på input. Skriv og tryk Enter
+      <button type="button" class="term-stop" title="Stop programmet (Esc)">■ Stop</button></span></div>
+      <pre class="console-out">${esc(output)}<input class="term-in" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Input til programmet"></pre></div>`;
+    const inp=host.querySelector(".term-in");
+    const stop=()=>{if(!alive())return;stopTerminal(host);
+      host.innerHTML=consoleHTML(output,{label:"Output"})+`<div class="test"><b>■ Programmet blev stoppet</b><p>Det ventede på input. Tryk ▶ Kør for at starte forfra.</p></div>`;resolve(null)};
+    host.querySelector(".term-stop").onclick=stop;
+    host.querySelector(".console-out").onclick=()=>inp.focus();
+    inp.onkeydown=e=>{
+      if(e.key==="Enter"){e.preventDefault();inp.readOnly=true;inp.classList.add("sent");resolve(inp.value)}
+      else if(e.key==="Escape"){e.preventDefault();stop()}
+    };
+    inp.focus({preventScroll:true});inp.scrollIntoView({block:"nearest"});
+  });
+}
+/* ▶ Kør: run the code in the interactive terminal (my_data etc. from the task setup is available). */
 async function runCode(){
-  const c=currentLive();if(!c)return;saveCurrentCode();setLiveBusy(true);
-  $("#results").innerHTML=`<div class="test">Kører din kode…</div>`;
-  const t0=c.tests&&c.tests[0]||{},inputs=t0.inputs||[];
-  try{
-    const t=performance.now();
-    const res=await pyExec($("#codeInput").value,[{name:"Kørsel",inputs,setup:t0.setup||"",check:"True",echo:true}]);
-    if(res.type!=="result"){$("#results").innerHTML=runFailHTML(res,"kørslen");return}
-    const r=res.data[0],ms=Math.round(performance.now()-t);
-    const meta=[inputs.length?`input() fik: ${inputs.map(x=>esc(x)).join(", ")}`:"",`${ms} ms`].filter(Boolean).join(" · ");
-    let html=consoleHTML(r.output,{label:r.err?"Output før fejlen":"Output",meta});
-    if(r.err&&r.err.type==="EOFError"&&inputs.length)r.err.msg=`input() blev kaldt flere gange, end Kør har input til (${inputs.length}).`;
-    html+=pyErrorHTML(r.err);
-    if(c.set==="mandatory1"&&!r.err)html+=r.result!==undefined?`<div class="result-line"><b>result</b> = <code>${esc(r.result)}</code> <span>(${esc(r.resultType)})</span></div>`:`<div class="result-line warn">Der er ingen variabel med navnet <code>result</code> endnu.</div>`;
-    html+=`<p class="results-foot">Tryk <b>✓ Kør tests</b> for at tjekke, om løsningen er rigtig.</p>`;
-    $("#results").innerHTML=html;bindGotoLines($("#results"),$("#codeInput"));
-  }catch(e){$("#results").innerHTML=`<div class="test fail"><b>Fejl</b><p>${esc(String(e.message||e))}</p></div>`}
-  finally{setLiveBusy(false)}
+  const c=currentLive();if(!c)return;saveCurrentCode();
+  const t0=c.tests&&c.tests[0]||{};
+  await runInteractive($("#results"),$("#codeInput").value,{setup:t0.setup||"",textarea:$("#codeInput"),busy:setLiveBusy,
+    extra:r=>c.set!=="mandatory1"?"":r.result!==undefined
+      ?`<div class="result-line"><b>result</b> = <code>${esc(r.result)}</code> <span>(${esc(r.resultType)})</span></div>`
+      :`<div class="result-line warn">Der er ingen variabel med navnet <code>result</code> endnu.</div>`,
+    foot:`<p class="results-foot">Tryk <b>✓ Kør tests</b> for at tjekke, om løsningen er rigtig.</p>`});
 }
 async function runTests(){
-  const c=currentLive();if(!c)return;saveCurrentCode();setLiveBusy(true);
+  const c=currentLive();if(!c)return;saveCurrentCode();stopTerminal($("#results"));setLiveBusy(true);
   $("#results").innerHTML=`<div class="test">Klargør Python og kører tests…</div>`;
   try{
     const res=await pyExec($("#codeInput").value,c.tests);

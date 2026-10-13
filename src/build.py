@@ -107,8 +107,8 @@ rep('</style>\n<script>', '\n' + css + '</style>\n<script>')
 rep('<header class="topnav">', '<header class="topnav" id="topnav">')
 rep('<button class="navbtn active" data-view="home">Start</button>',
     '<button class="navbtn active" data-view="home">Start</button>\n    <button class="navbtn" data-view="learn">Lær</button>')
-rep('<button class="navbtn" data-view="live">Live Coding</button>',
-    '<button class="navbtn" data-view="live">Live Coding</button>\n    <button class="navbtn" data-view="podcasts">Podcasts</button>\n    <button class="navbtn" data-view="videos">Videoer</button>')
+rep('<button class="navbtn" data-view="live">Python Lab</button>',
+    '<button class="navbtn" data-view="live">Python Lab</button>\n    <button class="navbtn" data-view="podcasts">Podcasts</button>\n    <button class="navbtn" data-view="videos">Videoer</button>')
 rep('<button class="btn" id="randomLive">Tilfældig opgave</button>',
     '<button class="btn" id="randomLive">Tilfældig opgave</button>\n        <button class="btn primary" id="sandboxBtn">🧪 Fri sandbox</button>')
 rep('<div class="live-layout">', '<div class="live-layout" id="liveMain">')
@@ -116,14 +116,11 @@ rep('<div class="live-layout">', '<div class="live-layout" id="liveMain">')
 sandbox = '''
     <section class="lab hidden" id="sandboxPanel">
       <div class="lab-head"><div class="meta"><span class="badge d2">Sandbox</span></div><h2>Fri Python-sandbox</h2>
-        <p>Skriv og kør din egen kode — fx eksamensopgaverne. <code>input()</code> læser fra feltet til højre (én linje pr. kald). Ctrl+Enter kører. Koden gemmes i browseren.</p></div>
-      <div class="sandbox-io">
-        <textarea class="code-input" id="sbCode" spellcheck="false" autocapitalize="off"></textarea>
-        <div class="sandbox-side"><label>Input (én linje pr. input())</label><textarea id="sbInput" spellcheck="false" placeholder="25"></textarea>
-          <label>Output</label><div class="sandbox-out" id="sbOut"></div></div>
-      </div>
-      <div class="lab-bottom"><div class="group"><button class="btn primary" id="sbRun">▶ Kør</button><button class="btn" id="sbClear">Ryd</button></div>
-        <span style="font-size:10px;color:var(--muted)">Kører Python 3 i browseren (Pyodide) · stoppes efter 10 sek.</span></div>
+        <p>Skriv og kør din egen kode, fx eksamensopgaverne. Når programmet kalder <code>input()</code>, skriver du svaret direkte i terminalen og trykker Enter. Ctrl+Enter kører. Koden gemmes i browseren.</p></div>
+      <textarea class="code-input" id="sbCode" spellcheck="false" autocapitalize="off" aria-label="Din kode"></textarea>
+      <div class="lab-bottom"><div class="group"><button class="btn run" id="sbRun">▶ Kør</button><button class="btn" id="sbClear">Ryd</button></div>
+        <span class="lab-note">Kører Python 3 i browseren (Pyodide) · stoppes efter 10 sek.</span></div>
+      <div class="results" id="sbOut" aria-live="polite"></div>
     </section>
 '''
 end_live = '</section>\n</main>'

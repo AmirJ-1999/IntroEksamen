@@ -44,7 +44,7 @@ renderHome=function(){
   const cards=subject==="Python"?[
     ["◧","Lær","Visuelle guides til hele Python-pensum: datatyper, slicing, loops, funktioner, filer, exceptions, sockets og Linux — med interaktive værktøjer.",`<button class="btn primary" data-go2="learn">Åbn guides (${g})</button>`],
     ["◫","Flashcards","Ét kort ad gangen med let og teknisk forklaring. Marker Kan / Usikker / Øv igen.",`<button class="btn" data-go2="study">Start flashcards</button>`],
-    ["⌘","Python Lab",`${LIVE_CHALLENGES.length} øvelser og de ${MANDATORY_1.length} spørgsmål fra Mandatory opgave 1 med automatiske tests — plus en fri sandbox, hvor du kan køre din egen kode.`,`<button class="btn" data-go2="live">Live Coding</button><button class="btn" data-go2="sandbox">Sandbox</button>`],
+    ["⌘","Python Lab",`${LIVE_CHALLENGES.length} øvelser og de ${MANDATORY_1.length} spørgsmål fra Mandatory opgave 1 med automatiske tests — plus en fri sandbox, hvor du kan køre din egen kode.`,`<button class="btn" data-go2="live">Åbn Python Lab</button><button class="btn" data-go2="sandbox">Sandbox</button>`],
     ["▶","Videoer",`${v} udvalgte videoer (Corey Schafer, NetworkChuck m.fl.) sorteret efter emne.`,`<button class="btn" data-go2="videos">Se videoer</button>`]
   ]:[
     ["◧","Lær","Visuelle guides for hvert lag: interaktive headers, sekvensdiagrammer, subnet- og fragmenteringsberegner og et header-galleri til eksamen.",`<button class="btn primary" data-go2="learn">Åbn guides (${g})</button>`],
@@ -105,7 +105,7 @@ function showGuide(id){
     ${pod?`<div class="g-box analogy" style="margin-top:18px"><b class="t">Lyt</b><p>Podcast-afsnittet <b>${esc(pod.title)}</b> (${pod.mins} min) gennemgår samme stof som samtale. <button class="btn" data-pod="${pod.id}" style="margin-left:6px">Gå til podcast</button></p></div>`:""}
     <div class="g-actions">
       ${cats.map(c=>`<button class="btn primary" data-cards="${esc(c)}">Øv flashcards: ${esc(c)}</button>`).join("")}
-      ${g.live?`<button class="btn" data-livecat="${esc(g.live)}">Live Coding: ${esc(g.live)}</button>`:""}
+      ${g.live?`<button class="btn" data-livecat="${esc(g.live)}">Python Lab: ${esc(g.live)}</button>`:""}
       <span style="flex:1"></span>
       ${i>0?`<button class="btn" data-g2="${list[i-1].id}">← ${esc(list[i-1].title)}</button>`:""}
       ${i<list.length-1?`<button class="btn" data-g2="${list[i+1].id}">${esc(list[i+1].title)} →</button>`:""}
@@ -124,7 +124,7 @@ function hydrate(root){
   root.querySelectorAll("[data-chk]").forEach(el=>renderChecklist(el,el.dataset.chk));
   root.querySelectorAll("pre[data-run]").forEach(pre=>{
     const b=document.createElement("button");b.className="btn";b.textContent="▶ Prøv i sandbox";b.style.margin="-8px 0 14px";
-    b.onclick=()=>{setView("live");openSandbox(pre.innerText.replace(/\n$/,""),pre.dataset.run||"")};
+    b.onclick=()=>{setView("live");openSandbox(pre.innerText.replace(/\n$/,""))};
     pre.after(b);
   });
   bindVideoCards(root);
@@ -283,30 +283,20 @@ function renderPodcasts(){
 }
 
 /* ---------- sandbox ---------- */
-function openSandbox(code,inputs){
+function openSandbox(code){
   $("#liveMain").classList.add("hidden");$("#sandboxPanel").classList.remove("hidden");
   $("#sandboxBtn").textContent="← Tilbage til opgaver";
-  if(code!==undefined){$("#sbCode").value=code;$("#sbInput").value=inputs||"";$("#sbOut").innerHTML=consoleHTML("",{label:"Output"})}
+  if(code!==undefined){$("#sbCode").value=code;stopTerminal($("#sbOut"));$("#sbOut").innerHTML=""}
   else if(!$("#sbCode").value)$("#sbCode").value=localStorage.getItem("its_sandbox")||"# Skriv frit Python her og tryk ▶ Kør (Ctrl+Enter)\nname = input('Hvad hedder du? ')\nprint('Hej', name)\n\nfor i in range(3):\n    print(i, i ** 2)";
 }
 function closeSandbox(){$("#liveMain").classList.remove("hidden");$("#sandboxPanel").classList.add("hidden");$("#sandboxBtn").textContent="🧪 Fri sandbox"}
 async function runSandbox(){
   const code=$("#sbCode").value;localStorage.setItem("its_sandbox",code);
-  const inputs=$("#sbInput").value.split("\n");while(inputs.length&&inputs[inputs.length-1]==="")inputs.pop();
-  const out=$("#sbOut");out.innerHTML=`<div class="test">Kører…</div>`;$("#sbRun").disabled=true;
-  try{
-    const res=await pyExec(code,[{name:"Kørsel",inputs,check:"True",echo:true}]);
-    if(res.type!=="result"){out.innerHTML=runFailHTML(res,"kørslen");return}
-    const r=res.data[0];
-    if(r.err&&r.err.type==="EOFError")r.err.msg="Programmet kaldte input() flere gange, end der er linjer i input-feltet. Tilføj en linje pr. input().";
-    out.innerHTML=consoleHTML(r.output,{label:r.err?"Output før fejlen":"Output"})+pyErrorHTML(r.err);
-    bindGotoLines(out,$("#sbCode"));
-  }catch(e){out.innerHTML=`<div class="test fail"><b>Fejl</b><p>${esc(String(e.message||e))}</p></div>`}
-  finally{$("#sbRun").disabled=false}
+  await runInteractive($("#sbOut"),code,{textarea:$("#sbCode"),busy:b=>$("#sbRun").disabled=b});
 }
 $("#sandboxBtn").onclick=()=>$("#sandboxPanel").classList.contains("hidden")?openSandbox():closeSandbox();
 $("#sbRun").onclick=runSandbox;
-$("#sbClear").onclick=()=>{$("#sbCode").value="";$("#sbOut").innerHTML=""};
+$("#sbClear").onclick=()=>{$("#sbCode").value="";stopTerminal($("#sbOut"));$("#sbOut").innerHTML=""};
 $("#sbCode").addEventListener("keydown",e=>{
   if(e.key==="Tab"){e.preventDefault();const t=e.target,s=t.selectionStart,en=t.selectionEnd;t.value=t.value.slice(0,s)+"    "+t.value.slice(en);t.selectionStart=t.selectionEnd=s+4}
   if((e.ctrlKey||e.metaKey)&&e.key==="Enter"){e.preventDefault();runSandbox()}
