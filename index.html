@@ -350,6 +350,11 @@ code{font-family:"SFMono-Regular",Consolas,monospace;background:var(--code-bg);b
 .theme-toggle button.active{background:var(--panel);color:var(--text);box-shadow:inset 0 0 0 1px var(--line)}
 @media(max-width:900px){.theme-toggle{margin-left:auto}.mobile-menu{margin-left:8px!important}}
 @media(max-width:560px){.theme-toggle button span{display:none}.theme-toggle button{padding:8px 10px}}
+.download-btn{border:1px solid var(--line);background:var(--panel3);color:var(--muted);border-radius:11px;padding:8px 11px;font-size:12px;display:flex;align-items:center;gap:5px;flex:0 0 auto}
+.download-btn:hover{color:var(--text);border-color:var(--line-hover)}
+.download-btn:disabled{opacity:.55;cursor:wait}
+@media(max-width:900px){.download-btn{margin-left:auto}.download-btn~.theme-toggle{margin-left:8px}}
+@media(max-width:560px){.download-btn span{display:none}.download-btn{padding:8px 10px}}
 </style>
 <script>
 (function(){try{var t=localStorage.getItem("its_theme");if(t==="dark")document.documentElement.dataset.theme="dark";else document.documentElement.dataset.theme="light";}catch(e){document.documentElement.dataset.theme="light";}})();
@@ -369,6 +374,8 @@ code{font-family:"SFMono-Regular",Consolas,monospace;background:var(--code-bg);b
     <button class="navbtn" data-view="browse">Alle kort</button>
     <button class="navbtn" data-view="live">Live Coding</button>
   </nav>
+
+  <button class="download-btn" id="downloadOffline" title="Download hele siden som én HTML-fil. Flashcards virker uden internet; Live Coding kræver internet til Python-motoren.">⬇<span>Download offline</span></button>
 
   <div class="theme-toggle" role="group" aria-label="Vælg tema">
     <button data-theme-btn="light" title="Lyst tema">☀<span>Lys</span></button>
@@ -933,6 +940,27 @@ function applyTheme(t){
   $$("[data-theme-btn]").forEach(b=>{b.classList.toggle("active",b.dataset.themeBtn===t);b.setAttribute("aria-pressed",b.dataset.themeBtn===t)});
 }
 $$("[data-theme-btn]").forEach(b=>b.onclick=()=>applyTheme(b.dataset.themeBtn));
+
+/* Offline download: hent sidens egen kildekode og gem den som én HTML-fil */
+const offlineBtn=$("#downloadOffline");
+if(location.protocol==="file:")offlineBtn.style.display="none";
+offlineBtn.onclick=async()=>{
+  const label=offlineBtn.querySelector("span");
+  offlineBtn.disabled=true;
+  try{
+    const res=await fetch(location.href.split("#")[0],{cache:"no-store"});
+    if(!res.ok)throw new Error("HTTP "+res.status);
+    const blob=new Blob([await res.text()],{type:"text/html;charset=utf-8"});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement("a");
+    a.href=url;a.download="IT-Sikkerhed-Study-Hub-offline.html";
+    document.body.appendChild(a);a.click();a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url),1000);
+    label.textContent="Hentet ✓";setTimeout(()=>label.textContent="Download offline",2500);
+  }catch(e){
+    alert("Kunne ikke hente siden til download. Tjek din internetforbindelse og prøv igen.");
+  }finally{offlineBtn.disabled=false}
+};
 applyTheme(document.documentElement.dataset.theme==="dark"?"dark":"light");
 
 syncSubject();setView("home");
