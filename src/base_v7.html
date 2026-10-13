@@ -1120,6 +1120,8 @@ function pyErrorHTML(err){
   if(!err)return "";
   let tip=PY_ERR_TIPS[err.type]||"Programmet stoppede med en fejl. Læs beskeden og kig på den markerede linje.";
   if(["SyntaxError","IndentationError"].includes(err.type)){const h=PY_SYNTAX_HINTS.find(([re])=>re.test(err.msg));if(h)tip=h[1]}
+  if(err.type==="SyntaxError"&&/(^|[^\w])(f|r|b|rf|fr|rb|br)\s+["']/i.test(err.code||""))
+    tip="Der er et mellemrum mellem præfikset og anførselstegnet. Skriv f\"…\" (eller r\"…\" / b\"…\") uden mellemrum: print(f\"Hej {navn}\").";
   if(err.phase==="test")tip="Fejlen opstod, da testen brugte din kode (ikke i din egen linje). "+tip;
   const line=err.line?`<button type="button" class="pyerr-line" data-goto="${err.line}" title="Markér linjen i editoren">linje ${err.line}</button>`:"";
   let code="";
