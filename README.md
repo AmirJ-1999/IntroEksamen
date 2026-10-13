@@ -13,7 +13,7 @@ Studieside til eksamen i *Introduction to IT-Security* (Python + Netværk).
 | **Videoer** | 46 udvalgte videoer (Jim Kurose, Ben Eater, Practical Networking, Corey Schafer, NetworkChuck og Daniels Wireshark-serie) |
 
 - **Download offline** (knappen øverst): gemmer hele siden som én HTML-fil. Guides, flashcards og transskriptioner virker uden internet; Python-motoren, lyd og videoer kræver internet.
-- Fremgang og afkrydsninger gemmes lokalt i din browser.
+- Fremgang og afkrydsninger gemmes lokalt i din browser. Med en **konto** (knappen øverst: brugernavn + password) synkroniseres de også mellem enheder: flashcard-status, gemte kort, Python Lab-fremgang og kode, tjeklister m.m. Temaet forbliver pr. enhed.
 - Podcasts og transskriptioner er AI-genererede/automatiske og kan indeholde unøjagtigheder.
 
 ## Kildekode
@@ -24,3 +24,19 @@ Studieside til eksamen i *Introduction to IT-Security* (Python + Netværk).
 cd src
 python build.py ../index.html
 ```
+
+## Konto og synkronisering
+
+Kontoerne kører på en lille Cloudflare Worker i `sync-worker/` med en D1-database (gratis plan): https://studylab-sync.amirjawad79.workers.dev
+
+- Én række pr. bruger: brugernavn, PBKDF2-hashet password og al fremgang som én JSON-blok (siden `localStorage`-nøglerne `its_*`).
+- Hver gemning øger et revisionsnummer. Har en anden enhed gemt imellem, svarer API'en `409`, og siden fletter de to versioner sammen og prøver igen.
+- Klientkoden ligger i `src/account.js`.
+
+```bash
+cd sync-worker
+npm install
+npx wrangler deploy
+```
+
+Nye migrationer i `sync-worker/migrations/` anvendes med `npm run migrate`. Til lokal test: `npx wrangler dev`, og sæt `localStorage.its_dev_api = "http://127.0.0.1:8787"` på siden.

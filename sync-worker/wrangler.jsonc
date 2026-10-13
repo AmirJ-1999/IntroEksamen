@@ -1,0 +1,17 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "studylab-sync",
+  "main": "src/index.js",
+  "compatibility_date": "2026-10-01",
+  "workers_dev": true,
+  "preview_urls": false,
+  "observability": { "enabled": true },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "studylab-sync",
+      "database_id": "2ebf9b22-36e1-45e2-8add-a38d84c16583",
+      "migrations_dir": "./migrations"
+    }
+  ]
+}

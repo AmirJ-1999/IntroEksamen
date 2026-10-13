@@ -9,7 +9,7 @@ sys.path.insert(0, EXT)
 from media_meta import VIDEOS, VIDEO_GROUPS, PODCASTS
 
 rd = lambda n: open(os.path.join(EXT, n), encoding='utf-8').read()
-css, data, gnet, gpy, extjs = rd('ext.css'), rd('data.js'), rd('guides_net.js'), rd('guides_py.js'), rd('ext.js')
+css, data, gnet, gpy, extjs, accjs = rd('ext.css'), rd('data.js'), rd('guides_net.js'), rd('guides_py.js'), rd('ext.js'), rd('account.js')
 
 # Python-guides: every backslash is meant literally (code shown/run as Python)
 gpy = gpy.replace('\\', '\\\\')
@@ -94,7 +94,7 @@ syncSubject();
 (function(){const g=new URLSearchParams(location.hash.slice(1)).get("guide");
  if(g&&GUIDES.some(x=>x.id===g))openGuide(g);else setView(currentView);})();
 '''
-script = '\n'.join([data, gnet, gpy, media, extjs, boot])
+script = '\n'.join([data, gnet, gpy, media, extjs, accjs, boot])
 assert '</script' not in script.lower()
 
 html = open(BASE, encoding='utf-8').read()
@@ -105,6 +105,12 @@ def rep(old, new, count=1):
 
 rep('</style>\n<script>', '\n' + css + '</style>\n<script>')
 rep('<header class="topnav">', '<header class="topnav" id="topnav">')
+account_ui = '''<div class="account-wrap">
+    <button class="account-btn" id="accountBtn" aria-haspopup="true" aria-expanded="false"><i class="acc-dot"></i>👤<span>Log ind</span></button>
+    <div class="account-menu" id="accountMenu" hidden></div>
+  </div>
+  '''
+rep('<button class="download-btn" id="downloadOffline"', account_ui + '<button class="download-btn" id="downloadOffline"')
 rep('<button class="navbtn active" data-view="home">Start</button>',
     '<button class="navbtn active" data-view="home">Start</button>\n    <button class="navbtn" data-view="learn">Lær</button>')
 rep('<button class="navbtn" data-view="live">Python Lab</button>',
@@ -145,6 +151,24 @@ views = '''
 '''
 html = html.replace(end_live, sandbox + end_live, 1)
 html = html.replace('</main>', views + '</main>', 1)
+account_dialog = '''
+<dialog class="account-dialog" id="accountDialog" data-mode="login" aria-labelledby="accTitle">
+  <form id="accForm" method="dialog" novalidate>
+    <button type="button" class="acc-close" id="accClose" aria-label="Luk">✕</button>
+    <h2 id="accTitle">Din konto</h2>
+    <div class="acc-tabs" role="tablist"><button type="button" class="acc-tab" role="tab" data-mode="login">Log ind</button><button type="button" class="acc-tab" role="tab" data-mode="register">Opret konto</button></div>
+    <p class="acc-intro" id="accIntro"></p>
+    <label for="accUser">Brugernavn</label>
+    <input class="input" id="accUser" name="username" autocomplete="username" autocapitalize="off" spellcheck="false" required minlength="3" maxlength="32">
+    <label for="accPass">Password</label>
+    <input class="input" id="accPass" name="password" type="password" autocomplete="current-password" required minlength="4">
+    <p class="acc-error" id="accError" role="alert"></p>
+    <button class="btn primary acc-submit" id="accSubmit" type="submit">Log ind</button>
+    <p class="acc-fine">En simpel studiekonto, der synkroniserer din fremgang. Brug ikke et password, du også bruger andre steder.</p>
+  </form>
+</dialog>
+'''
+html = html.replace('</main>', '</main>' + account_dialog, 1)
 rep('</script>\n</body>', '</script>\n<script>\n' + script + '\n</script>\n</body>')
 open(OUT, 'w', encoding='utf-8', newline='').write(html)
 print('ok', len(html), 'bytes ·', len(vids), 'videos ·', sum(len(p['lines']) for p in pods), 'transcript lines')
