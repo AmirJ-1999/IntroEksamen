@@ -1,10 +1,17 @@
-# IntroEksamen — Study Hub
+# IntroEksamen — Study Lab
 
-Flashcards og live-coding-træning til eksamen i *Introduction to IT-Security* (Python + Netværk).
+Studieside til eksamen i *Introduction to IT-Security* (Python + Netværk).
 
 **Åbn siden:** https://amirj-1999.github.io/IntroEksamen/
 
-- 194 flashcards (Python, Linux, Application, Transport, Network, Data Link, WiFi, værktøjer)
-- 70 Python live-coding-opgaver med automatiske tests (kører Python i browseren via Pyodide — kræver internet første gang)
-- Fremgang gemmes lokalt i din browser
-- **Download offline**: knappen øverst til højre gemmer hele siden som én HTML-fil. Flashcards virker uden internet; Live Coding kræver internet til Python-motoren.
+| Del | Indhold |
+|---|---|
+| **Lær** | 33 visuelle guides: klikbare headers (Ethernet, ARP, IPv4, IPv6, ICMP, TCP, UDP, DNS), sekvensdiagrammer (handshake, SACK, DORA, ARP, DNS, traceroute, RTS/CTS, sockets), subnet-, fragmenterings- og checksum-beregnere, slicing-/range-visualizer, Caesar-værksted, eksamens-tjeklister og et header-galleri |
+| **Flashcards** | 194 kort med let og teknisk forklaring |
+| **Python Lab** | 70 live-coding-opgaver med automatiske tests + en fri Python-sandbox (Pyodide i browseren) |
+| **Podcasts** | 4 netværks-afsnit (ca. 90 min) med klikbar transskription |
+| **Videoer** | 46 udvalgte videoer (Jim Kurose, Ben Eater, Practical Networking, Corey Schafer, NetworkChuck og Daniels Wireshark-serie) |
+
+- **Download offline** (knappen øverst): gemmer hele siden som én HTML-fil. Guides, flashcards og transskriptioner virker uden internet; Python-motoren, lyd og videoer kræver internet.
+- Fremgang og afkrydsninger gemmes lokalt i din browser.
+- Podcasts og transskriptioner er AI-genererede/automatiske og kan indeholde unøjagtigheder.
