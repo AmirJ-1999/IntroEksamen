@@ -13,7 +13,7 @@ Studieside til eksamen i *Introduction to IT-Security* (Python + Netværk).
 | **Videoer** | 46 udvalgte videoer (Jim Kurose, Ben Eater, Practical Networking, Corey Schafer, NetworkChuck og Daniels Wireshark-serie) |
 
 - **Download offline** (knappen øverst): gemmer hele siden som én HTML-fil. Guides, flashcards og transskriptioner virker uden internet; Python-motoren, lyd og videoer kræver internet.
-- Fremgang og afkrydsninger gemmes lokalt i din browser. Med en **konto** (knappen øverst: brugernavn + password) synkroniseres de også mellem enheder: flashcard-status, gemte kort, Python Lab-fremgang og kode, tjeklister m.m. Temaet forbliver pr. enhed.
+- Fremgang og afkrydsninger gemmes lokalt i din browser. Med en **konto** (knappen øverst: brugernavn + password) følger fremgangen kontoen på tværs af enheder: flashcard-status, gemte kort, Python Lab-fremgang og kode, tjeklister m.m. Browseren og kontoen har hver sin fremgang: Når du logger ind, lægges browserens egen fremgang til side, og når du logger ud, vises den igen. En ny konto starter med en kopi af browserens fremgang. Temaet forbliver pr. enhed.
 - Podcasts og transskriptioner er AI-genererede/automatiske og kan indeholde unøjagtigheder.
 
 ## Kildekode

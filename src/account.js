@@ -1,9 +1,12 @@
 /* ===== Konto & synkronisering ===== */
-/* Progress lives in localStorage (keys "its_*"). When logged in, every change is pushed to the
-   sync worker (debounced) and pulled again when the page opens or gets focus, so the same
-   account continues on any device. Conflicts (two devices saved) are merged key by key. */
+/* Progress lives in localStorage (keys "its_*"). The browser and the account keep two separate
+   progress states: logging in puts the browser's own progress aside (its_guest_backup) and shows
+   the account's; logging out saves the account and brings the browser's own progress back.
+   While logged in, every change is pushed to the sync worker (debounced) and pulled again when
+   the page opens or gets focus. Conflicts (two devices saved) are merged key by key. */
 const SYNC_API=(localStorage.getItem("its_dev_api")||"https://studylab-sync.amirjawad79.workers.dev").replace(/\/$/,"");
-const SYNC_LOCAL_ONLY=new Set(["its_theme","its_account","its_sync_meta","its_dev_api"]);
+const GUEST_KEY="its_guest_backup", PENDING_KEY="its_account_pending";
+const SYNC_LOCAL_ONLY=new Set(["its_theme","its_account","its_sync_meta","its_dev_api",GUEST_KEY,PENDING_KEY]);
 const isSyncedKey=k=>k.startsWith("its_")&&!SYNC_LOCAL_ONLY.has(k);
 let account=null, syncMeta={rev:0,dirty:false,last:0};
 try{account=JSON.parse(localStorage.getItem("its_account")||"null");syncMeta={...syncMeta,...JSON.parse(localStorage.getItem("its_sync_meta")||"{}")}}catch{}
@@ -23,7 +26,9 @@ Storage.prototype.removeItem=function(k){
 };
 function saveSyncMeta(){_setItem.call(localStorage,"its_sync_meta",JSON.stringify(syncMeta))}
 function markDirty(){
-  if(!account)return;   // logged out: nothing to sync (logging in merges this browser's progress anyway)
+  // logged out: nothing to sync. rev<0: the account's data hasn't loaded yet, so what's shown is
+  // still the browser's own progress, which must not end up in the account
+  if(!account||syncMeta.rev<0)return;
   changeSeq++;syncMeta.dirty=true;saveSyncMeta();
   clearTimeout(syncTimer);syncTimer=setTimeout(pushSync,3000);setSyncState("pending");
 }
@@ -59,6 +64,21 @@ function applySnapshot(snap,{replace=false}={}){
   }finally{applyingRemote=false}
   if(changed)reloadAppState();
 }
+/* the browser's own (logged-out) progress: put aside on login, restored on logout */
+function stashGuest(){
+  if(localStorage.getItem(GUEST_KEY)===null)_setItem.call(localStorage,GUEST_KEY,JSON.stringify(localSnapshot()));
+}
+function restoreGuest(){
+  let guest={};try{guest=JSON.parse(localStorage.getItem(GUEST_KEY)||"{}")}catch{}
+  applyingRemote=true;
+  try{
+    for(const k of Object.keys(localSnapshot()))localStorage.removeItem(k);
+    for(const [k,v] of Object.entries(guest))if(isSyncedKey(k))localStorage.setItem(k,v);
+  }finally{applyingRemote=false}
+  _removeItem.call(localStorage,GUEST_KEY);
+  stopTerminal($("#results"));stopTerminal($("#sbOut"));$("#sbOut").innerHTML="";
+  reloadAppState(true);
+}
 function reloadAppState(force=false){
   const J=(k,d)=>{try{const v=JSON.parse(localStorage.getItem(k)||"null");return v??d}catch{return d}};
   subject=localStorage.getItem("its_subject")||subject;
@@ -80,15 +100,20 @@ async function api(path,{method="GET",body}={}){
   let data={};try{data=await res.json()}catch{}
   return {status:res.status,data};
 }
+/* the session is no longer valid: keep any unsaved account changes aside (they are merged in on
+   the next login with the same username) and show the browser's own progress again */
 function sessionExpired(){
-  account=null;localStorage.removeItem("its_account");setSyncState("idle");renderAccount();
-  toast("Du er blevet logget ud. Log ind igen for at synkronisere.");
+  if(syncMeta.dirty)_setItem.call(localStorage,PENDING_KEY,JSON.stringify({user:account.username,snap:localSnapshot()}));
+  account=null;_removeItem.call(localStorage,"its_account");syncMeta={rev:0,dirty:false,last:0};saveSyncMeta();
+  restoreGuest();setSyncState("idle");
+  toast("Du er blevet logget ud. Log ind igen for at fortsætte med kontoens fremgang.");
 }
 
 /* upload this device's progress; on conflict merge with the server copy and try again */
 async function pushSync(){
   clearTimeout(syncTimer);
   if(!account)return;
+  if(syncMeta.rev<0)return pullSync();   // load the account first (login happened while offline)
   if(syncBusy){syncAgain=true;return}
   syncBusy=true;setSyncState("syncing");
   try{
@@ -107,9 +132,9 @@ async function pushSync(){
   finally{syncBusy=false}
   if(syncAgain||(syncMeta.dirty&&syncState==="pending")){syncAgain=false;syncTimer=setTimeout(pushSync,1500)}
 }
-/* download the account's progress. Unchanged device: the account copy replaces it. Changed device:
-   both are merged — local edits win, except right after login, where the account copy wins. */
-async function pullSync({preferServer=false}={}){
+/* download the account's progress. Unchanged device: the account copy replaces it.
+   Changed device (unsynced edits): both are merged and the local edits win. */
+async function pullSync(){
   if(!account||syncBusy)return;
   syncBusy=true;setSyncState("syncing");lastPull=Date.now();
   let push=false;
@@ -119,7 +144,7 @@ async function pullSync({preferServer=false}={}){
     if(status!==200)throw new Error(data.error||"HTTP "+status);
     if(data.rev!==syncMeta.rev){
       if(!syncMeta.dirty)applySnapshot(data.data,{replace:true});
-      else applySnapshot(preferServer?mergeSnapshots(localSnapshot(),data.data):mergeSnapshots(data.data,localSnapshot()));
+      else applySnapshot(mergeSnapshots(data.data,localSnapshot()));
       syncMeta.rev=data.rev;saveSyncMeta();
     }
     push=syncMeta.dirty;
@@ -148,7 +173,7 @@ function syncLabel(){
 function fillAccountMenu(){
   $("#accountMenu").innerHTML=`<div class="acc-who">Logget ind som<b>${esc(account.username)}</b></div>
     <div class="acc-status" data-sync="${syncState}"><i></i>${esc(syncLabel())}</div>
-    <p class="acc-note">Flashcards, gemte kort, Python Lab-fremgang og din kode gemmes på kontoen. Når du logger ud, fjernes de fra denne browser.</p>
+    <p class="acc-note">Du ser kontoens fremgang. Den gemmes online. Når du logger ud, vises denne browsers egen fremgang igen.</p>
     <button class="btn" id="accSyncNow">⟳ Synkronisér nu</button><button class="btn" id="accLogout">Log ud</button>`;
   $("#accSyncNow").onclick=()=>{syncMeta.dirty?pushSync():pullSync()};
   $("#accLogout").onclick=logout;
@@ -169,8 +194,8 @@ function setAuthMode(mode){
   $("#accSubmit").textContent=mode==="login"?"Log ind":"Opret konto";
   $("#accPass").autocomplete=mode==="login"?"current-password":"new-password";
   $("#accIntro").textContent=mode==="login"
-    ?"Log ind for at hente din fremgang og fortsætte, hvor du slap, på enhver enhed."
-    :"Opret en konto, så din fremgang gemmes online. Det du allerede har lavet i denne browser, bliver lagt på kontoen.";
+    ?"Log ind for at se kontoens fremgang på enhver enhed. Browserens egen fremgang gemmes separat og vises igen, når du logger ud."
+    :"Opret en konto, så din fremgang gemmes online. Kontoen starter med en kopi af det, du allerede har lavet i denne browser.";
 }
 async function submitAuth(e){
   e.preventDefault();
@@ -179,17 +204,32 @@ async function submitAuth(e){
   try{
     const {status,data}=await api(mode==="login"?"/api/login":"/api/register",{method:"POST",body:{username,password}});
     if(status!==200){err.textContent=data.error||"Noget gik galt. Prøv igen.";return}
+    // the browser's own progress is put aside untouched and comes back on logout
+    stashGuest();
     account={username:data.username,token:data.token};_setItem.call(localStorage,"its_account",JSON.stringify(account));
-    // a new login starts from the server copy; local progress from this browser is merged in and uploaded
-    syncMeta={rev:-1,dirty:true,last:0};saveSyncMeta();
     $("#accountDialog").close();renderAccount();
-    await pullSync({preferServer:true});
-    toast(mode==="login"?`Velkommen tilbage, ${data.username}! Din fremgang er hentet.`:`Kontoen ${data.username} er oprettet. Din fremgang gemmes nu online.`);
+    if(mode==="register"){
+      // a new account starts with a copy of what this browser has done so far
+      syncMeta={rev:0,dirty:true,last:0};saveSyncMeta();
+      await pushSync();
+      toast(`Kontoen ${data.username} er oprettet. Det du har lavet i browseren, er kopieret til kontoen.`);
+    }else{
+      // show the account's progress instead of the browser's
+      syncMeta={rev:-1,dirty:false,last:0};saveSyncMeta();
+      await pullSync();
+      // changes that couldn't be saved before an earlier session expired are merged back in
+      let pend=null;try{pend=JSON.parse(localStorage.getItem(PENDING_KEY)||"null")}catch{}
+      if(pend&&pend.user===data.username&&account){
+        _removeItem.call(localStorage,PENDING_KEY);
+        applySnapshot(mergeSnapshots(localSnapshot(),pend.snap));markDirty();
+      }
+      toast(`Velkommen tilbage, ${data.username}! Du ser nu kontoens fremgang.`);
+    }
   }catch(e2){err.textContent="Kunne ikke forbinde til serveren. Tjek din internetforbindelse."}
   finally{$("#accSubmit").disabled=false}
 }
-/* Log out = save the last changes to the account, then remove this account's progress from the
-   browser, so the next person on the same device starts clean (the theme stays). */
+/* Log out = save the last changes to the account, remove the account's progress from the browser
+   and bring back the browser's own progress from before the login (the theme stays). */
 async function logout(){
   toggleAccountMenu(false);
   clearTimeout(syncTimer);
@@ -199,11 +239,8 @@ async function logout(){
   if(syncMeta.dirty&&!confirm("Dine seneste ændringer kunne ikke gemmes på kontoen (ingen forbindelse?).\n\nLog ud alligevel? Så går de ændringer tabt."))return;
   try{await api("/api/logout",{method:"POST"})}catch{}
   account=null;_removeItem.call(localStorage,"its_account");syncMeta={rev:0,dirty:false,last:0};saveSyncMeta();
-  applyingRemote=true;
-  try{for(const k of Object.keys(localSnapshot()))localStorage.removeItem(k)}finally{applyingRemote=false}
-  stopTerminal($("#results"));stopTerminal($("#sbOut"));$("#sbOut").innerHTML="";
-  reloadAppState(true);
-  setSyncState("idle");toast("Du er logget ud, og din fremgang er fjernet fra denne browser. Den ligger stadig på kontoen.");
+  restoreGuest();
+  setSyncState("idle");toast("Du er logget ud. Du ser nu den fremgang, der er gemt i denne browser.");
 }
 function toast(msg){
   let t=$("#toast");if(!t){t=document.createElement("div");t.id="toast";t.className="toast";t.setAttribute("role","status");document.body.appendChild(t)}
