@@ -1,0 +1,479 @@
+[00:00] Hvad forhindrer egentlig en enkelt, sådan en helt forvillet datapakke i at køre i ring og nærmest formere sig og bare crashe hele det globale internet på under et minut?
+[00:10] Ja, det er et ret godt spørgsmål faktisk.
+[00:12] Og svaret ligger faktisk i tre bittesmå bogstaver, der er gemt helt dybt nede i hver eneste besked, du sender fra din telefon.
+[00:19] Og det er altså den slags usynlige mekanismer, der bare kører i baggrunden, mens vi sidder og swiper løs.
+[00:24] Nemlig.
+[00:25] Så i dag dykker vi altså ned i præcis de der mekanismer.
+[00:28] Vi skal nemlig gennemgå lydbog tre, netværkslaget, med et fuldstændig alt overskyggende formål.
+[00:35] Og det er at klæde dig, der lytter med her, på til din mundtlige re-eksamen i IT-sikkerhed.
+[00:40] Lige præcis.
+[00:41] Så vi tager de noter, og så oversætter vi dem fra den her lidt tørre teori til en forståelse, der altså trækker karakteren helt op.
+[00:48] Ja, for hvis vi skal nå det mål, så er vi simpelthen nødt til at skifte strategi.
+[00:52] Altså til eksamen er det bare ikke nok at kunne huske en lang list til sådan nogle mærkelige akronymer.
+[00:56] Nej, for så klapper man bare i.
+[00:58] Præcis.
+[00:58] Hvis du kun har lært tingene udenad, så falder korthuset jo fuldstændig sammen det sekund, at eksaminatoren beder dig om at relaterere det til den virkelige verden.
+[01:08] Vi skal se på, hvorfor netværket egentlig er bygget som det er.
+[01:12] Altså hvilke problemer forsøgte de her ingeniører at løse?
+[01:14] Ja.
+[01:15] For når du først forstår logikken bagved, så behøver du slet ikke lære det udenad.
+[01:18] Så giver det faktisk bare sig selv.
+[01:19] Det giver mega god mening.
+[01:22] Men før vi zoomer sådan helt ind på dens hovedperson, altså netværksladet, så lad os lige træde et enkelt skridt tilbage for at forstå selve konteksten.
+[01:31] Altså hvis jeg nu sidder ved min computer og bare trykker enter for at åbne en hjemmeside, hvad er det så overhovedet for en usynlig infrastruktur, der går i gang?
+[01:39] Jamen det, der går i gang, det er et ekstremt strengt opdelt samarbejde.
+[01:42] Altså vi bruger det, vi kalder en femlægsmodel til at strukturere det her.
+[01:46] Okay.
+[01:47] Så øverst oppe, altså helt tæt på dig som bruger, der har vi applikationsladet.
+[01:52] Og det er her alle programmerne, de bruger.
+[01:54] Det er protokoller som HTTP til hjemmesiden, eller DNS, når du skal slå domænenavn op, og ja, SMTP, når du sender en e-mail.
+[02:02] Ja, okay.
+[02:03] Men altså de her applikationer, de kan vel ikke bare kaste data ud i luften og så krydse fingre for, at de rammer?
+[02:08] Nej, præcis.
+[02:09] Og derfor sender applikationsladet så dataene et skridt ned til det, der hedder transportladet.
+[02:15] Her ligger der protokoller som TCP og UDP.
+[02:18] Og transportladets opgave er altså at holde styr på selve samtalen.
+[02:22] Aha.
+[02:22] Altså kommunikationen mellem den proces, der kører på din computer, og processen over på serveren.
+[02:27] Og ned under det, jamen der har vi så selve netværksladet, som vi jo har fuldt fokus på i dag.
+[02:32] Lige præcis.
+[02:33] Her der handler det nemlig om IP-adresser og routing.
+[02:35] Altså det er her, dataene rent faktisk skal finde deres vej fra afsenderens netværk, helt ud over internettet og så frem til modtagerens netværk.
+[02:43] Men vi skal vel endnu længere ned, ikke?
+[02:45] For altså dataene skal jo også fysisk flyttes på en eller anden måde.
+[02:48] Ja, fuldstændig.
+[02:49] For lige under netværksladet, der ligger linkladet.
+[02:52] Så mens netværksladet finder den store rute over hele jorden, så tager linkladet så kun af det allernæste fysiske hop på vejen.
+[02:59] Det kunne fx være fra din computer og så hen til din Wi-Fi-router.
+[03:03] Ja, og det er her, man bruger Ethernet og MAC-adresser, ikke?
+[03:06] Lige præcis.
+[03:07] Og til allersidst så rammer vi så bunden, og det er det fysiske lag.
+[03:11] Her bliver alt altså forvandlet til ro bits, du ved et-taller og nuller, som så sendes som lys i fiberkabler eller som radiobølger i luften.
+[03:18] Okay, så vi har applikation, transport, netværk, link og fysisk.
+[03:24] Men det her leder mig altså frem til noget, som underviserne konsekvent nævner, og som jeg synes altid skaber lidt forvirring.
+[03:31] Okay, hvad er det?
+[03:32] Jamen, dataene de skifter åbenbart navn på vej ned gennem de her lag.
+[03:36] Altså, de kaldes først message, og så segment, og så datagram, frame og til sidst bits.
+[03:43] Altså, hvorfor i alverden skal vi bruge fem forskellige ord for den præcis samme klump data?
+[03:48] Jamen, det er fordi, det rent faktisk ikke er den samme klump data længere.
+[03:51] Nå?
+[03:52] Nej, for hvert lag tager den data, det modtager oppefra, og tilføjer ligesom sine helt egne nødvendige styreinformationer for ligesom at kunne gøre sit specifikke arbejde.
+[04:01] Fagtermen for det er encapsulation, altså indkapsling.
+[04:05] Okay, for tit bliver det jo beskrevet som sådan nogle russiske babushka-dukker, ikke?
+[04:09] Hvor man lægger en dukke ind i en lidt større dukke.
+[04:12] Men den analogi har ærlig talt altid virket lidt mangelfuld for mig.
+[04:16] Dukkerne gør jo ikke rigtig noget.
+[04:18] Er det ikke snart ligesom at sende noget avanceret og skrøbelig elektronik med posten?
+[04:24] Jo, det er faktisk et meget bedre billede.
+[04:26] Altså, hvis vi tænker på selve beskeden fra din applikation som det der stykke elektronik, lad os bare kalde det for en message, så kan du ikke bare kaste det løs ind bag postbilen.
+[04:36] Nej, det ville gå i stykker.
+[04:36] Du er nødt til at beskytte det først, så transportlaget tager din message og pakker den ind i sådan noget stødabsorberende skum.
+[04:44] Altså en transporthætter.
+[04:45] Og nu er det så samlet set et segment.
+[04:48] Okay, men det skum er vel ikke nok til at finde vej, vel?
+[04:50] Så netværkslaget tager vel bare hele segmentet og lægger det ned i en robust papkasse, hvor de klistrer sådan en stor etiket på med GPS-koordinater.
+[04:59] Altså IP-adresser.
+[05:01] Og nu er det så et datagram.
+[05:03] Lige præcis.
+[05:03] Og postfirmaet tager så din papkasse og smider den ind i en ret specifik aflåst stålkontainer, der passer præcis til lige netop den lastbil, der skal køre den første del af ruten.
+[05:14] Og den container, det er så linklagets frame.
+[05:17] Aha.
+[05:18] Og til allersidst bliver hele molevitten så omdannet til bevægelse ude på vejen, altså de fysiske bits.
+[05:24] Så message, segment, datagram, frame, bits.
+[05:29] Den rækkefølge skal du bare sidde fuldstændig på ryggraden til eksamen.
+[05:32] Men altså, lad os åbne for den der papkasse i dag.
+[05:36] Netværkslaget.
+[05:37] For hvis applikationerne de skaber indholdet, og transportlaget de ligesom styrer selve samtalen, hvad så overhovedet netværkslagets kernemission?
+[05:46] Kernemissionen er helt klart IP-adressering, og så transport af IP-datagrammer fra afsender til destination, tværs over de her utalige forbundet netværk.
+[05:58] Det lyder som et ret massivt koordineringsarbejde.
+[06:01] Det er det også.
+[06:01] Og tæller vi om den velkendte IPv4-standard, som man oftest gør, så foregår det via adresser på præcis 32 bits.
+[06:09] Og ude på selve internettet, der er de bærende kræfter, så routerne.
+[06:13] De modtager datagrammerne, inspicerer dem, og så tager de ligesom beslutninger om, hvor pokker de skal sendes hen næste gang.
+[06:19] Og i den forbindelse, der er der faktisk to begreber i manuskriptet, som læreren har markeret med tyk streg under.
+[06:24] Og det er routing og forwarding.
+[06:28] Altså i hverdagssprog, der bruger vi det jo nærmest som synonymer.
+[06:31] Men til den her eksamen, der dumper man altså bare, hvis man blander dem sammen.
+[06:34] Hvor I består den helt præcise forskel?
+[06:36] Hvis du blander dem sammen, så misforstår du faktisk fuldstændig routerens job.
+[06:40] Routing, det er den der intelligente, meget tidskrævende planlægningsproces.
+[06:45] Okay.
+[06:45] Det er de algoritmer, der sidder og udveksler information med andre routere i verden, for simpelthen at tegne det store kort.
+[06:52] Og finde den mest optimale vej fra, lad os sige Danmark, til en server i Japan.
+[06:56] Routing, det danner selve routen.
+[06:58] Så routing er lidt ligesom at sidde med Google Maps, der bare tykker på en masse trafikdata.
+[07:03] Og udregner, at du ved, rute A er lidt hurtigere end rute B.
+[07:06] Lige præcis.
+[07:08] Og når routen så ligesom er regnet ud og gemt ind i routernes hukommelse, så kommer vi til forwarding.
+[07:13] Ja.
+[07:13] Og forwarding er den her utrolig hurtige, helt konkrete handling inde i selve routeren.
+[07:18] Et datagram ankommer via et kabel på port 1.
+[07:21] Routeren kigger lynhurtigt ind i sin kortlægning og siger,
+[07:23] at for at fylde routen mod Japan, så skal det her datagram bare skubbes ud af port 4.
+[07:29] Og det går stærkt.
+[07:30] Det tager brygdel af et millisekund.
+[07:32] Så routing, det er selve planlægningen af rejsen,
+[07:35] mens forwarding er den helt konkrete handling, hvor routeren drejer prættet.
+[07:39] Det giver totalt mening, det der.
+[07:41] Så datagene, de bevæger sig ligesom fra netværk til netværk.
+[07:45] Men hvordan er sådan et netværk egentlig defineret?
+[07:47] Altså, manuskriptet nævner et begreb, der hedder subnet, og noget, der hedder CIDR.
+[07:54] Tidt der ser man jo en IP-adresse, der bliver efterfugt af en skrådstrej og tallet 24.
+[07:59] Altså for eksempel slash 24.
+[08:01] Ja, det fortæller simpelthen noget om selve strukturen i den her adresse.
+[08:06] For et subnet, det er jo et lokalt netværk, hvor enhederne kan tale direkte med hinanden,
+[08:10] uden overhovedet at skue forbi en eller anden stor ekstern router.
+[08:13] Det er en del af det, man kalder en fælles netværksdel i deres IP-adresse.
+[08:19] Så når der står slash 24?
+[08:22] Ja, så fortæller den her CIDR-notation også egentlig bare,
+[08:25] at de første 24 er de i alt 32 bits, de er simpelthen lust fast til at være selve netværkets navn.
+[08:32] Så for at bruge vores byanalogi igen, så udgør de første 24 bits selve bynavnet og gadenavnet.
+[08:39] Så alle computere på det subnet bor altså på fuldstændig samme gade,
+[08:42] og de sidste resterende bits, det er så bare det specifikke husnummer for den enkelte computer.
+[08:47] Jamen det fungerer faktisk fremragende som et mentalt billede.
+[08:50] For din computer ved jo præcis, hvilken gade den selv bruger på.
+[08:54] Så når du beder den om at hente en fil fra en IP-adresse med et fuldstændig andet gadenavn,
+[08:58] så ved din computer altså straks, at den der maskine ligger overhovedet ikke på lokalnetværket.
+[09:03] Nej.
+[09:04] Og så kan den jo ikke levere pakken direkte.
+[09:06] Men hvad gør den så? Siger den bare fejl og lukker ned?
+[09:10] Nej, nej. Den sender pakken videre til sin default gateway.
+[09:14] Ligesom det sidste meget vigtige begreb her.
+[09:17] Din default gateway er simpelthen den router i din bygning,
+[09:20] der fungerer som sådan en udgangsstør til resten af verden.
+[09:23] Det er den, der ved, hvordan man kommer over til alle de andre gader.
+[09:27] Okay, vent lige lidt.
+[09:28] For hvis routeren, altså vores gateway, den skal tage imod den her pakke,
+[09:32] udføre noget forwarding, og så sende den ud af det helt rigtige kabel,
+[09:36] så er den jo på en eller anden måde nødt til at kunne læse uden på papkassen.
+[09:41] Altså der må vel være en form for frakseddel, der fortæller routeren,
+[09:44] hvad pokker den skal gøre med det her datagram,
+[09:46] uden at den skal til at bryde pakken op og læse min private e-mail.
+[09:50] Lige præcis.
+[09:51] Og den frakseddel er simpelthen præcis det, vi kalder for IPv4-headeren.
+[09:58] Og her er manuskriptet altså ekstremt tydeligt.
+[10:00] Vi skal ikke bare stå til eksamen og ramse alle de her felter i headeren op, som om vi var en robot.
+[10:05] For hvert eneste felt skal vi kunne forklare, hvad er det, og allervigtigst,
+[10:09] hvorfor er det overhovedet nødvendigt for at forhindre, at internettet bare bryder helt sammen.
+[10:13] Ja, så lad os da bare dissekere den.
+[10:16] Det allerførste routeren kigger på i den her header, det er det felt, der hedder version.
+[10:20] Okay.
+[10:20] Det er et lille 4-bit felt, der egentlig bare meget simpelt fortæller routeren,
+[10:24] at hey, det her er en IPv4-pakke, og det er ikke alt muligt andet.
+[10:28] Det færdsætter simpelthen spillereglerne for, hvordan resten af headeren så overhovedet skal læses.
+[10:33] Så langt så gør det, ikke?
+[10:34] Og det næste er så header-length.
+[10:37] Men altså, hvorfor er det overhovedet nødvendigt?
+[10:39] Kan routeren ikke bare selv mærke, du ved, hvor headeren den stopper,
+[10:42] og hvor selve payloaden, altså mine personlige data, begynder?
+[10:45] Jamen det kunne den faktisk godt, hvis headeren altså altid havde præcis samme størrelse.
+[10:49] Men der har en IPv4-header bare ikke nødvendigvis.
+[10:52] For lidt længere nede i den her header, der findes der et felt, der hedder options,
+[10:55] som man en sjældent gang imellem bruger til at tilføje ekstra netværksinformation.
+[11:00] Og netop fordi options kan gøre selve headeren længere,
+[11:03] så er header-length-feltet jo livsnødvendig.
+[11:06] Det fungerer ligesom sådan et bogmærk, der bare helt præcis dikterer for routeren,
+[11:09] okay, du skal stoppe med at læse instruktioner lige præcis her,
+[11:12] for herfra og nedefter, der er det brugernes private data.
+[11:16] Okay, supersmart.
+[11:17] Næste efter, så har vi feltet type of service,
+[11:21] og det kan vist fortælle routeren, om pakken er ekstremt vigtig,
+[11:25] f.eks. et live videoopkald, der lige skal rykkes frem forrest i køen.
+[11:29] Og derefter har vi så total length, som jo bare er den samlede størrelse på hele datagrammet.
+[11:33] Præcis.
+[11:34] Men så rammer vi en gruppe af hele tre felter, der ligesom arbejder sammen.
+[11:38] Det er identification, flags og fragment offset.
+[11:43] Hvad går deres mission egentlig ud på?
+[11:45] Jamen, de håndterer et meget, meget reelt fysisk problem.
+[11:48] For prøv at forestil dig, at dit datagram, det ankommer til en router.
+[11:52] Og den her router skal så sende det videre ud over et ret gammelt linklag,
+[11:56] hvor den maksimale kapacitet på en frame bare er ret lille.
+[11:59] Så hele dit datagram kan simpelthen bare ikke klemme sig igennem det der kabel på én gang.
+[12:02] Åh, det er lidt ligesom at prøve at få sådan en stor trepersoners sofa
+[12:06] bagset igennem en lille bitte kælderdør, ikke?
+[12:08] Altså, man er bare nødt til at skrue benene og armlænene af først.
+[12:11] Ja, lige netter.
+[12:12] Så routeren, den svinges faktisk til at hakke dit datagram op i meget mindre fragmenter.
+[12:17] Og når man hakker data i stykker på den måde,
+[12:19] jamen, så skaber man jo fuldstændig kaos for modtageren,
+[12:22] med mindre man sender en eller anden form for byggevejledning med.
+[12:24] Klart.
+[12:25] Og det er præcis det, de der tre felter er.
+[12:29] Identification giver nemlig alle stykkerne det præcis samme fælles ID-nummer,
+[12:33] så modtageren ved, okay, de hører alle sammen til den samme originale sofa.
+[12:36] Ja.
+[12:36] Og flags, det fortæller så modtageren, hey, hør her, der er flere stykker på vej,
+[12:41] så du skal bare blive ved med at vente.
+[12:43] Og til sidst har vi så fragment offset, der bare helt præcis fortæller,
+[12:46] i hvilken rækkefølge alle de her stykker skal samles for overhovedet at give mening.
+[12:50] Altså, det er jo simpelthen bare smukt udtænkt.
+[12:52] Og det bringer mig faktisk tilbage til det, jeg startede med at spørge om helt i begyndelsen i dag.
+[12:56] Jeg lovede at afsløre, hvad det er, der forhindrer internettet i bare at crashe fuldstændig.
+[13:01] Ja, nemlig.
+[13:02] Og det er simpelthen det næste felt her.
+[13:04] TTL, eller Time to Live.
+[13:07] Altså, for hvis to ruter er konfigureret forkert,
+[13:10] og de bare står og sender en pak frem og tilbage til hinanden i et helt uendeligt loop,
+[13:13] så ville netværket jo super hurtigt bare drukne i data, hvis ikke det var for TTL.
+[13:17] Hvad sker der rent mekanisk der?
+[13:19] Mekanisk set, der er TTL faktisk bare et tal.
+[13:23] Lad os sige, at det for eksempel starter på 64.
+[13:25] Og hver eneste gang pakken så hopper gennem en router,
+[13:28] så tvinges routeren simpelthen til at trække en fra det tal.
+[13:31] Så det bliver 63, 62, 61.
+[13:36] Så hvis pakken bare kører i ring, eller måske farer vild,
+[13:39] så vil TTL-tallet uomgåeligt til sidst ramme 0.
+[13:42] Og den router, der trækker tallet på 0,
+[13:45] den har altså en meget simpel indbygget ordre.
+[13:47] Slæt pakken fuldstændig øjebliklig.
+[13:49] Wow.
+[13:50] Ja, pakken dør bare, og internettets båndbredde er reddet.
+[13:53] Et fantastisk simpelt koncept, der bare løser et gigantisk problem.
+[13:58] Efter TTL, der har vi så protocol-feltet.
+[14:01] Og hvis vi lige husker den der dukkeanalogi,
+[14:03] eller måske vores papkasse med stødabsorberende skum indeni,
+[14:06] så giver det her felt egentlig rigtig god mening.
+[14:08] Protocol fortæller simpelthen bare,
+[14:10] hvilket transportlag, der venter op hos modtageren.
+[14:12] Altså, når pakken endelig er nået frem,
+[14:14] skal dataene så afleveres til en TCP-proces,
+[14:17] eller måske en UDP-proces.
+[14:19] det er vel bare en slags sorteringsmekanisme ved selve ankomsten.
+[14:23] Fuldstændig korrekt, det er.
+[14:24] Og derefter, der finder vi så header-checksum.
+[14:27] Og det er en matematisk formel,
+[14:29] som bruges til at opdage de her fejl,
+[14:31] der måske kan være opstået,
+[14:32] hvis der har været statisk støj på kablerne.
+[14:34] Men vent, hvorfor hedder det specifikt header-checksum?
+[14:37] Altså, tjekker den da slet ikke,
+[14:38] om selve min besked, altså min personlige data,
+[14:41] er blevet fuldstændig ødelagt undervejs?
+[14:43] Nej, slet ikke.
+[14:44] Og det er faktisk en utrolig vigtig pointe til din eksamen.
+[14:48] IP-laget interesserer sig udelukkende for,
+[14:50] om fragtsedlen er en takt.
+[14:52] Altså, hvis en adresse oppe i hætterne er blevet ændret
+[14:54] bare en lille smule af noget støj,
+[14:56] jamen, så sletter ruderen bare pakken,
+[14:57] for ellers risikerer den jo at levere den til en helt forkert
+[14:59] og måske endda ondsindet modtager et andet sted i verden.
+[15:02] Okay.
+[15:03] Men at kontrollere om selve indholdet nede i datagrammet,
+[15:06] altså payloaden er en takt,
+[15:08] det overleder IP-laget simpelthen til transportlaget,
+[15:11] for på den måde at spare beregningskraft ind i ruderen.
+[15:13] For ruderen skal jo bare have de her pakker ud af døren hurtigst muligt.
+[15:17] Effektivitet over alt andet, det er tydeligt.
+[15:20] De to sidste helt store felter, de giver næsten sig selv.
+[15:23] Det er Source IP og Destination IP.
+[15:26] Altså kort sagt, afsenderens adresse og modtagerens adresse.
+[15:29] Og lige nedenunder det, der ligger så vores data,
+[15:32] altså selve segmentet, som papkasten transporterer.
+[15:35] Præcis.
+[15:36] Hju, jamen det var altså selve headeren.
+[15:38] Men al den her snak om IP-adresser,
+[15:40] det forudsætter jo ligesom, at vi faktisk har en IP-adresse.
+[15:43] Ja, det er klart.
+[15:44] Så lad os tage et meget konkret hverdagseksempel fra bogen.
+[15:48] Jeg træder ind af døren derhjemme,
+[15:50] og min telefon vil jeg automatisk gerne på Wi-Fi.
+[15:53] For overhovedet at kunne tale med ruderen og sende datagrammer afsted,
+[15:56] så har den brug for en IP.
+[15:57] Men den er jo fuldstændig blank.
+[15:59] Hvordan får den en?
+[15:59] Jamen, den benytter sig af det, man kalder en protokol på applikationsladet,
+[16:03] der meget passende hedder DHCP,
+[16:06] altså Dynamic Host Configuration Protocol.
+[16:09] Ja.
+[16:09] Og DHCP-serveren, som oftest bare er bygget ind i din egen hjemrouter,
+[16:13] den sidder klar til at uddele netværksindstillinger.
+[16:16] Det forløber sig gennem fire bestemte trin,
+[16:18] som man nemt kan huske med DORA-akronymet.
+[16:21] Men altså, der synes jeg, at jeg ser et massivt logisk paradoks her.
+[16:25] For hvordan pokker kan min telefon overhovedet sende en besked til ruderen
+[16:28] og bede den om en IP-adresse,
+[16:30] når den endnu ikke har en IP-adresse at sende anmodningen fra?
+[16:33] Nej.
+[16:34] Ruderen kan jo for pokker ikke sende et svar tilbage til en afsender,
+[16:37] der slet ikke findes.
+[16:38] Og det er jo præcis det Catch-22, som DORA-processen løser.
+[16:43] Fordi telefonen overhovedet ingen identitet har,
+[16:46] og faktisk ikke engang kender DHCP-serverens adresse endnu,
+[16:49] så starter den simpelthen med et broadcast.
+[16:51] Okay.
+[16:51] Den råber nærmest bare ud i rummet til samtlige enheder på hele det lokale netværk.
+[16:56] Det er D'et i DORA.
+[16:57] Det skopper.
+[16:58] Den siger, hej, er der nogle DHCP-server, der kan høre mig?
+[17:02] Ah.
+[17:03] Og det fanger serveren så.
+[17:05] Så ordet, det står vel for offer.
+[17:07] Serveren råber tilbage og tilbyder den en IP-adresse.
+[17:10] Ja.
+[17:11] Men telefonen tager vel ikke bare adressen og stikker af med det samme.
+[17:13] Den skal lave et R, ikke et request.
+[17:17] Så den råber ligesom tilbage, at den gerne vil acceptere præcis det tilbud.
+[17:21] Men hvorfor skal den egentlig anmode om at få noget, som den rent faktisk lige er blevet tilbudt?
+[17:26] Jo, det er fordi i store virksomhedsnetværk, der kan der sagtens sidde to eller måske tre forskellige DHCP-server,
+[17:31] der faktisk alle sammen har sendt et tilbud fuldstændig samtidig, fordi de alle sammen vil være hurtigst.
+[17:36] Nå.
+[17:36] Så request-beskiden lader ligesom telefonen vælge bare ét af de tilbud.
+[17:41] Samtidig med, at den jo pænt og høfligt fortæller de der andre servere, at de faktisk går og kan tage deres tilbudadresser tilbage i puljen igen.
+[17:48] Det er smart.
+[17:49] Og til allersidst, så får telefonen så et A, som står for Acknowledgement.
+[17:54] Og det er simpelthen en bekræftelse på, at adressen nu er udlejet til telefonen.
+[17:58] Men altså kun i et bestemt tidsrum, som også er kendt som lease time.
+[18:02] Okay, så ud over selve IP-adressen fortæller DHCP altså også telefonen, hvad subnet-masken er, og hvem der er default gateway.
+[18:09] Og måske også adressen på DNS-serveren.
+[18:12] Den får bare hele overlevelsespakken stukket i hånden.
+[18:15] Lige præcis.
+[18:16] Men så melder det næste kæmpe problem-server.
+[18:18] Og det her er altså afgørende for overhovedet at forstå, hvordan det moderne internet hænger sammen.
+[18:23] For jeg har en telefon, jeg har en arbejds-PC, en tablet, min partner har fuldstændig det samme, børnene har Playstations,
+[18:29] og vi har endda et smart køleskab.
+[18:30] Altså vi snakker hurtigt 30 enheder, der alle sammen har fået tildelt en IP-adresse via DHCP på netværket.
+[18:37] Ja.
+[18:37] Men vi betaler jo for pokker kun vores internetudbydere for at få udleveret én enkelt offentlig IP-adresse til hele husstanden.
+[18:44] Hvordan i alverden kan 30 enheder overhovedet være på internettet, fuldstændig samtidig, hvis det hele skal foregå gennem én eneste adresse?
+[18:52] Jamen det løses med det, vi kalder NET, Network Address Translation.
+[18:55] Og det her, det er altså et af de absolut mest centrale koncepter på hele netværkslaget.
+[19:02] Indertil på dit eget lille subnet, der har dine 30 enheder jo hver deres egne private IP-adresse.
+[19:09] Det kunne for eksempel være 192.168.1.10.
+[19:14] Ja.
+[19:14] Men den adresse, den er jo fiktiv, ikke? Den er fuldstændig ugyldig ude på det globale internet.
+[19:20] Så når min computer beder om at få en hjemmeside ned, og den ligesom sender datagrammet afsted mod vores default gateway, altså mod hjemme-routeren, så gør routeren vel et eller andet ved pakken?
+[19:30] Lige præcis.
+[19:32] Routeren, den fungerer nærmest som en tolk eller sådan en lidt streng receptionist.
+[19:36] Den åbner op for IP-headeren, slætter din computers private adresse fra det der source-IP-felt, og stempler i stedet for husstandens ene offentlige IP-adresse ind i feltet.
+[19:48] Og først til efter, der sender den så pakken ud i verden.
+[19:50] Hold da op.
+[19:51] Men når webseveren så svarer tilbage og sender dataen retur til min offentlige IP-adresse, så havner pakken vel bare ude hos routeren, ikke?
+[19:59] Jo.
+[19:59] Hvordan i alverden kan routeren så huske, om det egentlig var min telefon, der bad om en YouTube-video, eller om det var mit smart-tv ind i stuen, der bad om en Netflix-film?
+[20:08] Ud af tæt, der ligner det jo fuldstændig, at begge de her anmodninger kom fra den samme afsender.
+[20:12] Ja, og det holder den simpelthen styr på ved hjælp af det, man kalder sin nattabel.
+[20:16] Og for at kunne gøre det, så er den faktisk nødt til lige at snyde lidt og kigge et lag op ind i transportlaget.
+[20:21] Nå.
+[20:22] Den kigger nemlig på de specifikke portnumre, der bliver brugt inde i TCP eller UDP-segmentet.
+[20:27] Og så gemmer den dem simpelthen i en stor tabel.
+[20:30] Så den siger, okay, den anmodning, der gik ud på port 45.000, den tilhører altså telefonen.
+[20:36] Så når svaret engang kommer tilbage på præcis den port, jamen så slår routeren bare op i tabellen,
+[20:41] oversætter den der offentlige destination tilbage til telefonens private IP, og sender pakken sikkert ind på lokalnetværket.
+[20:48] Ej, det er jo vanvittigt fascinerende udtænkt.
+[20:50] Men vi skal desværre skynde os lidt videre i noterne, for der er et fuldstændig uundgåeligt emne mere, som vi skal dække under IP-laget.
+[20:57] IP handler jo om at flytte data.
+[20:59] Men altså, hvad nu, hvis noget går galt, og routeren for eksempel er overbelastet og bare taber min pakke på gulvet?
+[21:07] IP-laget har vel i sig selv ingen mekanisme til at advare afsenderen, har den?
+[21:11] Nej, det har den overhovedet ikke.
+[21:12] Og det er her ICMP kommer ind i billedet.
+[21:15] Internet Control Message Protocol.
+[21:17] Altså, du kan lidt tænke på ICMP som internettets store nødblus og sådan et fejlrapporteringssystem.
+[21:23] For hvis en destination slet ikke kan nås, eller routeren bare kan finde vejen, så genererer den en ICMP-fejlbesked og sender den direkte tilbage til kilden.
+[21:31] Ah, og det er vel også her, at det klassiske ping-værktøj hører hjemme, ikke?
+[21:36] Hvor man bare råber echo request, og så håber, at serveren i den anden ende svarer med et echo reply.
+[21:42] Nemlig, det er præcis.
+[21:43] Men der er faktisk et endnu mere elegant værktøj, som ligesom udnytter ICMP.
+[21:48] Og det er Traceroute.
+[21:49] Og det bruges simpelthen til at tegne et fuldstændig kort over hver eneste router, din trafik ligesom passerer igennem på sin vej over til serveren.
+[21:58] Men det her er faktisk jeg altid undrømme over.
+[21:59] Fordi der er router undervejs, har der absolut ikke lyst til at stoppe op og sådan præsentere sig selv over for dig.
+[22:04] De er jo mega travlt med bare at forvorte i al trafikken.
+[22:07] Hvordan pokker kan Traceroute ligesom tvinge dem til at afsløre deres adresser?
+[22:11] Jamen, Traceroute-programmet, det bruger faktisk et ret genialt hack til netop det.
+[22:15] Det udnytter nemlig den der TTL-mekanisme, altså time to live, som vi talte om før.
+[22:20] Så Traceroute sender en pakke afsted mod destinationen.
+[22:23] Men den sætter helt bevidst TTL-værdien i IPv4-headeren til kun at være én.
+[22:31] Så når pakken rammer den allersomme første router ude på gaden?
+[22:35] Så trækker routeren én fra, og TTL bliver dermed nul.
+[22:38] Og så kasserer routeren jo bare pakken.
+[22:40] Men når den kasserer en pakke på den måde, så digterer reglerne altså, at den skal sende en ICMP-besked tilbage til afsenderen for at sige
+[22:47] Undskyld, men din pakkes levetid udløber altså hos mig.
+[22:51] Ej, okay.
+[22:52] Og bum, nu har du simpelthen fået IP-adressen på den allerførste router tilbage.
+[22:56] Præcis.
+[22:57] Og så sender Traceroute bare en ny pakke afsted med TTL sat til 2.
+[23:00] Så den overlever altså lige akkurat den første router, men dør hos den næste.
+[23:03] Ja.
+[23:04] Som så sender en fejlbesked tilbage.
+[23:05] Så den tvinger simpelthen alle routerne til, en efter en, at fejle fuldstændig bevidst og sende nødbluser op.
+[23:12] Hold op for, at det snedet tænker programmerne.
+[23:14] Det er det virkelig.
+[23:15] Okay, den aller sidste, ret tunge sten i dit pensum her, det er IPv6.
+[23:19] Altså, vi har jo talt om IPv4 indtil nu, og den har jo eksisteret nærmest siden intranettets ungdom.
+[23:25] Vi er ligesom ved at løbe fuldstændig tør for de gamle 32-bit-adresser.
+[23:28] Løsningen, det er selvfølgelig IPv6, som i stedet bruger 128-bit-adresser.
+[23:33] Det giver jo et helt ufatteligt stort antal adresser, så vi løber aldrig tør igen.
+[23:37] Lige ned op.
+[23:38] Men manuskriptet, det pointerer altså også meget kraftigt, at IPv6 har en fast header på præcis 40 bytes.
+[23:44] Hvorfor er det så vigtigt, at den er helt fastlåst i størrelsen?
+[23:47] Jamen, kan du huske det felt, der hedder header-length overfra IPv4, som vi er jo nødt til at bruge, fordi options kunne gøre headeren helt variabel i sin længde?
+[23:55] Ja.
+[23:55] Den der usikkerhed, den koster altså routerne tid.
+[23:59] De skal jo stoppe op og begynde at udregne, okay, hvor må vi helt præcis begynde at læse selve dataen.
+[24:04] I IPv6 er hele den uforudsigelighed simpelthen bare fjernet.
+[24:08] Headeren er altid fast, og den er fuldstændig strippet for unødvendige felter.
+[24:13] Og det betyder altså, at den moderne hardware ude i routerne, de kan behandle og forvarte de her IPv6-pakker med en fuldstændig vanvittig hastighed.
+[24:20] For alt ligger simpelthen altid på præcis de samme pladser.
+[24:23] Men altså, internettet, det ændres jo ikke bare overnight, ikke?
+[24:27] Der står vel stadig tusindvis af gamle IPv4-routere derude.
+[24:31] Hvis min nye computer nu sender et supermoderne IPv6-datagram afsted, og det pludselig rammer et rigtig gammelt netværk.
+[24:38] Altså, hvad gør vi så?
+[24:38] Jamen, det løser vi heldigvis med en teknik, der hedder tunneling.
+[24:42] Og der tager man simpelthen bare sit meget avancerede IPv6-datagram og putter det direkte ind i en gammel IPv4-papkasse som payload.
+[24:50] Ej, genialt.
+[24:51] Ja.
+[24:52] Så IPv4-routerne, de kigger altså kun på den IPv4-hætter, der sidder udenpå.
+[24:56] De trækker bare på skuldrene og sender pakken videre.
+[24:59] De fatter overhovedet ikke den moderne teknologi, der ligger indeni, ikke?
+[25:02] De transporterer den jo bare over det gamle netværk, lige indtil den rammer noget moderne hardware igen.
+[25:07] Fremragende.
+[25:08] Ved du hvad? Vi nærmer os faktisk afslutningen på noterne, og vi har dækket alt fra indkapsling til tunneller nu.
+[25:15] Så, hvis vi to lige forestiller os, at du træder ind i selve eksamenslokalet om to minutter.
+[25:20] Der er især tre meget konkrete spørgsmål fra pensum, hvor læreren garanteret vil forsøge at fange dig lidt i farten.
+[25:26] Okay, lad os tage dem.
+[25:27] Vi tager dem bare som en lynhurtekontrol her.
+[25:29] Første faldgruppe.
+[25:31] Hvad er den helt præcise forskel på routing og forwarding?
+[25:35] Altså, routing, det er den helt store planlægning.
+[25:38] Det er algoritmernes kortlægning af selve ruten gennem netværket.
+[25:42] Forwarding derimod, det er den lokale handling nede i routeren.
+[25:45] Altså, hvor den tager pakken og sender den fysisk ud gennem det rigtige kabel mod næste hop.
+[25:50] Helt perfekt.
+[25:52] Anden faldgruppe.
+[25:53] Hvorfor er det nu, vi absolut ikke kan undvære fældet header length i IPv4?
+[25:58] Jamen, det er fordi en IPv4 header kan skifte i størrelse på grund af optionsfeltet.
+[26:04] Og routeren skal vide, hvor instruktionerne slutter, så den ikke bare fejlagtigt begynder at læse brugernes private data, som om det var routing-instruktioner.
+[26:12] Lige præcis.
+[26:13] Og den allerlængste her til sidst.
+[26:15] Både TTL i et IPv4-datagram og en lokal ARP-cache, de handler jo begge om levetid.
+[26:21] Hvordan adskiller de to sig overhovedet fra hinanden?
+[26:24] Jo, men de måler faktisk to helt forskellige ting.
+[26:28] ARP-cachens levetid, den måler tid, altså i minutter og sekunder, for hvor længe computeren overhovedet skal huske en bestemt markadresse.
+[26:36] Men IPv4's TTL måler altså udelukkende i hop.
+[26:40] Den tæller simpelthen ned per router, fuldstændig uanset, hvor lang tid i sekunder, det egentlig har taget at nå dig til.
+[26:47] Spot on. Det sidder lige i skabet.
+[26:49] Jeg tør altså godt sige, at du er mere end klar til den mundtlige reaksamen.
+[26:53] Jamen tak.
+[26:55] Det er absolut bedste råd her på falderæbet.
+[26:58] Det er nok, undgå den der udenadslære for enhver pris.
+[27:02] Gør ligesom vi har gjort i dag, og spørg i stedet dig selv, hvorfor?
+[27:05] For hver eneste lag, for hver protokoll og for hvert felt.
+[27:08] Ja, ikke?
+[27:09] Ja.
+[27:09] Når du forstår det der mekaniske behov for, at for eksempel nat overhovedet eksisterer,
+[27:15] jamen så bliver hele samtalen til eksamen meget mere flydende, fordi det jo pludselig giver logisk mening.
+[27:20] Fuldstændig enig.
+[27:21] Altså det er logikken, der bærer det hele.
+[27:24] Og med netop logik i mente, så vil jeg rigtig gerne efterlade dig, der lytter med,
+[27:28] med en lille provokerende tanke, du lige kan tykke på indtil eksamen starter.
+[27:33] For vi talte jo før om det her NAT.
+[27:35] Altså hvordan routeren hjemme hos dig gemmer alle dine 30 private enheder bag en enkelt fælles offentlig IP-adresse.
+[27:43] Ja.
+[27:43] Og udover bare at spare på de der adresser, så skabte det her faktisk et ret massivt og utilsigtet lag af sikkerhed.
+[27:50] For onde aktører udefra kan faktisk ikke ramme dit smart TV direkte, for de har overhovedet ikke en offentlig adresse.
+[27:55] Ruderens NAT-tabel afviser simpelthen bare al den trafik, der ikke er bedt om indenfra.
+[28:02] Men hvad tror du egentlig, der sker med den der sikkerhedsmur den dag, hvor hele verden går 100% over til IPv6?
+[28:10] En fremtid, hvor vi faktisk har adresser nok til, at din telefon, din bærebar og endda dit køleskab,
+[28:16] alle sammen får deres helt egen, permanent, unikke og offentligt tilgængelige IP-adresse direkte udemod det globale internet.
+[28:24] Tænk lige lidt over det, og held og løge med din re-examen.

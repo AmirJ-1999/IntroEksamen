@@ -15,3 +15,12 @@ Studieside til eksamen i *Introduction to IT-Security* (Python + Netværk).
 - **Download offline** (knappen øverst): gemmer hele siden som én HTML-fil. Guides, flashcards og transskriptioner virker uden internet; Python-motoren, lyd og videoer kræver internet.
 - Fremgang og afkrydsninger gemmes lokalt i din browser.
 - Podcasts og transskriptioner er AI-genererede/automatiske og kan indeholde unøjagtigheder.
+
+## Kildekode
+
+`index.html` er bygget af filerne i `src/`: `base_v7.html` (flashcards + live coding) plus guides (`guides_net.js`, `guides_py.js`), diagrammer og værktøjer (`data.js`, `ext.js`, `ext.css`) og medie-data (`media_meta.py`, `oembed.json`, `transcripts/`). Genbyg med:
+
+```bash
+cd src
+python build.py ../index.html
+```

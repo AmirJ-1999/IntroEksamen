@@ -1,0 +1,495 @@
+[00:00] Du sidder ved din skærm, du taster DR.dk ind i din browser, og du trykker bare Enter.
+[00:05] Ja.
+[00:05] Og i de næste måske 50 millisekunder, altså før overskriften overhovedet dukker op på skærmen,
+[00:11] der udfører dine maskine et nærmest højteknologisk marathon tværs over kloden.
+[00:17] Det er helt utroligt at tænke på, jo.
+[00:18] Det er det nemlig.
+[00:19] Den navigerer gennem et kæmpe netværk af kabler, den oversætter navnet til maskinkode,
+[00:24] og den forhandler leveringsbetingelser med server i andre lande.
+[00:28] Og bygger til sidst en hel hjemmeside op, ikke?
+[00:31] Lige præcis. Helt fra bunden.
+[00:33] Og i dagens studiesession, der åbner vi simpelthen motorhjelmen på præcis det millisekund.
+[00:39] Og altså, det gør vi jo med et meget specifikt formål.
+[00:42] Fordi du sidder derude og forbereder dig til din mundtlige re-eksamen i introduktion til IT-sikkerhed.
+[00:46] Det gør du nemlig.
+[00:47] Og du skal bare vide, at vi har din ryg i dag.
+[00:50] Helt sikkert.
+[00:50] Det, der sker i de der 50 millisekunder, det er selve kernen i det, du skal op i.
+[00:54] Så vi skal kigge på applikationslaget.
+[00:56] Og ja, hele den her netværksforståelse.
+[00:59] Men vi gør det på en måde, hvor vi forstår selve mekanismerne.
+[01:02] Jamen, det handler jo ikke bare om at lære en eller anden lang telefonbog af begreber uden noget.
+[01:06] Nej, slet ikke.
+[01:07] Det handler om at forstå, hvordan og hvorfor data overhovedet bevæger sig, som den gør.
+[01:12] Så lad os trykbro det her.
+[01:14] Jeg tænker, jeg tager rollen som din medstuderende i dag.
+[01:17] Eller måske lidt som eksaminator ind imellem, ikke?
+[01:19] Det lyder som en rigtig god plan.
+[01:20] Vi skal have det her til at sidde helt fast på rygranden, inden vi står foran den rigtige eksaminator.
+[01:25] Så for at forstå, hvordan en hjemmeside lander på vores skærm, så er vi jo nok nødt til at starte med selve den bane, som dataen løber på.
+[01:32] Ja, selve fundamentet.
+[01:34] Lige præcis.
+[01:35] Og kildematerielet til eksamen bygger det hele op omkring det, der hedder femlagsmodellen.
+[01:39] Hvordan er den model overhovedet skruet sammen?
+[01:41] Altså, femlagsmodellen er essentielt set bare en arbejdsfordeling.
+[01:45] Hvert lag har én meget specifik opgave, og så bygger de ligesom oven på hinanden for at transportere dine data.
+[01:51] Okay, så hvis vi starter der, hvor du trykker Enter, hvor er vi så?
+[01:54] Så befinder vi os helt oppe på lag 5, altså applikationslaget.
+[01:59] Det er selve grænsefladen.
+[02:01] Det er her, dine programmer, altså din browser eller dit e-mailprogram formulerer den besked, der skal sendes afsted.
+[02:08] Aha, okay, så det er her, vi finder de der kendte protokoller?
+[02:10] Nemlig.
+[02:12] Her har vi protokoller som HTTP til hjemmesider, DNS til opslag, SMTP til e-mails og FTP til at overføre filer.
+[02:22] Men altså, selve applikationen kan jo ikke bare selv sende dataen over et kabel?
+[02:26] Nej, præcis.
+[02:27] Den er nødt til at række beskeden videre nedad i systemet.
+[02:30] Den giver stafetten videre.
+[02:33] Okay, så applikationen siger, hey, jeg vil gerne have den her hjemmeside, og så rækker den bestilling ned til næste lag, som er lag 4, transportlaget.
+[02:40] Lige præcis.
+[02:41] Og her i vores materiale nævnes der TCP og UDP. Hvad er det reelt, de gør, når de overtager beskeden fra lag 5?
+[02:50] Transportlagets opgave er simpelthen at etablere selve forbindelsen.
+[02:54] Altså mellem det program, du kører lokalt, og det program, der kører ud på serveren.
+[02:58] Det afgør, hvordan vi skal sende dataen.
+[03:01] Så man har et valg her?
+[03:02] Ja, altså bruger vi TCP, Transmission Control Protocol, så vælger vi den meget pålidelige løsning.
+[03:09] Hvad betyder pålidelig i den her sammenhæng?
+[03:12] Det betyder, at TCP opretter en fast forbindelse.
+[03:16] Den sørger for at hakke dine data op i overskuelige stykker.
+[03:20] Den nummererer dem alle sammen, og så tjekker den faktisk, at modtageren har fået dem alle sammen i den rigtige rækkefølge.
+[03:25] Og hvad, hvis der mangler noget?
+[03:26] Så beder TCP simpelthen om at få det sendt igen.
+[03:30] Vindelig, hvis TCP er så grundig og sikrer, at intet går tabt, hvorfor eksisterer UDP så overhovedet?
+[03:36] Det er et rigtig godt spørgsmål.
+[03:37] Jamen, for materialet kalder jo UDP for usikkert og uden leveringsgaranti.
+[03:42] Hvorfor i alverden ville vi vælge en metode, der bare, du ved, kaster data ud i luften, uden at tjekke, om det lander?
+[03:48] Fordi grundighed koster tid, ikke?
+[03:50] Det kræver vildt mange ressourcer at sende bekræftelser frem og tilbage hele tiden.
+[03:53] UDP, User Datagram Protocol, den dropper bare alt det administrativ arbejde.
+[03:59] Den gider ikke papirarbejde.
+[04:00] Præcis.
+[04:01] Den pakker dataen og skyder den af sted.
+[04:03] Lynhurtigt.
+[04:05] Forestil dig, du streamer en live fodboldkamp.
+[04:07] Ja, okay.
+[04:08] Hvis det lige forsvinder et par pixels i et enkelt billede, så vil du jo hellere have, at videoen bare kører videre, ikke?
+[04:13] Jo, helt klart.
+[04:14] Det ville være vildt irriterende, hvis hele udsendelsen bare frøs, fordi computeren skulle bede om at få sendt de der to manglende pixels igen.
+[04:21] Lige netop.
+[04:21] Så tommelfingereglen er, UDP bruges til hastighed, og TCP bruges til pålidelighed.
+[04:28] Det giver vildt god mening.
+[04:30] Så nu har vi en besked fra la 5, og vi har en transportmetode fra la 4.
+[04:34] Men altså, internettet er jo gigantisk.
+[04:36] Hvordan ved min maskine overhovedet, hvilken vej den skal sende den her pakke ud af mit hus?
+[04:40] Og se, det bringer os ned på lag 3.
+[04:43] Netværkslaget.
+[04:44] Des absolut eneste opgave er at finde vej tværs over netværk, fra afsender til den endelige destination.
+[04:50] Ah, og det er her IP-adresserne kommer ind i billedet.
+[04:54] Nemlig.
+[04:55] Det er IP, Internet Protocol, der styrer showet her.
+[04:58] Hver enhed har en IP-adresse.
+[05:01] EP-V4 eller EP-V6.
+[05:04] Men jeres eksamenspensrum nævner faktisk også nogle ret vigtige støttemekanismer på det her lag.
+[05:08] Ja, jeg så godt begreber som DHCP og NAT, fordi systemet jo åbenbart ikke bare kører helt af sig selv.
+[05:15] Nej, det har brug for hjælp.
+[05:17] Jeg har læst om dem, men hvordan fungerer de sådan rent mekaniske eksamen?
+[05:20] Hvad gør DHCP for eksempel?
+[05:22] Altså, tænk på DHCP lidt som en boligadministrator.
+[05:26] Når du forbinder din telefon til et nyt Wi-Fi-netværk, så har du jo ikke en IP-adresse endnu.
+[05:31] Nej, den er bare blank.
+[05:31] Ja, så telefonen råber ud på netværket, hey, jeg har brug for en adresse, og så svarer DHCP-serveren, som ofte sidder i din router,
+[05:40] værsgo, her er en ledig adresse, du må låne den i 24 timer.
+[05:44] Aha, så den udlejer simpelthen IP-adresser dynamisk.
+[05:47] Præcis.
+[05:48] Så slipper vi for at skulle sidde og manuelt indtaste lange talrækker hver evig eneste gang, vi går på nettet.
+[05:53] Det ville jo være den meget rigt.
+[05:54] Det ville det virkelig.
+[05:55] Og hvad er natsrollet så i det spil?
+[05:57] Vores materiale siger, at den ligesom oversætter mellem private og offentlige adresser.
+[06:02] Ja, NAT er faktisk en af de smarteste overlevelsesmekanismer, vi har på internettet i dag.
+[06:07] Problemet er jo, at vi for længst er løbet tør for de gamle IP-V4-adresser.
+[06:11] Så der er simpelthen ikke nok adresser til alle i verden?
+[06:13] Nej, slet ikke.
+[06:14] Så NAT fungerer lidt som en receptionist i en rigtig stor virksomhed.
+[06:19] Udadtil har hele din husstand, altså dine computerer, telefoner og dit smart-tv, kun én enkel offentlig IP-adresse, som resten af verden kan se.
+[06:27] Ligesom virksomhedens hovednummer.
+[06:29] Lige præcis.
+[06:30] Og indertil har de så fået tildelt interne private adresser.
+[06:34] Så når jeg beder om en hjemmeside, hvad gør NAT så rent fysisk?
+[06:39] Så tager routeren din forspørgsel.
+[06:41] Den noterer lige, at det var din specifikke computer på værelset, der spurgte.
+[06:45] Og så sender den beskeden ud på nettet under husets fællesadresse.
+[06:49] Når svaret så kommer tilbage udefra, kigger NAT bare i sine noter og sender hjemmesiden direkte ind til dig.
+[06:54] Hold da op.
+[06:55] Det er egentlig utrolig elegansk god sammen.
+[06:57] Det er supersmart.
+[06:59] Men okay.
+[07:00] Hvis netværkslaget og IP-adresserne sørger for rejsen hele vejen fra min computer til en server i, lad os sige, USA.
+[07:07] Hvad skal vi så overhovedet bruge det næste lag til?
+[07:10] Altså, lag 2 er linklaget.
+[07:12] Og her snakker vi pludselig om MAC-adresser og ARP og Ethernet.
+[07:17] Er en IP-adresse, der er ikke nok til at nå frem?
+[07:20] Altså, IP-adressen er nok til at kende den endelige destination.
+[07:24] Men den hjælper dig faktisk ikke med at tage det allernæste fysiske skridt.
+[07:28] Hvordan det?
+[07:29] Jo.
+[07:29] Tænk på IP-adressen som at skrive New York på et brev.
+[07:33] Det er jo fint nok.
+[07:34] Men postbådet er altså nødt til at vide, hvilken postcentral han skal køre til først her til morgen.
+[07:40] Linklads opgave er udelukkende at flytte dataen til den næste fysiske enhed på ruten.
+[07:44] Som oftest bare er min router derhjemme?
+[07:47] Ja, præcis.
+[07:48] Den skal bare klare det næste hop.
+[07:50] Ah, og det er så her, MAC-adressen kommer ind i billedet.
+[07:53] Lige netop.
+[07:54] MAC-adressen er det der fysiske indstøbte hardware-nummer, som sidder direkte i dit netværkskort.
+[07:59] Den ændrer sig aldrig, uanset hvor i verden du er, i modsætning til IP-adressen, som jo ændrer sig alt efter, hvilket netværk du er på.
+[08:06] Så for at dataen kan komme fra min computer til routeren via Wi-Fi, skal computeren kende routernes MAC-adresse?
+[08:12] Ja, og den måde den slår brug mellem IP-adressen på lag 3 og MAC-adressen på lag 2, det er via en protokol, der hedder ARP.
+[08:20] ARP, ja. Hvordan fungerer den?
+[08:22] Det fungerer bogstaveligt talt ved, at din computer råber ud på det lokale netværk.
+[08:26] Hvem af jer herinde har IP-adressen 192.168.1.1?
+[08:32] Send mig din MAC-adresse.
+[08:34] Og så svarer routeren tilbage med sit hardware-nummer.
+[08:36] Lige præcis. Og nu kan Link-laget endelig pakke dataen ind og sende den afsted på det første fysiske stræk.
+[08:43] Hvilket så bringer os helt ned på det nederste lag, lag 1, det fysiske lag.
+[08:47] Ja, nu er vi helt nede i maskinerummet.
+[08:50] Og her tænker jeg, at det giver lidt sig selv.
+[08:52] Vi taler jo ikke om adresser mere. Nu taler vi om ren fysik.
+[08:55] Bits, altså nuller og ettalder, der bliver skudt igennem koverkabler som strøm,
+[09:00] eller lys i fibernet, eller radiosignaler på vores Wi-Fi.
+[09:03] Helt korrekt. Og se, nu har vi faktisk lagt fundamentet for et af de absolut vigtigste koncepter,
+[09:09] du kan blive spurgt ind til et eksamen.
+[09:11] Uh, lad mig get.
+[09:12] Encapsuling. Eller encapsulation på engelsk.
+[09:16] Lige præcis. Det er et kerneemne.
+[09:19] Encapsuling. Lad mig lige prøve at tænke det her logisk igennem ud fra den rejse, vi lige har været på.
+[09:23] Det betyder vel bare, at hver gang vi rykker et lag nedad,
+[09:26] så pakker laget dataen ind i sine egne instruktioner for at kunne løse sine egne opgaver, ikke?
+[09:31] Jo, præcis.
+[09:32] Det er jo lidt ligesom sådan en russisk babushka-dukke.
+[09:34] Det er en helt fantastisk måde at tænke på det på. Brug endelig dens eksamen.
+[09:38] Hvis vi starter helt ind i midten af dukken, oppe på applikationslaget,
+[09:42] så har vi selve grunddataen.
+[09:44] Kan du huske, hvad dit eksamensmanuskript kalder den data?
+[09:47] På applikationslaget kalder vi det en message.
+[09:50] Rigtigt.
+[09:51] Og den rækker vi så ned til transportlaget.
+[09:53] Og lad os bare sige, at vi bruger TCP.
+[09:55] Så hakker TCP det over, sætter portnummer på, så her kalder vi det et segment.
+[10:01] Helt rigtigt.
+[10:01] Nu har du et TCP-segment.
+[10:03] Det rækkes så ned til netværkslaget.
+[10:06] IP-protokollen tager det her segment, og den sætter så sin egen dukke udenom.
+[10:11] Altså en header med afsender og modtager IP-adresser.
+[10:15] Hvad hedder pakken så nu?
+[10:16] Det må være et datagram.
+[10:18] Nemlig.
+[10:18] Og netværkslaget rækker så datagrammet videre ned til linklaget,
+[10:23] som jo skal finde den næste fysiske router via ARP.
+[10:27] Så linklaget sætter sin dukke udenom med MAC-adresser.
+[10:30] Så nu har vi en frame.
+[10:33] Helt korrekt.
+[10:34] En frame.
+[10:35] Som så til allersidst splittes ad til bits på det fysiske lag.
+[10:39] Så altså message, segment, datagram, frame, bits.
+[10:44] Okay.
+[10:45] Message, segment, datagram, frame.
+[10:48] bits.
+[10:49] Jeg har den.
+[10:50] Og når det så rammer modtageren, så sker det hele vel bare baglæns?
+[10:53] Lige præcis.
+[10:54] Serveren modtager de her bits, samler dem til en frame.
+[10:58] Linklaget piller MAC-adresserne af dukken.
+[11:00] Netværkslaget læser IP-adressen og fjerner den dukke.
+[11:04] Transportlaget samler segmenterne.
+[11:05] Og til sidst har serverens applikation modtaget den helt intakte message.
+[11:10] Det er selve mekanismen bag en kapsling.
+[11:13] Okay, fedt.
+[11:14] Så lad os lige spole tilbage til det aller øverste lag igen.
+[11:17] Applikationslaget.
+[11:17] Det er jo det her eksaminator primært, vi bruger i detaljerne.
+[11:21] Ja, det er her, det bliver rigtig sjovt.
+[11:23] Så lad os sige, at Papuska-dukken er pakket ud, og serveren har modtaget min forspørgsel.
+[11:28] Men hov, vent.
+[11:29] For overhovedet at sende forspørgselen afsted mod DR.dk.
+[11:32] Der manglede min computer jo en IP-adresse.
+[11:35] Det gjorde den nemlig.
+[11:35] For den der lange adresseliste over hele internettet ligger jo ikke bare gemt inde i min maskine.
+[11:40] Vi skal have fat i DNS.
+[11:42] Domain Name System.
+[11:44] Hvordan foregår den der oversættelse i praksis?
+[11:47] Altså, du kan tænke på DNS som internettets store kontaktbog.
+[11:50] Lidt ligesom appen kontakter på din smartphone, ikke?
+[11:53] Ja, hvor man bare kender navnet.
+[11:54] Præcis.
+[11:55] Du trykker på din vens navn og billede, men telefonen ringer jo i virkeligheden op til et skjult telefonnummer nede i baggrunden.
+[12:01] Det er akkurat det, DNS gør.
+[12:03] Den tager det menneskelige domænenavn, som vi kan huske, og slår de maskinlæsbare koordinater op.
+[12:09] Altså IP-adressen.
+[12:10] Vores materiale pointerer ret specifikt, at DNS typisk bruger UDP på port 53.
+[12:15] Ja, det er rigtigt.
+[12:16] Men altså, før der forklarede vi, at UDP bruges, når man accepterer, at data bare kan gå tabt.
+[12:21] Det virker jo fuldstændig vanvittigt at bruge en usikker metode til noget,
+[12:24] så kritisk som at finde den rigtige adresse.
+[12:26] Det kan godt virke lidt ulogisk i starten.
+[12:29] Hvorfor risikerer jeg, at mit opslag bare forsvinder ude i den blå luft?
+[12:32] Fordi her handler det igen om rå hastighed.
+[12:35] Hvis vi brugte det tunge TCP til DNS, så skulle din computer først bruge tre separate beskeder
+[12:41] bare for at etablere forbindelsen til DNS-serveren.
+[12:44] Altså, før den overhovedet kunne få lov at stille sit spørgsmål.
+[12:47] Åh, det er det der håndtryk.
+[12:49] Nemlig.
+[12:50] Med UDP skyder computeren bare spørgsmålet afsted med det samme.
+[12:53] Hey, hvad er I penge på dr.dk?
+[12:55] Og hvis den ikke får et svar i løbet af en prøvdel af et sekund,
+[12:58] så stiller den bare spørgsmålet igen.
+[12:59] Det er simpelthen stadig hurtigere.
+[13:01] Meget hurtigere, end at skulle bygge en formel TCP-forbindelse op for båden.
+[13:04] Okay, så vi spørger hurtigt.
+[13:07] Men hvem er det egentlig, vi spørger?
+[13:09] Det vil ikke bare en gigantisk server, der står i en kælder i Nevada
+[13:13] og har alle internettets adresser.
+[13:15] Det synes jeg, det ville jo gå ned konstant.
+[13:17] Nej, og det er netop for at undgå det dommedagsscenarie,
+[13:21] at DNS er bygget op som et distribueret hierarki.
+[13:24] Et system af delegation, kan man sige.
+[13:27] Hvordan fungerer det hierarki så?
+[13:29] Når din maskine vil kende en adresse,
+[13:31] tjekker den allerførst sin egen lokale DNS-cache.
+[13:34] Altså, har vi været på dr.dk inden for de sidste par timer?
+[13:37] Og hvis vi har det, så ligger adressen bare lokalt.
+[13:39] Ja, og så sparer vi enormt meget tid.
+[13:42] De har god mening.
+[13:43] For hvis blauserne skulle ud på nettet og spørge efter adressen
+[13:45] for hver evig eneste lille ikon og billede på en hjemmeside hver gang,
+[13:50] så ville nettet jo nok bryde sammen.
+[13:52] Det ville være helt ubrugeligt.
+[13:54] Men hvad tror du så, der sker, hvis adressen ikke ligger i cashen?
+[13:57] Så starter skattejagten vel?
+[14:00] Lige præcis.
+[14:01] Så spørg din internetudbydere en af de globale root servers.
+[14:05] Root serveren?
+[14:06] Ja.
+[14:06] Den kender ikke nødvendigvis svaret på, hvor dr.dk bor.
+[14:10] Men den siger, at jeg ved, hvem der styrer alle adresser, der ender på .dk.
+[14:14] Her er adressen til TLD-serveren.
+[14:17] TLD, det er top-level-domæn.
+[14:19] Nemlig.
+[14:20] For Danmark.
+[14:21] Så du bliver sendt videre til TLD-serveren.
+[14:24] Den kender heller ikke den præcise IP til DR.
+[14:26] Men den siger, at jeg ved, hvilken maskine DR selv har sat op til at styre deres domæne.
+[14:30] Gå til deres authoritative server.
+[14:32] Ah, så den peger mig bare videre til næste afdelen.
+[14:36] Lignet op.
+[14:36] Og den authoritative DNS-server har endelig det juridisk bændende svar på, hvad IP-adressen rent faktisk er.
+[14:43] Så kæden er cash, så root, så TLD og endelig authoritative.
+[14:48] Perfekt optimeret.
+[14:50] Og når jeg så endelig får det svar ud af den authoritative server, hvad står der så egentlig i det svar?
+[14:56] Eksamensnotaterne lister fire forskellige typer DNS records.
+[15:00] Ja, en DNS record er jo simpelthen bare den post, du finder inde i databasen.
+[15:04] Den primære er en A-record.
+[15:06] A for address.
+[15:08] Det er præcis.
+[15:08] Og dens mekanisme er helt basal.
+[15:10] Den binder et navn direkte til en IPv4-adresse.
+[15:14] Står der en A-record, så ved computeren præcis, hvor den skal gå hen.
+[15:17] Hvad så med C-navn?
+[15:19] Det lyder lidt mere langkåret.
+[15:20] C-navn er faktisk bare et alias.
+[15:23] Forestil dig, at du har domænet shop.dr.dk.
+[15:26] I stedet for at binde det direkte til en IP-adresse, så kan du lave en C-navn-record, der bare siger,
+[15:31] ved du hvad, slå bare dr.dk op og bruge den samme adresse.
+[15:35] Ah, så hvis DR senere skifter server og får en helt ny IP-adresse,
+[15:39] så behøver de kun at opdatere A-recorden fra selve dr.dk.
+[15:42] Lige præcis.
+[15:43] C-navnet følger bare automatisk med, fordi det peger på navnet og ikke på selve IP'en.
+[15:47] Det er ret smart.
+[15:48] Det er mega smart.
+[15:49] De sidste to i vores materiale er MX og NS.
+[15:54] Og altså, MX står for Mail Exchange.
+[15:57] Og det fortæller åbenbart systemet, hvilken server, der skal modtage e-mails, der bliver sendt til det domæne.
+[16:01] Nemlig.
+[16:02] Mens NS, altså Nameserver, er den record, der dikterer, hvilke serverer, der faktisk er de autoritære serverer fra selve domænet.
+[16:10] Lige præcis. Du har fuldstændig styr på det.
+[16:12] De records fortæller bare andre systemer, hvem der har ansvaret.
+[16:15] Okay, men lad os koble det hele sammen nu.
+[16:17] Min browser har brugt DNS.
+[16:20] Skattejagten er slut.
+[16:21] Jeg har fået A-recorden.
+[16:23] Jeg har mit IP-adresse.
+[16:25] Nu kan min browser og serveren finde hinanden over netværkslaget.
+[16:29] Ja.
+[16:29] Men hvordan tæller de sig sammen?
+[16:31] Hvordan beder I om at få udleveret selve hjemmesidens indhold?
+[16:34] Og der bruger vi så HTTP.
+[16:36] Hypertext Transfer Protocol.
+[16:38] Det er jo selve hjertet i webbet.
+[16:40] HTTP fungerer som et meget stringent opkald-svarssystem.
+[16:44] Mellem en klient, som er din browser, og så serveren.
+[16:48] Så jeg piger om noget, og den svarer.
+[16:50] Præcis.
+[16:51] Klienten sender en request, altså en anmodning, og serveren behandler den og sender et response tilbage.
+[16:56] Og i den request, der ligger selve metoden for, hvad jeg vil have.
+[17:00] For mandoskriptet gør ret meget ud af forskellen mellem get og post.
+[17:04] Ja.
+[17:04] Det er også ret afgørende at kende til eksamen.
+[17:07] En get request er en ren data-hentning.
+[17:10] Du siger bare til serveren, giv mig din forside.
+[17:13] Og din forspørgsel ligger helt åbent i selve URL'en.
+[17:16] Giver meni.
+[17:17] Hvad så med post?
+[17:18] En post-request er derimod, når du skal levere data til serveren.
+[17:22] F.eks. når du indtaster dit brugernavn og password på en side.
+[17:25] Så det ligger ikke åbent op i adresselinjen?
+[17:28] Nej.
+[17:28] Her gennem staten ind i selve kroppen er din HTTP-besked.
+[17:32] Det, vi kalder payloaden.
+[17:33] Så det skal behandles af serveren, i stedet for, at du bare henter en fil.
+[17:37] Og når serveren så endelig svarer med sin response, så sender den en statuskode med.
+[17:42] Dem kender vi jo godt, ikke?
+[17:43] Jo.
+[17:43] Altså, 200 OK betyder succes.
+[17:46] Hjemmesiden er på vej.
+[17:47] Og vi har alle sammen prøvet at få en 404 not found.
+[17:50] Men betyder 404 egentlig, at serveren er nede?
+[17:53] Nej.
+[17:53] Det er en ret vigtig skildning at lave her.
+[17:56] Hvis du får en 404-fejl, så har HTTP-forbindelsen faktisk fungeret helt perfekt.
+[18:01] Helt perfekt?
+[18:01] Ja.
+[18:02] Du har fået fat i den rigtige server.
+[18:04] Forbindelsen er der.
+[18:05] Men serveren kigger i sine filer og svarer tilbage til dig.
+[18:08] Jeg eksisterer.
+[18:09] Jeg hører dig.
+[18:10] Men præcis den fil eller underside, du beder om, den findes altså ikke hos mig.
+[18:15] Så fejlen ligger i din anmodning.
+[18:17] Ikke i selve forbindelsen.
+[18:18] Ah, det er en god detalje.
+[18:20] Her er der også et ord i noterne, som tit forvirrer.
+[18:23] Stateless.
+[18:25] At HTTP er stateless.
+[18:26] Betyder det virkelig, at HTTP ikke giver mig nogen historik overhovedet?
+[18:30] Ja, det gør det faktisk.
+[18:31] Men vent, hvis det er et tilfælde.
+[18:33] Lad os sige, at jeg er logget ind på en webshop, og jeg klikker videre til næste side for at købe noget.
+[18:38] Hvis HTTP glemmer alt, hvorfor kaster den mig så ikke bare ud med det samme og beder mig at logge ind igen på hver eneste lille underside?
+[18:43] Det er et fantastisk spørgsmål.
+[18:45] Og det er ofte et decideret eksamensspørgsmål.
+[18:48] Selve HTTP-protokollen er totalt amnesisk.
+[18:51] Den glemmer alt.
+[18:52] Den anser hvert eneste klik for at være en helt ny person, den aldrig har mødt før.
+[18:56] Det lyder ekstremt besværligt.
+[18:57] Altså, det er godt for serveren, for så sparer den hukommelse på millioner af mennesker.
+[19:02] Men webudviklerne har jo måttet bygge et lille hack for at omgå problemet, når vi skal logge ind.
+[19:07] Og det er cookies?
+[19:08] Lige præcis.
+[19:09] Når du logger ind første gang, så sender serveren et lille stykke tekst, en cookie, tilbage til din browser.
+[19:14] Det er lidt ligesom at få sådan et paparmbånd på, når du går ind på et diskotek.
+[19:17] Okay, så næste gang jeg klikker på et link og laver en ny HTTP-request, så sender min browser armbåndet med.
+[19:24] Ligner der?
+[19:25] Og serveren genkender armbåndet og tænker, at det er ham, der lige har logget ind.
+[19:28] Lad ham endelig passere.
+[19:30] Selvom HTTP-protokollen selv stadig ingen engelse har om, hvem du er.
+[19:34] Det er et vildt godt eksempel.
+[19:36] En anden mekanisme, materialet også fremhæver under HTTP, er forbindelsestypen.
+[19:40] Altså non-persistent versus persistent.
+[19:44] Hvorfor går vi overhovedet op i det på applikationslaget?
+[19:46] Vi går op i det, fordi vi er nødt til at tænke på det, vi talte om på transportlaget.
+[19:50] Kan du huske TCP?
+[19:52] Ja, det var grundigt, men ret langsomt.
+[19:54] Præcis.
+[19:55] For at oprette en TCP-forbindelse, skal maskinerne igennem et såkaldt trevejshåndtryk.
+[20:01] Forestil dig nu, at du skal hente en hjemmeside, der består af ét tekstdokument og ti billeder.
+[20:05] Okay, 11 ting i alt.
+[20:06] Ja.
+[20:07] Hvis vi bruger den gamle metode, altså non-persistent, så åbner din maskine et helt nyt TCP-håndtryk for tekstfilen.
+[20:13] lukker det, så åbner det et nyt håndtryk for det første billede.
+[20:18] Lukker det.
+[20:19] Det er 11 separate håndtryk og forbindelser?
+[20:21] Ja, og det skaber en helt enorm forsinkelse.
+[20:23] Det er vildt ineffektivt.
+[20:25] Så persistent HTTP betyder simpelthen bare, at vi holder det der TCP-rør åben?
+[20:30] Nemlig.
+[20:30] Vi tager det ene håndtryk i starten, vi holder forbindelsen åben, og så pumper vi bare alle 11 filer igennem den samme linje.
+[20:38] Det er standarden i dag.
+[20:39] Det fjerner selvfølgelig en massiv mængde overflødig netværkstrafik.
+[20:41] Lige præcis.
+[20:42] Alright, jamen vi er jo næsten i mål med applikationslaget nu.
+[20:45] Vi har dækket DNS og HTTP ret dybtegående.
+[20:49] Vores materiale nævner også lige ganske kort to andre applikationsprotokoller, som vi bare lige skal kunne redegøre for funktionen af.
+[20:55] SMTP og FTP.
+[20:57] Hvad er mekanismerne bag dem?
+[20:58] Altså SMTP, Simple Mail Transfer Protocol, har en meget specifik funktion.
+[21:04] Den skubber e-mails fra en server til en anden server.
+[21:08] Så den afleverer den ikke til min telefon?
+[21:09] Nej.
+[21:10] Tænk på den som tilbypostbilen, der kører bredet fra København til Aarhus.
+[21:15] Den afleverer det bare på den rigtige postcentral derovre.
+[21:18] Den sørger ikke for, at du rent faktisk kan læse mailen i din indbakke.
+[21:21] Det bruger vi andre protokoller til.
+[21:23] Ah, okay.
+[21:24] Typisk e-map eller sådan noget, ikke?
+[21:25] Jo.
+[21:27] SMTP kører på TCP-port 25 og er strengt til for at overlevere posten mellem servererne.
+[21:34] Og så har vi FTP.
+[21:37] File Transfer Protocol.
+[21:38] Nemlig.
+[21:39] Den er bygget specielt til at uploade og downloade store filer mellem en klient og en server.
+[21:44] F.eks. hvis en webudvikler skal uploade alle filerne til sin færdige hjemmeside op til en webserver.
+[21:51] Okay.
+[21:51] Lad os prøve at kåre alt det her ind til essensen.
+[21:54] Vi står foran eksaminator, sensor sidder og kigger på os.
+[21:58] Kan du skære de fire protokoller ned til deres absolute kernefunktion, som vi bare har?
+[22:02] Det er helt på plads.
+[22:03] Helt sikkert.
+[22:05] Her er din kerne til eksamen.
+[22:07] Nummer 1. DNS er kontaktbogen.
+[22:09] Den oversætter menneskelige domænenavne til maskinlæsbare IP-adresser.
+[22:13] Tjek.
+[22:14] Nummer 2. HTTP er websproget.
+[22:17] Det udveksler hjemmesider og indhold mellem din browser og serveren gennem get og post.
+[22:21] Tjek.
+[22:22] Nummer 3. SMTP er postbilen.
+[22:25] Den sender e-mails mellem mail-server.
+[22:27] Og nummer 4. FTP er flyttemanden.
+[22:30] Den transporterer rå filer på tværs af netværket.
+[22:33] Perfekt.
+[22:34] Lad mig lige køre en sidste trykprøvning.
+[22:36] Det er absolut klassikerspørgsmål, hvor man hurtigt kan snuble, hvis man er lidt nervøs.
+[22:41] Hvad er den helt fundamentale forskel på DNS og HTTP?
+[22:46] Altså, DNS finder udelukkende ud af, hvor serveren bor.
+[22:52] Den skaffer bare adressen.
+[22:53] Og HTTP er så den protokol, der rent faktisk tager afsted til adressen, banker på døren og beder om at få selve indholdet udleveret.
+[23:01] Fremragende.
+[23:02] Har du en sidste tanke, vi kan tage med os?
+[23:04] Noget, der måske rækker lidt ud over pensum, men som virkelig viser overskud?
+[23:09] Ja, det har jeg faktisk.
+[23:11] Hvis du gerne vil vise Examinator, at du forstår, hvor netværksteknologien bevæger sig hen ude i virkeligheden,
+[23:16] så kan du nævne det usynlige lag af sikkerhed.
+[23:20] Hvordan tænker du?
+[23:21] Altså, alt det vi har talt om i dag, dine get requests, dine cookies, hvilke filer du beder om,
+[23:28] alt det sendes jo som udgangspunkt bare som åben tekst over nettet.
+[23:31] Som alle kan læse?
+[23:33] Ja, i teorien.
+[23:34] Men når vi så lægger et S på HTTP og gør det til HTTPS,
+[23:40] så pakker vi simpelthen hele applikationslagets indhold ind i en stærk kryptering.
+[23:44] Ah, okay.
+[23:45] Det betyder, at de lavere lag, altså e-pay-routerne og link-switchene undervejs,
+[23:51] de kan kun se, hvor pakken skal hen.
+[23:52] Men de har ingen anelse om, hvorvidt du er ved at tjekke din netbank, eller om du bare læser nyheder.
+[23:58] Krypteringen beskytter selve indholdet under rejsen.
+[24:01] Det er en rigtig god pointe.
+[24:03] Det viser jo lige præcis, at man forstår, hvordan teorien fra femlagsmodellen møder den virkelige verden.
+[24:08] Præcis. Det er et rigtig godt sted at slut.
+[24:11] Og med den tanke lukker vi altså eksamensmanuskriptet for i dag.
+[24:14] Forhåbentlig har den her fiktive 50 millisekunders rejse givet dig en meget dybere forståelse af de motorer, der arbejder under kølerhjelmen,
+[24:22] næste gang du taster DRDK ind.
+[24:24] Det er jeg sikker på, den har.
+[24:26] Så træk ved dig dybt til din reeksamen.
+[24:28] Husk at forklare, hvordan det virker.
+[24:29] Husk at bruge babuskedukken til at forklare indkapsling.
+[24:32] Og fremfor alt, husk, at du faktisk forstår det her.
+[24:34] Held og lykke.
+[24:36] Held og lykke.

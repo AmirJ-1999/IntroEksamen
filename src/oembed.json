@@ -1,0 +1,227 @@
+{
+ "IZ_PnVXtMeY": {
+  "title": "1.5 Layering, encapsulation",
+  "author": "JimKurose",
+  "ok": true
+ },
+ "S9GEPaQ1lFs": {
+  "title": "2.2 The Web and HTTP (part 1)",
+  "author": "JimKurose",
+  "ok": true
+ },
+ "4M39gEPWPYs": {
+  "title": "2.2 The Web and HTTP part 2",
+  "author": "JimKurose",
+  "ok": true
+ },
+ "6lRcMh5Yphg": {
+  "title": "2.4 The Domain Name System (DNS)",
+  "author": "JimKurose",
+  "ok": true
+ },
+ "D3GMrOMR2dk": {
+  "title": "2.3 Email",
+  "author": "JimKurose",
+  "ok": true
+ },
+ "UVR9lhUGAyU": {
+  "title": "DNS Explained in 100 Seconds",
+  "author": "Fireship",
+  "ok": true
+ },
+ "_iHMMo7SDfQ": {
+  "title": "2.7 Socket programming",
+  "author": "JimKurose",
+  "ok": true
+ },
+ "CekW6ipRrGA": {
+  "title": "3.2 Transport layer multiplexing and demultiplexing",
+  "author": "JimKurose",
+  "ok": true
+ },
+ "VjBDgcNno-Q": {
+  "title": "3.3 Connectionless Transport: UDP",
+  "author": "JimKurose",
+  "ok": true
+ },
+ "UYJP-6mhF6E": {
+  "title": "3.5-1 TCP Reliability, Flow Control, and Connection Management",
+  "author": "JimKurose",
+  "ok": true
+ },
+ "E4I6t0mI_is": {
+  "title": "3.5-2 TCP Reliability, Flow Control, and Congestion Control (part 2/2)",
+  "author": "JimKurose",
+  "ok": true
+ },
+ "cIHiSR4j3g4": {
+  "title": "3 7 TCP Congestion Control",
+  "author": "JimKurose",
+  "ok": true
+ },
+ "F27PLin3TV0": {
+  "title": "TCP connection walkthrough | Networking tutorial (13 of 13)",
+  "author": "Ben Eater",
+  "ok": true
+ },
+ "sdIpLuIR1ZY": {
+  "title": "4.3 The Internet Protocol, part 1",
+  "author": "JimKurose",
+  "ok": true
+ },
+ "H9DivCEFuUg": {
+  "title": "4.3 The Internet Protocol, part 2",
+  "author": "JimKurose",
+  "ok": true
+ },
+ "EHV0Q0R--Ns": {
+  "title": "5.6 ICMP: Internet Control Message Protocol",
+  "author": "JimKurose",
+  "ok": true
+ },
+ "BWZ-MHIhqjM": {
+  "title": "What is Subnetting? - Subnetting Mastery - Part 1 of 7",
+  "author": "Practical Networking",
+  "ok": true
+ },
+ "lMGWJZLTulY": {
+  "title": "6.1 Introduction to the Link Layer",
+  "author": "JimKurose",
+  "ok": true
+ },
+ "X2cLpzFRMT4": {
+  "title": "6.3 Multiple Access links  and protocols",
+  "author": "JimKurose",
+  "ok": true
+ },
+ "QPi5Nvxaosw": {
+  "title": "Address Resolution Protocol (ARP) in less than 5 minutes",
+  "author": "Practical Networking",
+  "ok": true
+ },
+ "aamG4-tH_m8": {
+  "title": "ARP: Mapping between IP and Ethernet | Networking tutorial (9 of 13)",
+  "author": "Ben Eater",
+  "ok": true
+ },
+ "1XrRT0CmzYw": {
+  "title": "Frame formats | Networking tutorial (6 of 13)",
+  "author": "Ben Eater",
+  "ok": true
+ },
+ "vvhEnr52UOU": {
+  "title": "802.11 How WiFi Works - Wireless Networks | Computer Networks Ep. 7.3 | Kurose & Ross",
+  "author": "Epic Networks Lab",
+  "ok": true
+ },
+ "89vY3ofpC3A": {
+  "title": "Networking 101 - Internet Protocol Stack",
+  "author": "Security in mind",
+  "ok": true
+ },
+ "2D0s2pWqeyc": {
+  "title": "Understanding network traffic - introduction to network 102",
+  "author": "Security in mind",
+  "ok": true
+ },
+ "rLKAwYFyVEE": {
+  "title": "Lets talk WireShark: Human Traffic IDS/IPS Reflections - Traffic Analysis",
+  "author": "Security in mind",
+  "ok": true
+ },
+ "hiMT7jSv0q0": {
+  "title": "Lets talk WireShark: Normal Traffic - Traffic Analysis",
+  "author": "Security in mind",
+  "ok": true
+ },
+ "Dl8yRMxaHZs": {
+  "title": "Lets talk WireShark: Nikto scan - Traffic Analysis",
+  "author": "Security in mind",
+  "ok": true
+ },
+ "zXG3HS0Nh88": {
+  "title": "Lets talk WireShark: Dirb scan - Traffic Analysis",
+  "author": "Security in mind",
+  "ok": true
+ },
+ "fF7OAveC-Fg": {
+  "title": "Lets talk WireShark: NMAP Stealth Scan - Traffic Analysis",
+  "author": "Security in mind",
+  "ok": true
+ },
+ "479mJfofj-Y": {
+  "title": "Lets talk WireShark: NMAP Scan Port 80 Version Scan  - Traffic Analysis",
+  "author": "Security in mind",
+  "ok": true
+ },
+ "1p-FPXRg88g": {
+  "title": "Lets talk WireShark: NMAP Standard Scan 1000 Common Ports  - Traffic Analysis",
+  "author": "Security in mind",
+  "ok": true
+ },
+ "yqnmotqP8U0": {
+  "title": "Lets talk WireShark: HTTP + TCP Protocol - Traffic Analysis",
+  "author": "Security in mind",
+  "ok": true
+ },
+ "Z6lopklJHmI": {
+  "title": "TCP Protocol - Is it secure or not? Lets talk about it",
+  "author": "Security in mind",
+  "ok": true
+ },
+ "k9TUPpGqYTo": {
+  "title": "Python Tutorial for Beginners 2: Strings - Working with Textual Data",
+  "author": "Corey Schafer",
+  "ok": true
+ },
+ "ajrtAuDg3yw": {
+  "title": "Python Tutorial: Slicing Lists and Strings",
+  "author": "Corey Schafer",
+  "ok": true
+ },
+ "W8KRzm-HUcc": {
+  "title": "Python Tutorial for Beginners 4: Lists, Tuples, and Sets",
+  "author": "Corey Schafer",
+  "ok": true
+ },
+ "daefaLgNkw0": {
+  "title": "Python Tutorial for Beginners 5: Dictionaries - Working with Key-Value Pairs",
+  "author": "Corey Schafer",
+  "ok": true
+ },
+ "DZwmZ8Usvnk": {
+  "title": "Python Tutorial for Beginners 6: Conditionals and Booleans - If, Else, and Elif Statements",
+  "author": "Corey Schafer",
+  "ok": true
+ },
+ "6iF8Xb7Z3wQ": {
+  "title": "Python Tutorial for Beginners 7: Loops and Iterations - For/While Loops",
+  "author": "Corey Schafer",
+  "ok": true
+ },
+ "9Os0o3wzS_I": {
+  "title": "Python Tutorial for Beginners 8: Functions",
+  "author": "Corey Schafer",
+  "ok": true
+ },
+ "Uh2ebFW8OYM": {
+  "title": "Python Tutorial: File Objects - Reading and Writing to Files",
+  "author": "Corey Schafer",
+  "ok": true
+ },
+ "NIWwJbo-9_8": {
+  "title": "Python Tutorial: Using Try/Except Blocks for Error Handling",
+  "author": "Corey Schafer",
+  "ok": true
+ },
+ "gd7BXuUQ91w": {
+  "title": "60 Linux Commands you NEED to know (in 10 minutes)",
+  "author": "NetworkChuck",
+  "ok": true
+ },
+ "VbEx7B_PTOE": {
+  "title": "Linux for Hackers // EP 1 (FREE Linux course for beginners)",
+  "author": "NetworkChuck",
+  "ok": true
+ }
+}

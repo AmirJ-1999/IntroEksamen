@@ -1,0 +1,393 @@
+[00:00] Lige i dette millisekund, altså mens du sidder og lytter til min stemme lige nu,
+[00:05] så modtager din computer eller din telefon simpelthen tusindvis af fuldstændig usynlige datapakker.
+[00:11] Ja, det er faktisk ret vildt at tænke på.
+[00:13] Ikke også? Nogle af dem udgør præcis den her lydfil, du hører,
+[00:17] men andre er måske en notifikation, der popper op, eller en kalender, der synkroniserer.
+[00:23] Og spørgsmålet er jo, hvordan i alverden din enhed ved, hvilken pakke, der hører til hvad?
+[00:28] Altså, så min stemme ikke pludselig ender ind i din kalender-app?
+[00:31] Lige præcis. Og svaret på det, det ligger i det her usynlige, men helt utrolig fascinerende maskinrum,
+[00:38] som vi kalder transportlaget. Og det er jo lige præcis det, vi skal dykke ned i under vores gennemgang her i dag.
+[00:44] Ja, for vi ved jo godt, at du sidder og forbereder dig til dine mundtlige re-examen i IT-sikkerhed.
+[00:49] Og vores mission i dag, det er altså ikke at fodre dig med en masse udenadslager.
+[00:53] Nej, for hvis man bare forsøger at fotografere pensum med hjernen, så falder man lynhurtigt igennem,
+[01:00] når man skal forklare det med sine egne ord.
+[01:01] Det handler om at få en reelt, mekanisk forståelse af de her systemer.
+[01:05] Lige præcis.
+[01:06] Så for at bygge den der sande forståelse, så bruger vi en meget fast skabelon i dag.
+[01:11] Hver gang vi rammer et teknisk koncept, så stiller vi tre simple spørgsmål.
+[01:16] Hvad er det? Hvad gør det? Og allervigtigst, hvorfor er det overhovedet nødvendigt?
+[01:21] Det er en supergod struktur. Det tvinger os ligesom væk fra bare at remse fakta op.
+[01:27] Men før vi begynder at dissekere selve transportlaget, så skal vi måske lige have placeret det i den store sammenhæng.
+[01:33] Ja, lad os lige sætte scenen for lytteren.
+[01:35] Altså, hvis vi forestiller os en helt almindelig handling, du åbner en hjemmeside,
+[01:39] så er der faktisk fem abstrakte lag, der samarbejder vertikalt.
+[01:42] Øverst oppe har vi applikationsflaget. Det er der, dine programmer lever, HTTP og den slags.
+[01:47] Og så under det?
+[01:48] De under det finder vi vores kernesubjekt for i dag, nemlig transportlaget med TCP og UDP.
+[01:55] Under det ligger netværkslaget med IP-adresser, så linklaget med MAC-adresser,
+[02:01] og helt nede i bunden rammer vi det fysiske lag, altså bare rå bits af elektriske signaler i kablet.
+[02:07] Okay, det giver jo en meget pæn kassemodel, altså rent teoretisk.
+[02:10] Men der er et punkt her, som vi er nødt til at tage fat i.
+[02:13] Ja, hvad tænker du på?
+[02:14] Hvorfor opererer vi med så absurd mange forskellige navne for den samme klump data?
+[02:20] Altså, nogle gange siger underviseren message, andre gange er det segment, datagram, frame eller bare bits.
+[02:27] Hvorfor hedder det ikke bare data hele vejen ned?
+[02:29] Nå ja, den klassiske forvirring.
+[02:32] Det er faktisk fordi, det i praksis ikke er de samme data mere, når de bevæger sig ned gennem lagene.
+[02:37] Konceptet kaldes encapsulation, altså incapsling.
+[02:43] Incapsling.
+[02:45] Altså ligesom noget, der bliver pakket ind.
+[02:48] Lige netop.
+[02:49] For hvert skridt, dine data tager nedad, så tilføjer det nye lag sine egne styreoplysninger udenpå.
+[02:55] Du skal forestille dig en russisk babushka-dukke.
+[02:57] Eller endnu bedre måske et brev.
+[03:00] Okay, et brev. Den er jeg med på.
+[03:02] Ja, et brev, der bliver lagt i en kuvert.
+[03:05] Den kuvert bliver så lagt ned i en større forsællelsesæske med en fragtlebe på.
+[03:10] Og den æske, den ryger sig ind i en kæmpe stålkontainer.
+[03:14] Ah, så navnet skifter simpelthen for at fortælle os præcis, hvilken container vi kigger på i det givende øjeblik.
+[03:20] Fuldstændig rigtigt.
+[03:21] Oppe i applicationsladet hedder det en message.
+[03:23] Når den ankommer til TCP i transportladet, og TCP sætter sine egne hætter på, så kalder vi hele muligheden for et segment.
+[03:30] Og så ned i netværkslaget.
+[03:33] Jems, der får den en IP-hætter på, og så hedder det datagram.
+[03:37] Ned på linklaget pakkes det i en frame, og helt til sidst hugges den frame op i små bits på det fysiske lag.
+[03:43] Okay, lad os lige slå den rækkefølge helt fast for eksamens skyld.
+[03:47] Message på applikation.
+[03:49] Segment på transport.
+[03:51] Datagram på netværk.
+[03:52] Frame på link.
+[03:53] Og bits på det fysiske.
+[03:55] Lige præcis.
+[03:56] Det sidder lige i skabet.
+[03:57] Men lad os nu zoome helt ind på det, vi kalder et segment i transportladet.
+[04:03] Hvordan i alverden finder de her segmenter frem til det rigtige program på computeren?
+[04:08] Her er det super godt at have et konkret hverdagseksempel parat.
+[04:11] Hvis vi nu forestiller os selve internettet som en kæmpestor by.
+[04:16] IP-adressen nede på netværkslaget, det er simpelthen adressen på den bygning, du gerne vil besøge.
+[04:21] Ja, den finder frem til selve maskinen derude.
+[04:24] Men bygningen er jo ikke slutmålet.
+[04:26] Altså, hvis jeg dumper et brev i lobbyen på en skyskraber, så når det jo ikke op til den rigtige person.
+[04:31] Nej, og det er jo lige akkurat transportladets eksistensberettelse.
+[04:35] Bygningen har jo 100 viser lejligheder.
+[04:37] Og de repræsenterer alle programmerne på din computer.
+[04:41] Portnummeret i transportladet er dit lejlighedsnummer.
+[04:43] Ah, så det sorterer trafikken.
+[04:46] Ja, og endelig har vi det, der hedder en socket.
+[04:49] En socket er selve døren ind til lejligheden.
+[04:52] Det er den åbning, hvor dit program rent faktisk sidder og lytter for at få data ind.
+[04:56] Okay, jeg elsker det billede.
+[04:58] Bygningen er IP-adressen.
+[05:01] Lejligheden er portnummeret.
+[05:02] Og døren ind er vores socket.
+[05:04] Præcis.
+[05:04] Men vel lidt.
+[05:05] Hvis min computer, lad os sige, at jeg har fem browserfane at åbne,
+[05:09] og jeg hører Spotify, og jeg opdaterer et spil i baggrunden.
+[05:12] der strømmer jo fuldstændig vanvittige mængder data ind og ud af en masse døre på én gang.
+[05:17] Hvordan skiller systemet det ad?
+[05:19] Det er to processer, vi kalder multiplexing og demultiplexing.
+[05:24] Hos afsenderen foregår der multiplexing.
+[05:27] Transportladet suger data til sig fra alle de åbne sockets,
+[05:30] klæsker portnummer på dem for at markere, hvor de kommer fra,
+[05:32] og så fletter den dem sammen til én lang strøm ud på netværket.
+[05:36] Så multiplexing samler simpelthen trådene.
+[05:38] Og demultiplexing må så være det modsatte over hos modtageren.
+[05:41] Fuldstændig.
+[05:42] Når den der enorme sammenblandede strøm rammer transportladet hos modtageren,
+[05:47] så fungerer demultiplexing som et postsorteringscenter.
+[05:51] Den kigger på modtagerportnumret på hver eneste segment,
+[05:54] og så fordeler den bare posten op til det rigtige dør.
+[05:57] Det er derfor, at din lydfil ikke rammer kalenderer af dem.
+[05:59] Det giver rigtig god mening.
+[06:01] Og det bringer os jo frem til de to absolute hovedpersoner her i transportladet.
+[06:05] Man hører konstant om TCP og UDP.
+[06:07] Ja, de er uundgåelige brødre.
+[06:10] Præcis.
+[06:10] Men hvad adskiller dem egentlig, når de nu begge to bare skal levere data til de her porte?
+[06:15] Jamen altså forskellen ligger primært i deres tilgang til pålidelighed.
+[06:19] TCP, som står for Transmission Control Protocol, det er den meget omhyggelige type.
+[06:25] TCP garanterer, at alt ankommer, og at det samles i den fuldstændig korrekte rækkefølge.
+[06:30] Men, og der er et men, det koster.
+[06:32] Det koster på hastigheden.
+[06:34] Ja.
+[06:35] Al den logik kræver en tung header på minimum 20 bytes.
+[06:39] Men altså, hvorfor så overhovedet have et alternativ?
+[06:42] Hvorfor ville man nogensinde vælge en protokol som UDP, der kan finde på at tabe data?
+[06:46] Det lød jo helt forkert.
+[06:48] Fordi, som du selv var inde på, omhyggelighed tager tid.
+[06:51] UDP står for User Data Gram Protocol, og den etablerer slet ikke nogen forbindelse.
+[06:56] Den spørger ikke, om modtageren er klar.
+[06:58] Den garanterer ingenting.
+[06:59] Den tager bare dataene og kaster dem blindt afsted.
+[07:02] Så hvis vi skal bruge en analogi, så er TCP det der meget grundige, anbefalede postbåde, der kræver underskrift for hver pakke.
+[07:09] Og UDP, det er en mand med en brændslange, der bare sprøjter pakker mod bygningen og håber, at nogen rammer den rigtige altan.
+[07:15] Ja, brændslangen er faktisk en meget rammende beskrivelse.
+[07:18] Og vi har brug for den brændslange for at undgå det, vi kalder overhead.
+[07:22] UDP's header fylder kun 8 bytes mod TCP's 20.
+[07:26] Så det er til de hurtige opgaver?
+[07:27] Ja, hvis du for eksempel bare skal lave et lynhårigt opslag på en DNS-server.
+[07:32] Du har ikke tid til at skrive under på papir og hilsepænt på serveren.
+[07:35] Du vil bare have et svar.
+[07:37] Går pakken tabt, så trykker du bare opdater igen to sekunder efter.
+[07:41] Okay, nu nævner du hilsepænt.
+[07:43] For vi sagde, at TCP er forbindelsesorienteret.
+[07:46] Hvordan etablerer TCP egentlig en forbindelsering mekanisk, før den overhovedet begynder at sende min fil?
+[07:52] Den gør det via det, der kaldes et three-way handshake.
+[07:55] Tre helt præcise trin.
+[07:57] Trin 1.
+[07:58] Din browser, altså clienten, sender et segment til serveren med et såkaldt synflag aktiveret.
+[08:04] Syn for Synchronize.
+[08:06] Den siger egentlig bare, hej, jeg vil gerne oprette en forbindelse, og her er mit startnummer.
+[08:10] Okay, trin 2 må så være serverens reaktion.
+[08:13] Lige præcis. Serveren svarer tilbage med to flag aktiveret.
+[08:17] Syn og ACK.
+[08:19] Så den kvitterer altså ACK for at den hører klienten, og samtidig sender den sit eget syn tilbage.
+[08:25] Modtaget, og her er jo et mit startnummer til dig.
+[08:29] Og til allersidst i trin 3, der sender klienten et endeligt ACK tilbage for at bekræfte, jeg har også hørt dig.
+[08:36] Men vent lige et øjeblik.
+[08:37] Tre trin lyder helt vildt ineffektivt.
+[08:40] Skal vi virkelig igennem alt det?
+[08:41] Hej, hej, jeg hører dig.
+[08:44] Før vi kan få lov at se en hjemmeside.
+[08:45] Ja, det skaber en lille, men mållig forsinkelse.
+[08:48] Men det er fundamentalt for pålideligheden.
+[08:51] For de hilser jo ikke bare.
+[08:52] De aftaler de to vigtigste begreber i TCP.
+[08:55] Sequence number og acknowledgement number.
+[08:58] Dem er vi nødt til at pakke ud.
+[09:00] Sequence number og ACK nummer.
+[09:02] Hvordan holder de rent mekanisk styr på kaoset?
+[09:04] Hver eneste byte i TCP får et nummer.
+[09:08] Sequence number er simpelthen numret på den allerførste byte i det specifikke segment, du sender.
+[09:12] Så modtageren ved præcis, hvor i det store puslespilbrikken hører hjemme.
+[09:17] Og acknowledgement number?
+[09:19] Det hedder vel også ACK number ofte.
+[09:21] Ja, og det er modtagerens svar.
+[09:24] Når den sender et ACK number tilbage, siger den, jeg har nu succesfuldt modtaget frem til det her punkt.
+[09:29] Den allernæste byte, jeg forventer at sige fra det, er det her nummer.
+[09:33] Okay, lad os gøre det eksamens konkret.
+[09:36] Jeg sender et segment til dig med 100 bytes data.
+[09:39] Mit sequence number starter på 1.
+[09:41] Hvis du modtager dem alle sammen uden en eneste fejl, hvad sender du så tilbage til mig?
+[09:45] Så sender jeg et svar, hvor mit ACK nummer er sat til 101.
+[09:49] For jeg har fået 1 til 100.
+[09:50] Så den næste byte, jeg forventer og mangler, er nummer 101.
+[09:54] Ah, okay.
+[09:56] Men hvad sker der så, hvis netværket svigter?
+[09:57] Hvad hvis min pakke slet ikke når frem til dig?
+[10:00] TCP har en indbygget timer for hver afsendt pakke.
+[10:03] Hvis du ikke får mit ACK-svar tilbage, inden tiden udløber,
+[10:07] så slår den koldt vand i blodet og tænker, pakken er tabt.
+[10:09] Og så laver den en retransmission.
+[10:11] Den gensender simpelthen bare segmentet.
+[10:13] Men altså, jeg læste i slidesene, at det historisk set skabte problemer,
+[10:17] fordi modtageren kun kunne bekræfte hele uafbrudte blokke af bytes.
+[10:21] Ja, det var et kæmpe problem.
+[10:23] For hvis du sendte 1000 pakker og kun pakke nummer 50 røg i svinget,
+[10:27] så ville modtageren bare blive ved med at råbe,
+[10:29] jeg mangler nummer 50, selvom den faktisk havde fået pakket 51.000 i god behold.
+[10:34] Og så gensendte afsenderen bare alt det hele igen.
+[10:37] Præcis.
+[10:37] Hvilket jo er et enormt spil af netværk.
+[10:39] Så derfor introducerede man SAC, Selective Acknowledgement.
+[10:43] Det lavede modtageren sige meget præcist,
+[10:45] jeg mangler det her specifikke hulrum.
+[10:48] Vi har også to meget specifikke termer i kildematerialet til det her.
+[10:51] SLE og SAI.
+[10:52] Hvad gør de?
+[10:53] S-L-I står for S-A-I-C-K Left Edge,
+[10:57] og S-R-I er S-A-I-C-K Right Edge.
+[11:00] De definerer bogstaveligt talt yderkanterne på en klump data
+[11:04] ude i fremtiden, som er modtaget.
+[11:06] Så når du kender yderkanterne,
+[11:08] ved du præcis, hvilket hul, der mangler at blive fyldt.
+[11:11] Genialt.
+[11:12] Men alt den her gensending kan jo stresse et netværk.
+[11:15] Og det åbner for to koncepter, der står super centralt til eksamen,
+[11:18] og som mange forveksler.
+[11:20] Flow control og congestion control.
+[11:23] Ja, de er vigtige at skille ad.
+[11:25] Og forskellen ligger i, hvem vi prøver at beskytte.
+[11:28] Så skal vi starte med flow control.
+[11:30] Ja, lad os det.
+[11:31] Hvem beskytter vi der?
+[11:32] Vi beskytter modtageren.
+[11:34] Her bruger vi analogien med et vandglas.
+[11:37] Modtageren har kun en begrænset buffer og gennemdata i.
+[11:41] Uanset hvor meget vand afsenderen har,
+[11:43] må man ikke hælde hurtigere, end vandglasset kan rumme.
+[11:45] Flow control sørger for, at glasset ikke flyder over.
+[11:49] Okay, så flow control er en meget privat aftale mellem to computer.
+[11:52] Skru lige ned, jeg kan ikke følge med.
+[11:54] Hvad så med congestion control?
+[11:56] Der beskytter vi selve netværket, altså motorvejen imellem dem.
+[12:00] Hvis der er trafikprop ude på internettet ved en central router,
+[12:03] hjælper det ikke, at din computer pumper data ud,
+[12:05] bare fordi modtagerens vandglas er tom.
+[12:07] Congestion control overvåger forsinkelser og tvinger afsenderen til at bremse for at løsne trafikproppen.
+[12:14] Flow control beskytter modtageren.
+[12:16] Congestion control beskytter motorvejen.
+[12:18] Den er stærk.
+[12:19] Men lad os prøve at omsætte alt det her til en eksamensituation.
+[12:23] Vi sidder over for eksaminator.
+[12:24] De slår et slide op og beder os gennemgå TCP-hætteren felt for felt oppefra og ned.
+[12:29] Hvordan griber vi det an?
+[12:30] Vi holder fast i reglen.
+[12:32] Hvad er det? Hvad gør det? Hvorfor er det nødvendigt?
+[12:35] Øverst i headeren har vi sourceport og destinationport.
+[12:39] Det er 16-bit nummer, der udgør vores lejlighedsnummer.
+[12:43] Og de er nødvendige for overhovedet at identificere kommunikationen mellem de to programmer.
+[12:46] Præcis.
+[12:47] Og husk endelig, der er ingen IP-adresser herinde.
+[12:50] Dem lod vi blive i IP-hætteren.
+[12:53] Lige under portene har vi sequence-nummer og acknowledgement-nummer, som vi lige har talt om.
+[12:57] Jeps.
+[12:58] Begge er 32-bit nummer.
+[13:00] De holder styr på byte-nummer, og uden dem falder hele ideen om rækkefølge og genudsendelse fuldstændig fra hinanden.
+[13:06] Hvad er det næste så?
+[13:07] Så har vi header-length, også kaldet data-offset nogle steder.
+[13:12] Den angiver, hvor stor TCP-hætteren er.
+[13:14] Er den altid 20 bytes?
+[13:16] Nej, og det er et klassisk eksamensspørgsmål.
+[13:19] Den er mindst 20, men den kan vokse helt op til 60 bytes på grund af optionsfeltet, ikke?
+[13:23] Jo, fuldstændig rigtigt.
+[13:24] Maskinen har brug for at vide præcis, hvor headeren stopper, så den ved, hvor selve dataene, din payload, begynder.
+[13:30] Og efter header-length kommer vi så til de berømte TCP-flags.
+[13:35] Der er seks af de helt klassiske.
+[13:37] Skal vi tage dem lynhurtigt fra en inden af?
+[13:38] Skal vi løst?
+[13:39] Okay, vi har URG, urgent pointer.
+[13:42] Det betyder, læs det her omgående, det haster.
+[13:45] Så har vi ACK-flaget.
+[13:46] Det fortæller bare, at der rent faktisk står en gyldig værdi i acknowledgement-feltet lige nu.
+[13:51] Og så er der PSH, push.
+[13:53] Ja, og hvad gør push?
+[13:54] Den fortæller modtagerens TCP, at den skal skubbe dataene direkte op til applikationen med det samme,
+[14:01] i stedet for at lade dem ligge og trække i bufferen.
+[14:03] Korrekt.
+[14:04] Så tager jeg de sidste tre.
+[14:07] RST er reset.
+[14:09] Den river forbindelsen fuldstændig over uden varsel.
+[14:12] Syn kender vi fra vores three-way handshake.
+[14:15] Den bruges til at starte en forbindelse.
+[14:17] Og fin, den markerer den normale, helt planlagte afslutning på en samtale.
+[14:21] Jeg elsker lige at sammenligne RST og FIND.
+[14:24] FIND er ligesom at sige, tak for i dag.
+[14:27] Vi lægger røret på.
+[14:28] Mens RST, det er den brutale, man smækker røret på midt i en sætning, fordi noget gik galt.
+[14:33] Og hov, en lille ting.
+[14:35] Da vi snakkede syn-ak tidligere, der ledte jeg efter et separat syn-ak-flag.
+[14:40] Men det findes jo slet, ikke vel?
+[14:41] Nej, det er en vigtig pointe.
+[14:43] Syn-ak er ikke ét flag.
+[14:45] Det er bare en tilstand, hvor både det normale syn-flag og ak-flaget er aktiveret på nøjagtig samme tid i hætteren.
+[14:51] God detalje til eksamen.
+[14:52] Næste felt er receive window, eller window size.
+[14:57] Og det peger vel direkte tilbage på vores vandglas?
+[14:59] Lige netop.
+[15:00] Det er det tal, der lader flow control fungere.
+[15:03] Det fortæller modparten, min buffer har plads til præcis x antal bytes lige nu.
+[15:08] Så mangler vi vel kun checksummen, før vi rammer options og payload?
+[15:11] Ja.
+[15:12] Checksummen er lidt matematik.
+[15:14] Afsenderen regner ud, som modtageren så tjekker.
+[15:16] Men husk, den opdager kun fejlen.
+[15:19] Den reparerer ingenting.
+[15:20] Er der fejl, kasserer TCP-pakken i total stillhed, og så venter vi bare på, at timer-funktionen beder om en retransmission.
+[15:27] Og bagefter kommer selve vores payload.
+[15:30] De rene data.
+[15:31] Sikke en svejterkniv af en protokol.
+[15:34] Men altså, hvis vi nu lukker TCP og åbner for UDP's hætter, hvordan ser landskabet ud der?
+[15:39] Jamen, det er jo som at gå fra cockpitet i et fly til et løbehjul.
+[15:44] UDP har kun fire felter i alt.
+[15:47] Den fylder sølle 8 bytes.
+[15:48] Source port, destination port, et længstfelt og en meget basalt checksum.
+[15:54] Slut.
+[15:54] Det er jo fuldstændig skræbet.
+[15:56] Intet sequence number, intet SEK, så ingen aner, om pakken kom frem.
+[16:00] In the window size, så brændslangen kører bare videre, uden at skænke flow-controlling-tanke.
+[16:05] Og fejler checksummen i UDP, så bliver pakken bare slettet.
+[16:09] UDP trækker bare på skuldrene.
+[16:11] Det er op til, at selve applikationen røder op, hvis fejlen er et problem.
+[16:14] UDP tilbyder udelukkende, absolut minimumtidsspil.
+[16:18] Men jeg vil gerne lige dvale ved det length-felt, der er i UDP.
+[16:21] For vi sagde, at TCP havde et felt, der hedder header-length.
+[16:25] Hvad er eksamensforskellen på de to?
+[16:27] Åh, det er et rigtig godt spørgsmål at have styr på.
+[16:30] TCP's header-length angiver udelukkende størrelsen på selve headeren.
+[16:35] Men UDP's length-felt udregner størrelsen på hele datagrammet.
+[16:40] Altså header plus payload.
+[16:42] Ah, okay.
+[16:44] Så hvis mit program sender 50 bytes data afsted over UDP,
+[16:48] så pakker UDP sine 8 bytes header udenom,
+[16:51] og så står der 58 i length-feltet.
+[16:55] Præcis. Sådan fungerer matematikken der.
+[16:57] Fænomenalt.
+[16:58] Så har vi lagene, opgaverne og alle header-felterne på plads.
+[17:03] Lad os slutte af med at teste af.
+[17:04] Vi laver lige et hurtigt eksamensscenarie,
+[17:06] og så fyrer vi de korte, mundtlige svar af fra manuskriptet i en hurtig pingpong.
+[17:10] Ja, klar.
+[17:11] Lad os sige, at du ved at downloade en kæmpe fil over TCP,
+[17:14] pludselig dør dit Wi-Fi i præcis to sekunder.
+[17:19] Hvorfor får det lille udfald ikke bare filen til at crashe totalt,
+[17:21] så du skal starte forfra?
+[17:23] Okay, skyd.
+[17:24] Jamen, hvorfor identificerer vi overhovedet downloaden ud fra sourceport,
+[17:28] og ikke blare IP-adressen?
+[17:31] Fordi IP-adressen findes nede i IP-headeren,
+[17:33] og kunden identificerer den overordnede bygning,
+[17:36] altså det netværksinterface, der gik ned.
+[17:38] Porten i transportladet identificerer den unikke kommunikation frem til lejlighedens dør,
+[17:42] altså vores socket.
+[17:44] Godt.
+[17:45] Men hvordan overlever filen hullet?
+[17:47] Hvorfor kræver TCP både sequence number og acknowledgement number her?
+[17:53] Fordi da Wi-Fi'en dykket, forsvandt nogle sekvenser.
+[17:56] Sequence number er afsenderens stempel, der viser, hvor dataene hører hjemme i filen.
+[18:01] Acknowledgement number er modtagerens måde at råbe op på.
+[18:04] Jeg overlede hertil.
+[18:05] Den allernæste bike, jeg forventer for at lappe hullet, er nummer X.
+[18:09] Præcis.
+[18:09] Og hvorfor har vi så brug for Windows Size lige efter udfaldet?
+[18:13] Maskinen har nok fået travlt.
+[18:15] Windows Size er flow control.
+[18:18] Modtageren signalerer, så og så meget plads har jeg tilbage i bufferen,
+[18:22] så afsenderen ikke drukner systemet i sit forsøg på at gensende alt på en gang.
+[18:26] Vandglæsset må ikke flyde over.
+[18:28] Sådan.
+[18:30] Sidste spørgsmål.
+[18:31] Forestil dig, at det var UDP i stedet for TCP.
+[18:34] Hvorfor er UDP's header kortere, og hvordan vil filen have det?
+[18:38] UDP er kun 8 bytes, fordi den er blottet for kontrol.
+[18:42] Den kan ikke ræde filen.
+[18:43] Ingen sequence numbers, ingen retransmission.
+[18:46] Pakkerne er tabt for evigt i transportlaget, medmindre applikationen selv har en nødplan.
+[18:51] Det er simpelthen perfekt.
+[18:52] Den der måde at koble specifikationerne direkte til virkelige handlinger,
+[18:56] det er lige præcis den mentalitet, du skal tage med ind til den mundtlige eksamen.
+[18:59] Man skal hele tiden tænke, hvad er det? Hvad gør det? Hvorfor findes det?
+[19:04] Ja.
+[19:05] Og hvis du går i stå, så grib fat i analogierne.
+[19:08] Det viser overskud.
+[19:10] Vandglæsset er flow control.
+[19:11] Motorvejen er congestion control.
+[19:13] Bygningen og døren klargør IP overfor portet.
+[19:17] Det er virkelig god råd.
+[19:18] Som en allersidste tanke at gå til eksamen på, til dig der sidder og lytter.
+[19:22] Når man for alvor kradser i overfladen på alt det her, så rammer det en, hvor svimlende et kaos, der eksisterer ude på kablerne.
+[19:29] Prøv at tænk på det næste gang, du bare trykker opdater på en side.
+[19:33] Ja, det er jo voldsomt, når man bryder det ned.
+[19:35] Helt vildt.
+[19:37] Dit ene klik knuses øjeblikkeligt til en strøm af usynlige pakker.
+[19:41] De kasses ud på et globalt motorvejsnet.
+[19:44] Lynhurtigt finder de den helt rigtige bygning i verden.
+[19:46] De sorteres, suser op til den rigtige lejlighed og banker på præcis den rigtige dør.
+[19:51] Og TCP sidder bagved som en usynlig dirigent, overvåger globale forsinkelser, forhindrer trafikkøer og sikrer matematisk, at dit lille digitale vandglas aldrig løber over.
+[20:02] Alt det på en brygdel af et millisekund.
+[20:05] Hver eneste gang, du rører din skærm, det er ægte, enestående arkitektur.
+[20:10] Og med den forståelse er vi nået til vejs ende.
+[20:12] Du har byggeklodserne nu, og fundamentet er bundsolidt.
+[20:16] Vi hæpper på dig inde ved det grønne bord.
+[20:17] Held og lykke med re-examen, og tak fordi du lyttede med.

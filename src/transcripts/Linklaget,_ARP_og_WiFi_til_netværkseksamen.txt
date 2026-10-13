@@ -1,0 +1,329 @@
+[00:00] Lige nu, i dette sekund, der ligger din telefon formentlig helt stille ved siden af dig.
+[00:06] Den ser i hvert fald lydløs ud.
+[00:08] Det gør den.
+[00:09] Men hvis du ligesom kunne tune ind på det her usynlige digitale spektrum,
+[00:13] så ville du opdage, at den lige nu nærmest skriger ud i rummet.
+[00:17] Ja, den har ret travlt.
+[00:18] Fuldstændig.
+[00:19] Den sender desperate usynlige radiobølger ud til alle andre enheder i nærheden,
+[00:24] bare for at finde ud af, hvem der egentlig ejer en helt bestemt lokaladresse.
+[00:28] Alt sammen bare, så den kan hente den næste notifikation til din skærm.
+[00:32] Det er altså et fuldstændig kaotisk, men utroligt smukt koreogreferet system.
+[00:37] Det er det jo.
+[00:38] Det er et digitalt økosystem, der arbejder på højtryk.
+[00:42] Og det mest fascinerende er vel egentlig, at vi stort set aldrig bemærker det.
+[00:46] Altså, før det går i stykker, ikke?
+[00:47] Nemlig.
+[00:48] Men når man skal op til en mundtlig eksamen i IT-sikkerhed,
+[00:51] så er det jo præcis de her usynlige mekanismer, man skal kunne trække frem i lyset.
+[00:54] Man skal kunne forklare dem krystalklart.
+[00:56] Lige præcis.
+[00:57] Og det er præcis vores mission i dag.
+[01:00] Fordi vi dykker simpelthen dybt ned i dit eksamensmanuskript om linklaget og wifi.
+[01:05] Ja, vi skal helt ned i maskinerummet i dag.
+[01:07] Det skal vi.
+[01:08] Og i dag, der træder vi simpelthen nogle faste roller.
+[01:09] Jeg er den nysgerrige studerende, der stiller spørgsmålene,
+[01:12] og du er den kloge underviser, der er stiv for det hele.
+[01:15] Det lyder som en god plan.
+[01:16] Og vi har nogle faste regler i dag fra den her session.
+[01:19] Vi holder os strengt til dit manuskript.
+[01:21] Ingen udenom snak.
+[01:22] Ingen nye, vilde emner.
+[01:23] Perfekt.
+[01:25] Og vores fokus er på forståelse.
+[01:27] Det handler ikke om ren udenadslære,
+[01:29] men om at du, når du sidder til re-eksamen,
+[01:31] kan forklare de her koncepter med dine egne ord.
+[01:34] Altså at man fatter logikken bagved.
+[01:35] For når man forstår logikken,
+[01:37] så forsvinder behovet for at lære ting udlade jo lidt.
+[01:40] Lige præcis.
+[01:41] Det handler simpelthen om at bygge bro mellem
+[01:43] de der teoretiske koncepter,
+[01:45] og så den fysiske virkelighed.
+[01:46] Så hvis vi starter med at zoome helt ud.
+[01:50] Ja, lad os lige.
+[01:51] For at forstå linklaget, som er dagens hovedperson,
+[01:53] så er vi nødt til at se på det store overblik.
+[01:56] Hvad sker der egentlig, når du åbner en helt almindelig hjemmeside?
+[01:59] Der er jo fem lag, der samarbejder.
+[02:01] Den klassiske femlagsmodel.
+[02:03] Nemlig.
+[02:05] Hvis jeg skal bryde den ned,
+[02:06] så har vi jo applikationslaget helt oppe i toppen.
+[02:09] Det er her de programmer, vi interagerer med, de lever.
+[02:11] Det er HTTP til hjemmesider og DNS,
+[02:16] når vi tager sig et domænenavn ind,
+[02:18] og SMTP til e-mails.
+[02:20] Ja.
+[02:21] Men altså, applikationen aner jo ingenting om kabler og radiobølger.
+[02:26] Den ved bare, at den gerne vil sende noget data.
+[02:28] Præcis.
+[02:29] Og derfor sender applikationen sine data et lag ned.
+[02:32] Ned til transportlaget.
+[02:34] Det er her, vi finder protokoller som TCP og UDP.
+[02:39] Transportlagets opgave er simpelthen at sørge for kommunikation,
+[02:41] mellem de specifikke processer på afsenderen og modtagerens maskiner.
+[02:46] TCP hakker for eksempel store mængder data op i mindre stykker,
+[02:49] og sikrer, at de ankommer i den rigtige rækkefølge.
+[02:53] Okay, og nedenunder transportlaget har vi så netværkslaget.
+[02:57] Og det vil have IP-adresserne og routerne kommer ind i billedet.
+[03:00] Lige præcis.
+[03:01] Altså, deres opgave er jo rent logistik.
+[03:03] At finde vej.
+[03:04] Den mest effektive rute tværs over hele internettet.
+[03:07] Men netværkslaget kan jo ikke selv flytte dataen fysisk fra den ene router til den næste.
+[03:13] Nej, og det er jo så her, vi ankommer til linklaget, dagens fokus.
+[03:17] Linklagets eneste, men altså utrolig vigtige opgave,
+[03:21] er at sende frames over det næste link.
+[03:23] Altså lokalt.
+[03:25] Ja.
+[03:25] Det bruger Ethernet og MAC-adresser til at klare den opgave.
+[03:28] Og helt nede i kælderen, der har vi det fysiske lag.
+[03:33] Her taler vi jo bare rå fysik, ikke?
+[03:35] Elektriske impulser, radiobølger, den slags.
+[03:38] Præcis.
+[03:39] Det overfører simpelthen bits som fysiske signaler.
+[03:42] Men her ved den her model, der opstår der altså tit forvirring til eksamen.
+[03:45] Ja, det er der, vi har det her eksemspørgsmål fra teksten.
+[03:48] Hvorfor er det lige, at læreren nogle gange siger message, segment, datagram, frame og bits?
+[03:53] Hvorfor skifter det hele tiden navn?
+[03:54] Det er et supergodt spørgsmål, og det korte svar er encapsuling, eller encapsulation, som det hedder.
+[04:01] Okay, så dataen bliver pakket ind?
+[04:03] Lige præcis.
+[04:04] Dataen skifter simpelthen navn, fordi hvert lag lægger sine egne specifikke oplysninger udenpå.
+[04:09] Som en konvolut udenom en anden konvolut.
+[04:13] Så på applikationslaget, der hedder det bare en message?
+[04:16] Ja.
+[04:16] Når det rammer transportlaget med TCP, så bliver det til et segment.
+[04:20] Okay, segment.
+[04:21] Og på netværkslaget?
+[04:22] Der pakkes det ind i et IP-datagram.
+[04:26] Datagram, ja.
+[04:27] Og så kommer vi til linklaget.
+[04:29] Og det her, det bliver til en frame.
+[04:31] Nemlig.
+[04:32] Linklaget laver en frame.
+[04:33] Og til allersidst på det fysiske lag, der bliver hele den her frame brudt ned til bits.
+[04:38] Så message, segment, datagram, frame, bits.
+[04:43] Præcis.
+[04:44] Lad os lige sige den højt sammen, for det er nærmest et mantra, du skal kunne i søvnene til eksamen.
+[04:47] Okay, jeg er klar.
+[04:48] Message, segment, datagram, frame, bits.
+[04:54] Message, segment, datagram, frame, bits.
+[04:58] Det er faktisk rart lige at sige det højt.
+[05:00] Man husker det bedre.
+[05:01] Nemlig.
+[05:02] Okay, så nu har vi slået fast, at vi befinder os på linklaget, og vores data ligger i en frame.
+[05:07] Men hvordan finder den her frame sig frem til den rigtige enhed på det lokale netværk?
+[05:11] Ja, for vi har jo både IP-adresser og MAC-adresser holdt styr på her.
+[05:16] Præcis.
+[05:17] Og her skal du trække en meget klar streg i sandet til eksamen.
+[05:20] IP, som hører til på netværkslaget, handler om, hvor dataen skal hen globalt, altså gennem forskellige netværk.
+[05:27] MAC-adressen derimod, som hører til på linklaget og er på 48 bits, den handler om, hvem der fysisk skal modtage den her frame på det lokale link.
+[05:36] Okay, så IP er hvor, MAC er hvem.
+[05:40] Men altså, lad os sige, at min computer A vil sende noget til computer B.
+[05:44] De er på samme netværk.
+[05:45] Jeg kender B's IP-adresse, men jeg mangler dens MAC-adresse.
+[05:49] Hvad gør jeg så?
+[05:49] Så prøver du en protokol, der hedder ARP, Address Resolution Protocol.
+[05:54] Ah, okay.
+[05:55] ARP's hele formål er at finde en ukendt MAC-adresse ud fra en kendt IPv4-adresse på det samme lokale netværk.
+[06:02] Så det foregår ved, at min computer A sender en, hvad kalder man det, en ARP-request?
+[06:08] Lige præcis.
+[06:09] A sender en ARP-request, og den siger dybest set, hvem har den her IP-adresse?
+[06:15] Og det leder mig faktisk til et ret vigtigt spørgsmål fra eksamensmændskræftet.
+[06:19] For hvorfor er en ARP-request et broadcast?
+[06:23] Ja, og det skal du bare kunne svare på uden at blinke.
+[06:26] Er det ikke simpelthen, fordi afsenderen jo ikke kender MAC-adressen endnu?
+[06:30] Så man er vel nødt til at råbe det ud til alle i rummet?
+[06:34] Fuldstændig korrekt.
+[06:35] Man sender et broadcast til alle på lokalnettet, fordi man ikke ved, hvem modtageren er.
+[06:39] Okay, så alle hører mit råb.
+[06:42] Men B, som har den rigtige IP, svarer vel så?
+[06:45] Ja, B svarer med en ARP-reply.
+[06:48] Men her er det vigtigt.
+[06:50] B svarer med en Unicast.
+[06:52] Altså en direkte besked tilbage til A.
+[06:54] For nu kender B jo A's MAC-adresse fra anmodningen.
+[06:57] Ah, selvfølgelig. Så det har jeg her i min MAC-adresse.
+[07:01] Går direkte tilbage. Giver god mening.
+[07:04] Men teksten nævner også en ARP-cache.
+[07:06] Hvorfor gemmer vi egentlig ARP-svaret i en ARP-cache bagefter?
+[07:10] Prøv at forestil dig, at du skulle sende en stor fil.
+[07:13] Du vil jo ikke sende et broadcast, altså råbe ud til hele netværket, for hver evig eneste lille frame, vel?
+[07:19] Nej, det vil jo spamme netværket fuldstændig i stykker.
+[07:21] Præcis. Så computer A gemmer svaret i en midlertidig tabel i hukommelsen, så den ved til næste gang, der skal sendes frames.
+[07:29] Det er ARP-cachen.
+[07:32] Smart. Men der står noget med TTL her, som man skal passe på.
+[07:36] Ja. Du skal lige være skarp på, at cachens TTL, time to live, altså dens livetid, slet ikke er det samme som det TTL-felt, vi finder i en IPv4-hætter.
+[07:47] Hvordan det?
+[07:47] I en ARP-cache er TTL faktisk tid, altså sekunder eller minutter.
+[07:53] Den smider adressen ud efter lidt tid for at sikre, at tabellen altid er opdateret, hvis nu computer slukkes eller flyttes.
+[07:59] Okay.
+[08:00] I et IPv4-datagram er TTL derimod en hoptæller, der tæller ned per router, den passerer.
+[08:07] Bare så pakker ikke cirkulærer for evigt på internettet.
+[08:10] Modtaget, det er en ret stor forskel.
+[08:11] Men hvad hvis computer B slet ikke ligger på mit lokale netværk? Hvad hvis den er på et andet netværk?
+[08:18] Det er et klassisk eksamensspørgsmål. Hvad tror du, der sker?
+[08:21] Altså, frame bliver vel sendt til routeren i stedet for?
+[08:24] Lige præcis. Frame bliver sendt til routernes MAC-adresse, altså vores default gateway.
+[08:29] Men, og det er vigtigt, IP-destinationen inde i datagrammet forbliver B's IP-adresse.
+[08:35] Så er det simpelthen derfor, vi har brug for begge dele. IP'en peger mod det endelige mål, men MAC-adressen peger bare på næste stop på ruten.
+[08:44] Ligeskabet. Og det er faktisk en perfekt overgang til at åbne selve konvoluten og kigge på Ethernet-framen.
+[08:51] Altså, hvad er felterne, og hvad gør de?
+[08:53] Ja, lad os kigge på diagrammet. Det første felt hedder preamble.
+[08:58] Ja. Preamble ligger allerførst, og dens opgave er ren synkronisering mellem sender og modtagere på det fysiske lag.
+[09:04] Altså bare så de er enige om rytmen, når de læser bitene?
+[09:08] Nemlig.
+[09:09] Derefter kommer destination-mark. Den fortæller, hvem framen skal afleveres til lokalt.
+[09:13] Og bagefter har vi source-mark.
+[09:16] Som jo fortæller, hvem framen kommer fra.
+[09:18] Giver mening.
+[09:19] Men så kommer et felt, der hedder type.
+[09:22] Hvorfor er det overhovedet nødvendigt?
+[09:24] Typefeltet er vigtigt, fordi det fortæller modtageren, hvilken protokol, der ligger inde i payloaden.
+[09:28] Øh, altså hvilken type data det er?
+[09:31] Præcis.
+[09:31] Ofte vil typefeltet sige, hey, indholdet af den her frame er et IPv4-datagram, så når du har åbnet framen, skal du sende indholdet videre til IPv4-processen.
+[09:41] Okay, så det er simpelthen en slags vejvisertillaget længere op?
+[09:45] Nemlig.
+[09:46] Og så har vi jo datafeltet, som bare er selve payloaden, altså IP-datagrammet.
+[09:51] Og til sidst, helt nede i bunden, der har vi CRC, som står for Cyclic Redundancy Checking.
+[09:57] Korrekt.
+[09:58] Men teksten siger, vi skal kunne forklare forskellen på type og CRC.
+[10:03] Og de har jo slet ikke noget med hinanden at gøre.
+[10:05] Overhovedet ikke.
+[10:06] Og det er nok derfor, de spørger om det til eksamen, for at se, om du har styr på det.
+[10:09] Som vi sagde, type fortæller, hvilken protokol dataen tilhører.
+[10:14] CRC derimod, det er et filecheck.
+[10:16] Et filecheck, ja.
+[10:18] Hvordan fungerer det egentlig?
+[10:19] Det fungerer ved hjælp af noget ret avanceret matematik.
+[10:22] Men alt, du behøver at vide, er, at det er en beregning, der opdager, om der er sket fejl i bitne under overførselen.
+[10:28] Så hvis der har været noget støj på linjen?
+[10:30] Ja.
+[10:31] Og hvis der er fejl, altså hvis CRC-checket fejler hos modtageren, hvad gør linklaget så, tror du?
+[10:37] Altså, beder det om at få det sendt igen?
+[10:39] Nej, det gør det nemlig ikke.
+[10:41] Linklaget dropper bare framen helt.
+[10:43] Den smider den simpelthen ud?
+[10:44] Lige i skraldspanden.
+[10:46] Det er jo nødvendigt for at sikre dataens integritet.
+[10:49] Det er så op til lagene højere oppe, som TCP, at opdage, at noget mangler og bede om en retransmission.
+[10:55] Linklaget fjerner bare alt, der er defekt.
+[10:58] Hold da op, okay.
+[11:00] Nå, lad os lige runde forskellen på en switch og en router, for det nævner manuskriptet også.
+[11:05] Ja, og her har jeg en super simpel huskeregel til dig, som du bare skal sige til Exterminator.
+[11:09] Er du klar?
+[11:10] Førløs.
+[11:11] Switch, mag.
+[11:13] Router, IP.
+[11:13] Switch, mag.
+[11:16] Router, IP.
+[11:18] Altså, en switch arbejder på linklaget og kigger på magadresser?
+[11:22] Lige præcis.
+[11:23] En switch viderestander frames ved at kigge på destinationens magadresse, og den lærer magadresserne at kende på sine forskellige porte.
+[11:29] Og routeren arbejder så på netværkslaget og videre sender IP-datagrammer ved at kigge på IP-adresser?
+[11:37] Præcis. Længere er den egentlig ikke.
+[11:40] Okay, super. Men alt det her, vi har talt om indtil videre, det gælder jo primært, når vi har et kabel stukket i maskinen.
+[11:46] Ja, Ethernet over kover eller fiber.
+[11:49] Men hvad sker der egentlig, når vi fjerner kablet og sender det hele trådløst ud i luften?
+[11:53] Det må jo være kaos.
+[11:54] Det ændrer spillereglerne totalt, ja.
+[11:57] For et kabel er et lukket system. Luften er et delt medium.
+[12:01] For at styre det her trådløse kaos introducerer vi CSMA.
+[12:05] Carrier sends multiple access.
+[12:07] Nemlig. Carrier sends betyder helt lavpraktisk. Lyt før du sender.
+[12:12] Det bliver som i en normal samtale, hvor man lige venter på, at den anden taler færdig.
+[12:15] Lige præcis.
+[12:16] På de ældre delte Ethernet-kabler brugte man noget, der hedder CSMA CD, hvor CD står for collision detection.
+[12:22] Detektion, altså at den opdager det?
+[12:24] Ja. Netværkskortet kan mærke spændingen i kablet og opdage kollisioner, imens den sender.
+[12:29] Hvis to maskiner afbryder hinanden, stopper de og prøver igen lidt senere.
+[12:34] Men eksamensspørgsmålet her er jo, hvad er forskellen på CSMA CD og CSMA CA?
+[12:41] Hvor Wi-Fi jo bruger CA.
+[12:43] Ja, og i Wi-Fi er det CA. Collision avoidance, altså at undgå kollisioner.
+[12:48] Ja, for man kan vel bruge detection i luften?
+[12:50] Nej, det er fysisk meget svært at lytte efter kollisioner i, mens ens egne antenne råber for fuld kraft ud i rummet.
+[12:57] Man overdøjer jo ligesom sig selv.
+[12:59] Fuldstændig.
+[13:00] Derfor prøver man at undgå kollisionerne i stedet.
+[13:02] Man lytter, og hvis mediet er optaget, så venter man en lille tilfældig periode, inden man forsøger igen.
+[13:07] Ah, så man trækker simpelthen lidt lod om, hvem der får lov til at sende næste gang.
+[13:11] Præcis.
+[13:11] Men der er et scenarie, hvor selv den her avoidance-taktik kommer til kort, og det kaldes the hidden terminal problem.
+[13:18] Ja, det skjulte terminalproblem.
+[13:21] Hvordan fungerer det egentlig?
+[13:23] Forestil dig, at vi har et access point, en router i midten af en bygning.
+[13:28] Computer A og B står i hver sin ende af bygningen.
+[13:30] Okay.
+[13:31] A kan nå access pointet, og B kan nå access pointet.
+[13:34] Men A og B kan ikke høre hinanden, der er for langt imellem dem.
+[13:38] Så hvis A lytter til luften med CSMA, så hører den slet ikke B?
+[13:42] Nej, den tror, at luften er fri.
+[13:44] B tror også, at luften er fri.
+[13:46] Så de sender begge to samtidig.
+[13:48] Og framerne brager sammen inde i midten ved access pointet.
+[13:51] Og alt data går tabt.
+[13:53] De er skjulte for hinanden.
+[13:55] Men altså, det er jo vildt uheldigt.
+[13:57] Især hvis man havde gang med at downloade en stor fil.
+[13:59] Hvordan løser vi det problem?
+[14:01] Det gør vi med RTS-CTS.
+[14:04] Det står for Request to Send og Clear to Send.
+[14:07] Hvordan virker det?
+[14:09] Før Computer A sender en stor mængde data,
+[14:11] sender den en bitte lille frame inden RTS til access pointet.
+[14:16] Må jeg sende data nu?
+[14:18] Access pointet svarer med et højt Clear to Send.
+[14:21] Ja, værsgo, kør løs.
+[14:23] Men fordi access pointet er i midten,
+[14:25] så kan B jo også høre det her CTS-svar.
+[14:28] Ja, selvfølgelig.
+[14:29] Så B ved, at A har fået ordet,
+[14:32] selvom B ikke kan høre A direkte.
+[14:34] Lige præcis.
+[14:35] B ved nu, at den skal holde sig i ro i et bestemt tidsrum,
+[14:38] fordi A har reserveret adgang.
+[14:39] Det forhindrer, at især lange datatransmissioner kolliderer ud i luften.
+[14:43] Det er dele med smartfundet på.
+[14:46] Det er det.
+[14:47] Og her til sidst, husk altid forbindelsen til laget under.
+[14:51] Linklaget styrer framen,
+[14:52] tjekker for fejl og styrer, hvem der må sende hvornår.
+[14:54] Men det underliggende fysiske lag står for at oversætte bitsene
+[14:58] og sende selve de fysiske radiobølger.
+[15:01] Det samler jo ligesom hele billedet.
+[15:02] Det gør det.
+[15:03] Og hvis jeg lige skal give dig et par hurtige opsummerende ord med ind til eksamensbordet.
+[15:07] Ja tak, meget gerne.
+[15:08] Øv dig på diagrammet.
+[15:09] Sæt fingeren på hvert felt i framen.
+[15:11] Preamble, destination mag, source mag, type, data, CRC.
+[15:16] Og forklar, hvad de gør.
+[15:17] Okay, fingeren på felterne.
+[15:18] Ja, og vær i stand til at forklare ARP request og ARP reply.
+[15:23] Og hvordan cachen fungerer fra start til slut.
+[15:26] Præcis som vi lige har gennemgået.
+[15:28] Undgå bare lige at nå det af, du har lært uden ad.
+[15:30] Forstå, hvorfor de er der.
+[15:32] Forstå. Ikke bare huske.
+[15:34] Jeg har tjekket på det.
+[15:35] Før vi runder helt af i dag, så har jeg faktisk en lille tanke, du kan tage med dig.
+[15:39] Spændende.
+[15:40] Ja.
+[15:40] Næste gang du, ja, du lytteren, sidder nede på en café med din telefon og åbner en hjemmeside.
+[15:46] Så prøv lige at kigge op et sekund og forestil dig det usynlige kaos, der foregår i rummet omkring dig.
+[15:52] Det er et vildt billede.
+[15:53] Jeg har ikke.
+[15:54] Forestil dig de her hundredvise ARP-broadcasts, der flyver rundt.
+[15:58] Telefoner, der lynhurtigt tager CSMA-CA-beslutninger for ikke at tale i munden på hinanden,
+[16:04] mens de trækker lod om sendetiden med RTS og CTS.
+[16:07] Det er en helt usynlig symfoni af kommunikation.
+[16:10] Det er det virkelig.
+[16:12] Alt sammen bare for, at du kan læse en simpel artikel over din kaffe.
+[16:15] Det er sgu meget fedt.
+[16:17] Men altså, du er helt klar til det her nu.
+[16:19] Held og lykke med den mundtlige reg, Samen, og tak fordi du lyttede med.
