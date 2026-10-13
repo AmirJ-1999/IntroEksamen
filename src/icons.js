@@ -61,7 +61,12 @@ const ICONS={
   pencil:'<path d="M4 20h4L19 9a2.8 2.8 0 0 0-4-4L4 16z"/><path d="m13.5 6.5 4 4"/>',
   eye:'<path d="M2.5 12S6 5 12 5s9.5 7 9.5 7-3.5 7-9.5 7-9.5-7-9.5-7z"/><circle cx="12" cy="12" r="3"/>',
   lock:'<rect x="4.5" y="10.5" width="15" height="10.5" rx="2.2"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/>',
-  rotate:'<path d="M20.5 12a8.5 8.5 0 1 1-2.8-6.3l2.8 2.6"/><path d="M20.5 3.5v4.8h-4.8"/>'
+  rotate:'<path d="M20.5 12a8.5 8.5 0 1 1-2.8-6.3l2.8 2.6"/><path d="M20.5 3.5v4.8h-4.8"/>',
+  pause:'<rect x="6" y="4.5" width="4" height="15" rx="1.2"/><rect x="14" y="4.5" width="4" height="15" rx="1.2"/>',
+  info:'<circle cx="12" cy="12" r="9"/><path d="M12 11v5.5M12 7.6v.1"/>',
+  alert:'<path d="M12 3.5 21.5 20h-19z"/><path d="M12 10v4.5M12 17.4v.1"/>',
+  copy:'<rect x="8.5" y="8.5" width="12" height="12" rx="2.2"/><path d="M15.5 8.5V5.7a2.2 2.2 0 0 0-2.2-2.2H5.7a2.2 2.2 0 0 0-2.2 2.2v7.6a2.2 2.2 0 0 0 2.2 2.2h2.8"/>',
+  list:'<path d="M9 6h11.5M9 12h11.5M9 18h11.5"/><circle cx="4.5" cy="6" r="1"/><circle cx="4.5" cy="12" r="1"/><circle cx="4.5" cy="18" r="1"/>'
 };
 for(const k in ICONS)ICONS[k]=ICONS[k].replace(/<(path|circle|rect)/g,'<$1 pathLength="1"');
 function icon(name,cls=""){

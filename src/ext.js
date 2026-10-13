@@ -117,12 +117,21 @@ function renderLearn(){
   if(hash&&list.some(g=>g.id===hash))id=hash;
   if(!list.some(g=>g.id===id))id=list[0].id;
   const groups=[...new Set(list.map(g=>g.group))];
-  $("#guideNav").innerHTML=`<h3>${esc(subject)} · guides</h3><p style="color:var(--muted);font-size:11px;margin:0">${list.length} guides · visuelt og interaktivt</p>`+
-    groups.map(gr=>`<div class="gn-group">${esc(gr)}</div>`+list.filter(g=>g.group===gr).map(g=>`<button class="gn-btn ${g.id===id?"active":""}" data-g="${g.id}">${esc(g.title)}<small>${g.mins} min${g.tools?" · "+esc(g.tools):""}</small></button>`).join("")).join("");
+  $("#guideNav").innerHTML=`<div class="gn-head"><h3>${esc(subject)} · guides</h3><div class="gn-prog"><i></i></div><p class="gn-count"></p></div>`+
+    groups.map(gr=>`<div class="gn-group">${esc(gr)}</div>`+list.filter(g=>g.group===gr).map(g=>`<button class="gn-btn ${g.id===id?"active":""}" data-g="${g.id}"><span class="gn-dot">${icon("check")}</span><span class="gn-txt">${esc(g.title)}<small>${g.mins} min${g.tools?" · "+esc(g.tools):""}</small></span></button>`).join("")).join("");
   $("#guideSelect").innerHTML=groups.map(gr=>`<optgroup label="${esc(gr)}">`+list.filter(g=>g.group===gr).map(g=>`<option value="${g.id}" ${g.id===id?"selected":""}>${esc(g.title)}</option>`).join("")+`</optgroup>`).join("");
   $$("#guideNav [data-g]").forEach(b=>b.onclick=()=>openGuide(b.dataset.g));
   $("#guideSelect").onchange=e=>openGuide(e.target.value);
   showGuide(id);
+}
+const seenGuides=()=>{try{return JSON.parse(localStorage.getItem("its_learn_seen")||"{}")}catch{return {}}};
+function updateGuideProgress(){
+  const list=guidesFor(subject),seen=seenGuides(),n=list.filter(g=>seen[g.id]).length;
+  $$("#guideNav [data-g]").forEach(b=>b.classList.toggle("seen",!!seen[b.dataset.g]));
+  const bar=$("#guideNav .gn-prog i");if(bar)bar.style.width=(n/list.length*100)+"%";
+  const c=$("#guideNav .gn-count");if(c)c.textContent=`${n} af ${list.length} guides åbnet`;
+  const mins=list.reduce((a,g)=>a+(g.mins||0),0),tools=list.filter(g=>g.tools).length;
+  $("#learnStats").innerHTML=`<span>${icon("book")}${list.length} guides</span><span>${icon("clock")}${mins} min i alt</span><span>${icon("sparkles")}${tools} med interaktive værktøjer</span><span>${icon("checkCircle")}${n}/${list.length} åbnet</span>`;
 }
 function openGuide(id){
   const g=GUIDES.find(x=>x.id===id);if(!g)return;
@@ -150,32 +159,66 @@ function showGuide(id){
     <p class="g-lead">${g.lead}</p>
     ${g.html}
     ${vids.length?`<h2>Se også</h2><div class="g-videos"><div class="vid-grid">${vids.map(videoCard).join("")}</div></div>`:""}
-    ${pod?`<div class="g-box analogy" style="margin-top:18px"><b class="t">Lyt</b><p>Podcast-afsnittet <b>${esc(pod.title)}</b> (${pod.mins} min) gennemgår samme stof som samtale. <button class="btn" data-pod="${pod.id}" style="margin-left:6px">Gå til podcast</button></p></div>`:""}
-    <div class="g-actions">
-      ${cats.map(c=>`<button class="btn primary" data-cards="${esc(c)}">Øv flashcards: ${esc(c)}</button>`).join("")}
-      ${g.live?`<button class="btn" data-livecat="${esc(g.live)}">Python Lab: ${esc(g.live)}</button>`:""}
-      ${NQ_GUIDE_TOPIC[g.group]?`<button class="btn" data-nqtopic="${NQ_GUIDE_TOPIC[g.group]}">Netværk Lab: test dig selv i ${esc(nqTopic(NQ_GUIDE_TOPIC[g.group]).name)}</button>`:""}
-      <span style="flex:1"></span>
-      ${i>0?`<button class="btn" data-g2="${list[i-1].id}">← ${esc(list[i-1].title)}</button>`:""}
-      ${i<list.length-1?`<button class="btn" data-g2="${list[i+1].id}">${esc(list[i+1].title)} →</button>`:""}
-    </div></article>`;
+    ${pod?`<div class="g-listen"><span class="g-listen-ic">${icon("headphones")}</span><div><b>Lyt til samme stof</b><p>Podcast-afsnittet <b>${esc(pod.title)}</b> (${pod.mins} min) gennemgår det som samtale.</p></div><button class="btn" data-pod="${pod.id}">${icon("play")}Gå til podcast</button></div>`:""}
+    ${cats.length||g.live||NQ_GUIDE_TOPIC[g.group]?`<div class="g-practice"><b class="g-practice-t">Øv det du har lært</b><div class="g-actions">
+      ${cats.map(c=>`<button class="btn primary" data-cards="${esc(c)}">${icon("cards")}Flashcards: ${esc(c)}</button>`).join("")}
+      ${g.live?`<button class="btn" data-livecat="${esc(g.live)}">${icon("code")}Python Lab: ${esc(g.live)}</button>`:""}
+      ${NQ_GUIDE_TOPIC[g.group]?`<button class="btn" data-nqtopic="${NQ_GUIDE_TOPIC[g.group]}">${icon("target")}Netværk Lab: ${esc(nqTopic(NQ_GUIDE_TOPIC[g.group]).name)}</button>`:""}
+    </div></div>`:""}
+    <nav class="g-pager" aria-label="Andre guides">
+      ${i>0?`<button class="g-page prev" data-g2="${list[i-1].id}"><small>${icon("arrowLeft")}Forrige</small><b>${esc(list[i-1].title)}</b></button>`:"<span></span>"}
+      ${i<list.length-1?`<button class="g-page next" data-g2="${list[i+1].id}"><small>Næste${icon("arrowRight")}</small><b>${esc(list[i+1].title)}</b></button>`:"<span></span>"}
+    </nav></article>`;
   hydrate($("#guideBody"));
+  guideToc();
+  const seen=seenGuides();seen[g.id]=1;try{localStorage.setItem("its_learn_seen",JSON.stringify(seen))}catch{}
+  updateGuideProgress();
   $$("#guideBody [data-g2]").forEach(b=>b.onclick=()=>openGuide(b.dataset.g2));
   $$("#guideBody [data-cards]").forEach(b=>b.onclick=()=>{category=b.dataset.cards;difficulty="all";typeFilter="all";statusFilter="all";sortMode="default";search="";studyIndex=0;setView("study")});
   $$("#guideBody [data-livecat]").forEach(b=>b.onclick=()=>{liveSet="ovelser";liveCategory=b.dataset.livecat;liveIndex=0;setView("live");closeSandbox()});
   $$("#guideBody [data-nqtopic]").forEach(b=>b.onclick=()=>{setView("netlab");nqStart(b.dataset.nqtopic)});
-  $$("#guideBody [data-pod]").forEach(b=>b.onclick=()=>{setView("podcasts");setTimeout(()=>document.getElementById("pod-"+b.dataset.pod)?.scrollIntoView({behavior:"smooth",block:"start"}),60)});
+  $$("#guideBody [data-pod]").forEach(b=>b.onclick=()=>{setView("podcasts");setTimeout(()=>{const el=document.getElementById("pod-"+b.dataset.pod);if(el)window.scrollTo({top:el.getBoundingClientRect().top+scrollY-stickTop()-12,behavior:"smooth"})},60)});
 }
+/* "På denne side": jump links to the guide's sections; the current one follows the scroll */
+function guideToc(){
+  const art=$("#guideBody .guide"),hs=[...art.querySelectorAll("h2")];
+  if(hs.length<3)return;
+  hs.forEach((h,i)=>h.id="gs-"+i);
+  art.querySelector(".g-lead").insertAdjacentHTML("afterend",`<nav class="g-toc" aria-label="På denne side"><span class="g-toc-t">${icon("list")}På denne side</span>${hs.map((h,i)=>`<button data-toc="${i}">${esc(h.textContent)}</button>`).join("")}</nav>`);
+  art.querySelectorAll("[data-toc]").forEach(b=>b.onclick=()=>{const h=$("#gs-"+b.dataset.toc);window.scrollTo({top:h.getBoundingClientRect().top+scrollY-stickTop()-14,behavior:"smooth"})});
+}
+const stickTop=()=>{const b=$(".subject-focus-bar"),n=$("#topnav");const bs=b&&getComputedStyle(b).position==="sticky";return (n?n.offsetHeight:0)+(bs?b.offsetHeight:0)};
+const readBar=document.createElement("div");readBar.className="read-bar";readBar.innerHTML="<i></i>";document.body.appendChild(readBar);
+let readRaf=0;
+function onGuideScroll(){
+  readRaf=0;
+  if(document.body.dataset.view!=="learn")return;
+  const art=$("#guideBody .guide");if(!art)return;
+  const r=art.getBoundingClientRect(),top=stickTop();
+  const p=Math.min(1,Math.max(0,(top+40-r.top)/Math.max(1,r.height-innerHeight+top+40)));
+  readBar.firstChild.style.transform=`scaleX(${p})`;
+  let cur=-1;
+  art.querySelectorAll("h2[id^=gs-]").forEach((h,i)=>{if(h.getBoundingClientRect().top<top+90)cur=i});
+  art.querySelectorAll("[data-toc]").forEach(b=>b.classList.toggle("on",+b.dataset.toc===cur));
+}
+window.addEventListener("scroll",()=>{if(!readRaf)readRaf=requestAnimationFrame(onGuideScroll)},{passive:true});
 function hydrate(root){
   root.querySelectorAll("[data-header]").forEach(el=>renderHeader(el,el.dataset.header));
   root.querySelectorAll("[data-frame]").forEach(el=>renderFrame(el,el.dataset.frame));
   root.querySelectorAll("[data-seq]").forEach(el=>renderSeq(el,el.dataset.seq));
   root.querySelectorAll("[data-viz]").forEach(el=>{const f=VIZ[el.dataset.viz];if(f)f(el)});
   root.querySelectorAll("[data-chk]").forEach(el=>renderChecklist(el,el.dataset.chk));
+  root.querySelectorAll(".g-box>b.t").forEach(t=>{if(t.querySelector(".ic"))return;const box=t.parentElement;
+    t.insertAdjacentHTML("afterbegin",icon(box.classList.contains("exam")?"bulb":box.classList.contains("warn")?"alert":box.classList.contains("analogy")?"sparkles":"info"))});
   root.querySelectorAll("pre[data-run]").forEach(pre=>{
-    const b=document.createElement("button");b.className="btn";b.innerHTML=icon("flask")+"Prøv i sandbox";b.style.margin="-8px 0 14px";
-    b.onclick=()=>{setView("live");openSandbox(pre.innerText.replace(/\n$/,""))};
-    pre.after(b);
+    const wrap=document.createElement("div");wrap.className="g-code";
+    wrap.innerHTML=`<div class="g-code-head"><span class="g-code-lang"><i class="g-dots"><b></b><b></b><b></b></i>Python</span><span class="g-code-act"><button class="g-code-btn" data-copy title="Kopiér koden">${icon("copy")}<span>Kopiér</span></button><button class="g-code-btn run" title="Åbn koden i sandboxen">${icon("flask")}<span>Prøv i sandbox</span></button></span></div>`;
+    pre.before(wrap);wrap.appendChild(pre);
+    const code=()=>pre.innerText.replace(/\n$/,"");
+    wrap.querySelector(".run").onclick=()=>{setView("live");openSandbox(code())};
+    const cp=wrap.querySelector("[data-copy]");
+    cp.onclick=()=>{navigator.clipboard?.writeText(code()).then(()=>{cp.classList.add("done");cp.innerHTML=icon("check")+"<span>Kopieret</span>";
+      setTimeout(()=>{cp.classList.remove("done");cp.innerHTML=icon("copy")+"<span>Kopiér</span>"},1600)}).catch(()=>{})};
   });
   bindVideoCards(root);
 }
@@ -307,28 +350,52 @@ const fmt=t=>String(Math.floor(t/60)).padStart(2,"0")+":"+String(Math.floor(t%60
 function renderPodcasts(){
   if($("#podList").dataset.done)return;
   $("#podList").dataset.done="1";
+  const podLen=p=>Math.max(p.mins*60,(p.lines.at(-1)||[0])[0]+20);
+  $("#podStats").innerHTML=`<span>${icon("headphones")}${PODCASTS.length} afsnit</span><span>${icon("clock")}${PODCASTS.reduce((a,p)=>a+p.mins,0)} min i alt</span><span>${icon("video")}Video med animationer</span><span>${icon("captions")}Undertekster og transskription</span>`;
+  $("#podOverview").innerHTML=PODCASTS.map((p,i)=>`<button class="po-card" data-po="${p.id}"><span class="po-num">${i+1}</span><span class="po-txt"><b>${esc(p.title)}</b><small>${p.mins} min · ${esc(p.layers)}</small><span class="po-bar"><i></i></span></span><span class="po-eq" aria-hidden="true"><i></i><i></i><i></i></span></button>`).join("");
+  $$("#podOverview [data-po]").forEach(b=>b.onclick=()=>{const el=$("#pod-"+b.dataset.po);window.scrollTo({top:el.getBoundingClientRect().top+scrollY-stickTop()-12,behavior:"smooth"})});
   $("#podList").innerHTML=PODCASTS.map((p,i)=>`<article class="pod" id="pod-${p.id}">
-    <div class="pod-head"><div class="pod-num">${i+1}</div><div><h3>${esc(p.title)}</h3><div class="pod-sub">${p.mins} min · ${esc(p.layers)}</div></div></div>
-    <p>${p.desc}</p>
-    ${POD_VIDEO[p.id]?`<div class="pv-mode" role="group" aria-label="Vælg visning"><button data-mode="video">${icon("video")}Video</button><button data-mode="audio">${icon("headphones")}Kun lyd</button></div>`:""}
+    <div class="pod-head"><div class="pod-num"><small>Afsnit</small>${i+1}</div><div class="pod-titles"><h3>${esc(p.title)}</h3><div class="pod-meta"><span>${icon("clock")}${p.mins} min</span><span>${icon("layers")}${esc(p.layers)}</span></div></div>
+      ${POD_VIDEO[p.id]?`<div class="pv-mode" role="group" aria-label="Vælg visning"><button data-mode="video">${icon("video")}Video</button><button data-mode="audio">${icon("headphones")}Kun lyd</button></div>`:""}</div>
+    <p class="pod-desc">${p.desc}</p>
     <div class="pv-wrap">
       ${POD_VIDEO[p.id]?`<div class="pv-stage unstarted"><div class="pv-scene"></div><div class="pv-playbig" aria-hidden="true"><span>${icon("play")}</span></div><button class="pv-fs" title="Fuld skærm" aria-label="Fuld skærm">${icon("maximize")}</button></div>`:""}
       <div class="pod-cc idle" aria-hidden="true"><div class="cc-prev"></div><div class="cc-now">Underteksterne vises her, når du trykker afspil.</div></div>
-      <audio controls preload="none" src="${MEDIA_BASE}podcasts/${p.file}"></audio>
+      <audio preload="none" src="${MEDIA_BASE}podcasts/${p.file}"></audio>
+      <div class="pp" role="group" aria-label="Afspiller">
+        <button class="pp-play" aria-label="Afspil">${icon("play")}${icon("pause")}</button>
+        <button class="pp-btn" data-skip="-15" title="15 sek. tilbage" aria-label="15 sekunder tilbage">${icon("reset")}<small>15</small></button>
+        <button class="pp-btn" data-skip="15" title="15 sek. frem" aria-label="15 sekunder frem">${icon("rotate")}<small>15</small></button>
+        <span class="pp-time pp-cur">00:00</span>
+        <div class="pp-track"><input type="range" class="pp-seek" min="0" max="${podLen(p)}" step="1" value="0" aria-label="Position i afsnittet"><div class="pp-marks"></div></div>
+        <span class="pp-time pp-dur">${fmt(podLen(p))}</span>
+        <button class="pp-btn pp-rate" title="Afspilningshastighed">1×</button>
+        <button class="pp-btn pp-cc" data-cc aria-pressed="true" title="Undertekster" aria-label="Undertekster">${icon("captions")}</button>
+      </div>
+      <button class="pp-resume" hidden>${icon("play")}<span></span></button>
       ${POD_VIDEO[p.id]?`<div class="pv-chapters" aria-label="Kapitler"></div>`:""}
     </div>
-    <b style="font-size:12px">Hovedpointer</b>
-    <ul class="pod-take">${p.take.map(t=>`<li>${t}</li>`).join("")}</ul>
-    ${p.caveat?`<div class="g-box warn" style="margin-top:10px"><b class="t">Vær kritisk</b><p>${p.caveat}</p></div>`:""}
-    <div class="pod-tools"><button class="btn" data-cc aria-pressed="true">Undertekster: til</button><button class="btn" data-tr="${p.id}">${icon("fileText")}<span>Vis transskription</span></button>${(p.guides||[]).map(g=>{const gg=GUIDES.find(x=>x.id===g);return gg?`<button class="btn" data-pg="${g}">Guide: ${esc(gg.title)}</button>`:""}).join("")}</div>
-    <div class="transcript" id="tr-${p.id}"><input class="input tr-search" placeholder="Søg i transskriptionen…"><div class="tr-lines">${p.lines.map(l=>`<div class="tl" data-t="${l[0]}"><button data-seek="${l[0]}">${fmt(l[0])}</button><span>${esc(l[1])}</span></div>`).join("")}</div></div>
+    <div class="pod-grid">
+      <div class="pod-takes"><h4>${icon("bulb")}Hovedpointer</h4><ul class="pod-take">${p.take.map(t=>`<li>${icon("checkCircle")}<span>${t}</span></li>`).join("")}</ul></div>
+      ${p.caveat?`<div class="g-box warn"><b class="t">${icon("alert")}Vær kritisk</b><p>${p.caveat}</p></div>`:""}
+    </div>
+    <div class="pod-tools"><button class="btn" data-tr="${p.id}">${icon("fileText")}<span>Vis transskription</span></button>${(p.guides||[]).map(g=>{const gg=GUIDES.find(x=>x.id===g);return gg?`<button class="btn" data-pg="${g}">${icon("book")}Guide: ${esc(gg.title)}</button>`:""}).join("")}</div>
+    <div class="transcript" id="tr-${p.id}"><div class="tr-top"><i data-icon="search"></i><input class="input tr-search" placeholder="Søg i transskriptionen…"></div><div class="tr-lines">${p.lines.map(l=>`<div class="tl" data-t="${l[0]}"><button data-seek="${l[0]}">${fmt(l[0])}</button><span>${esc(l[1])}</span></div>`).join("")}</div><p class="tr-note">Transskriptionen er automatisk genereret og kan have stavefejl.</p></div>
   </article>`).join("");
-  $$("#podList [data-tr]").forEach(b=>b.onclick=()=>{const t=$("#tr-"+b.dataset.tr);t.classList.toggle("open");b.querySelector("span").textContent=t.classList.contains("open")?"Skjul transskription":"Vis transskription"});
+  $$("#podList [data-tr]").forEach(b=>b.onclick=()=>{const t=$("#tr-"+b.dataset.tr);t.classList.toggle("open");b.classList.toggle("on",t.classList.contains("open"));b.querySelector("span").textContent=t.classList.contains("open")?"Skjul transskription":"Vis transskription"});
   $$("#podList [data-pg]").forEach(b=>b.onclick=()=>openGuide(b.dataset.pg));
   /* subtitles under the player: on/off is remembered for all episodes */
   const setCC=on=>{try{localStorage.setItem("its_pod_cc",on?"1":"0")}catch{}
     $$("#podList .pod").forEach(p=>p.classList.toggle("cc-off",!on));
-    $$("#podList [data-cc]").forEach(b=>{b.innerHTML=`${icon("captions")}Undertekster: ${on?"til":"fra"}`;b.setAttribute("aria-pressed",String(on))})};
+    $$("#podList [data-cc]").forEach(b=>{b.title=`Undertekster: ${on?"til":"fra"}`;b.setAttribute("aria-pressed",String(on))})};
+  /* playback speed is shared by all episodes and remembered */
+  const RATES=[1,1.25,1.5,1.75,2,0.75];
+  const setRate=r=>{try{localStorage.setItem("its_pod_rate",String(r))}catch{}
+    $$("#podList audio").forEach(a=>{a.defaultPlaybackRate=r;a.playbackRate=r});
+    $$("#podList .pp-rate").forEach(b=>b.textContent=String(r).replace(".",",")+"×")};
+  setRate(RATES.includes(+localStorage.getItem("its_pod_rate"))?+localStorage.getItem("its_pod_rate"):1);
+  $$("#podList .pp-rate").forEach(b=>b.onclick=()=>{const a=b.closest(".pod").querySelector("audio");setRate(RATES[(RATES.indexOf(a.playbackRate)+1)%RATES.length])});
+  const posAll=()=>{try{return JSON.parse(localStorage.getItem("its_pod_pos")||"{}")}catch{return {}}};
   setCC(localStorage.getItem("its_pod_cc")!=="0");
   /* episodes with visual scenes can be watched as video or listened to as audio only (remembered) */
   const setMode=mode=>{try{localStorage.setItem("its_pod_mode",mode)}catch{}
@@ -342,6 +409,7 @@ function renderPodcasts(){
     const cc=pod.querySelector(".pod-cc"),ccPrev=cc.querySelector(".cc-prev"),ccNow=cc.querySelector(".cc-now");
     pod.querySelectorAll("[data-seek]").forEach(b=>b.onclick=()=>{audio.currentTime=+b.dataset.seek;audio.play()});
     if(POD_VIDEO[PODCASTS[pi].id])pvAttach(pod,PODCASTS[pi],audio);
+    podPlayer(pod,PODCASTS[pi],audio,posAll);
     let last=-1;
     audio.addEventListener("timeupdate",()=>{
       const t=audio.currentTime;let idx=-1;
@@ -357,6 +425,32 @@ function renderPodcasts(){
   });
   /* only one audio at a time */
   $$("#podList audio").forEach(a=>a.addEventListener("play",()=>$$("#podList audio").forEach(o=>{if(o!==a)o.pause()})));
+}
+
+/* custom player bar: play/pause, ±15 s, seek with chapter marks, speed, resume where you left off */
+function podPlayer(pod,p,audio,posAll){
+  const pp=pod.querySelector(".pp"),seek=pp.querySelector(".pp-seek"),cur=pp.querySelector(".pp-cur"),durEl=pp.querySelector(".pp-dur"),
+    playB=pp.querySelector(".pp-play"),resume=pod.querySelector(".pp-resume"),card=$(`#podOverview [data-po="${p.id}"]`);
+  let dur=+seek.max,drag=false,lastSave=0;
+  const marks=()=>{pp.querySelector(".pp-marks").innerHTML=[...pod.querySelectorAll(".pv-ch")].slice(1).map(c=>`<i style="left:${Math.min(100,+c.dataset.t/dur*100)}%"></i>`).join("")};
+  const saved=()=>posAll()[p.id]||0;
+  const paintCard=t=>{if(card)card.querySelector(".po-bar i").style.width=Math.min(100,t/dur*100)+"%"};
+  const paint=()=>{const t=drag?+seek.value:(audio.currentTime||0);if(!drag)seek.value=t;cur.textContent=fmt(t);seek.style.setProperty("--p",Math.min(100,t/dur*100)+"%")};
+  const save=force=>{const t=audio.currentTime||0,now=Date.now();if(!force&&now-lastSave<4000)return;lastSave=now;
+    const all=posAll();if(t>5&&t<dur-20)all[p.id]=Math.round(t);else delete all[p.id];try{localStorage.setItem("its_pod_pos",JSON.stringify(all))}catch{}paintCard(t)};
+  marks();paint();paintCard(saved());
+  const s0=saved();
+  if(s0>15){resume.hidden=false;resume.querySelector("span").textContent=`Fortsæt hvor du slap (${fmt(s0)})`;
+    resume.onclick=()=>{audio.currentTime=s0;audio.play().catch(()=>{})}}
+  audio.addEventListener("loadedmetadata",()=>{if(isFinite(audio.duration)&&audio.duration>0){dur=audio.duration;seek.max=dur;durEl.textContent=fmt(dur);marks();paint()}});
+  audio.addEventListener("timeupdate",()=>{paint();if(!audio.paused)save()});
+  const state=()=>{const on=!audio.paused;pod.classList.toggle("playing",on);card?.classList.toggle("playing",on);playB.setAttribute("aria-label",on?"Pause":"Afspil");if(on)resume.hidden=true};
+  ["play","pause","ended"].forEach(e=>audio.addEventListener(e,state));
+  audio.addEventListener("pause",()=>save(true));
+  playB.onclick=()=>audio.paused?audio.play().catch(()=>{}):audio.pause();
+  seek.oninput=()=>{drag=true;paint()};
+  seek.onchange=()=>{drag=false;audio.currentTime=+seek.value;paint()};
+  pp.querySelectorAll("[data-skip]").forEach(b=>b.onclick=()=>{audio.currentTime=Math.max(0,Math.min(dur,(audio.currentTime||0)+ +b.dataset.skip));paint()});
 }
 
 /* ---------- sandbox ---------- */

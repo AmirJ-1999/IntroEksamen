@@ -142,13 +142,14 @@ assert html.count(end_live) == 1
 views = '''
 <section id="learnView" class="hidden">
   <div class="hero"><div><div class="eyebrow">Lær · visuelt og interaktivt</div><h1 style="font-size:clamp(26px,3.4vw,40px)">Guides</h1>
-    <p>Forklaringer med headers du kan klikke på, sekvensdiagrammer, beregnere og eksempler du kan køre. Vælg en guide i menuen.</p></div></div>
+    <p>Forklaringer med headers du kan klikke på, sekvensdiagrammer, beregnere og eksempler du kan køre. Vælg en guide i menuen.</p><div class="hero-stats" id="learnStats"></div></div></div>
   <select class="select guide-select" id="guideSelect" aria-label="Vælg guide"></select>
   <div class="learn-layout"><aside class="guide-nav" id="guideNav"></aside><div id="guideBody"></div></div>
 </section>
 <section id="podcastsView" class="hidden">
   <div class="hero"><div><div class="eyebrow">Netværk · lyt og læs med</div><h1 style="font-size:clamp(26px,3.4vw,40px)">Podcasts</h1>
-    <p>Fire samtaler om lagene (ca. 90 min i alt). Tryk på et tidsstempel i transskriptionen for at hoppe dertil — den aktuelle linje markeres, mens du lytter. Transskriptionerne er automatisk genereret og kan have stavefejl.</p></div></div>
+    <p>Fire samtaler om lagene (ca. 90 min i alt). Tryk på et tidsstempel i transskriptionen for at hoppe dertil — den aktuelle linje markeres, mens du lytter. Transskriptionerne er automatisk genereret og kan have stavefejl.</p><div class="hero-stats" id="podStats"></div></div></div>
+  <div class="pod-overview" id="podOverview"></div>
   <div class="pod-list" id="podList"></div>
 </section>
 <section id="netlabView" class="hidden">
