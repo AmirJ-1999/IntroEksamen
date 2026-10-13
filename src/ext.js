@@ -269,8 +269,13 @@ function renderPodcasts(){
   $("#podList").innerHTML=PODCASTS.map((p,i)=>`<article class="pod" id="pod-${p.id}">
     <div class="pod-head"><div class="pod-num">${i+1}</div><div><h3>${esc(p.title)}</h3><div class="pod-sub">${p.mins} min · ${esc(p.layers)}</div></div></div>
     <p>${p.desc}</p>
-    <audio controls preload="none" src="${MEDIA_BASE}podcasts/${p.file}"></audio>
-    <div class="pod-cc idle" aria-hidden="true"><div class="cc-prev"></div><div class="cc-now">Underteksterne vises her, når du trykker afspil.</div></div>
+    ${POD_VIDEO[p.id]?`<div class="pv-mode" role="group" aria-label="Vælg visning"><button data-mode="video">▶ Video</button><button data-mode="audio">♪ Kun lyd</button></div>`:""}
+    <div class="pv-wrap">
+      ${POD_VIDEO[p.id]?`<div class="pv-stage unstarted"><div class="pv-scene"></div><div class="pv-playbig" aria-hidden="true"><span>▶</span></div><button class="pv-fs" title="Fuld skærm" aria-label="Fuld skærm">⛶</button></div>`:""}
+      <div class="pod-cc idle" aria-hidden="true"><div class="cc-prev"></div><div class="cc-now">Underteksterne vises her, når du trykker afspil.</div></div>
+      <audio controls preload="none" src="${MEDIA_BASE}podcasts/${p.file}"></audio>
+      ${POD_VIDEO[p.id]?`<div class="pv-chapters" aria-label="Kapitler"></div>`:""}
+    </div>
     <b style="font-size:12px">Hovedpointer</b>
     <ul class="pod-take">${p.take.map(t=>`<li>${t}</li>`).join("")}</ul>
     ${p.caveat?`<div class="g-box warn" style="margin-top:10px"><b class="t">Vær kritisk</b><p>${p.caveat}</p></div>`:""}
@@ -284,11 +289,18 @@ function renderPodcasts(){
     $$("#podList .pod").forEach(p=>p.classList.toggle("cc-off",!on));
     $$("#podList [data-cc]").forEach(b=>{b.textContent=`Undertekster: ${on?"til":"fra"}`;b.setAttribute("aria-pressed",String(on))})};
   setCC(localStorage.getItem("its_pod_cc")!=="0");
+  /* episodes with visual scenes can be watched as video or listened to as audio only (remembered) */
+  const setMode=mode=>{try{localStorage.setItem("its_pod_mode",mode)}catch{}
+    $$("#podList .pod").forEach(p=>{const has=!!p.querySelector(".pv-stage");p.classList.toggle("mode-video",has&&mode==="video");p.classList.toggle("mode-audio",!has||mode!=="video")});
+    $$("#podList [data-mode]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.mode===mode)))};
+  setMode(localStorage.getItem("its_pod_mode")==="audio"?"audio":"video");
+  $$("#podList [data-mode]").forEach(b=>b.onclick=()=>setMode(b.dataset.mode));
   $$("#podList [data-cc]").forEach(b=>b.onclick=()=>setCC(b.getAttribute("aria-pressed")!=="true"));
   $$("#podList .pod").forEach((pod,pi)=>{
     const audio=pod.querySelector("audio"),lines=[...pod.querySelectorAll(".tl")],text=PODCASTS[pi].lines.map(l=>l[1]);
     const cc=pod.querySelector(".pod-cc"),ccPrev=cc.querySelector(".cc-prev"),ccNow=cc.querySelector(".cc-now");
     pod.querySelectorAll("[data-seek]").forEach(b=>b.onclick=()=>{audio.currentTime=+b.dataset.seek;audio.play()});
+    if(POD_VIDEO[PODCASTS[pi].id])pvAttach(pod,PODCASTS[pi],audio);
     let last=-1;
     audio.addEventListener("timeupdate",()=>{
       const t=audio.currentTime;let idx=-1;

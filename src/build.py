@@ -10,7 +10,8 @@ from media_meta import VIDEOS, VIDEO_GROUPS, PODCASTS
 
 rd = lambda n: open(os.path.join(EXT, n), encoding='utf-8').read()
 css, data, gnet, gpy, extjs, accjs = rd('ext.css'), rd('data.js'), rd('guides_net.js'), rd('guides_py.js'), rd('ext.js'), rd('account.js')
-quizjs, netlabjs = rd('quiz_net.js'), rd('netlab.js')
+quizjs, netlabjs, podvjs = rd('quiz_net.js'), rd('netlab.js'), rd('podvideo.js')
+css += '\n' + rd('podvideo.css')
 
 # Python-guides: every backslash is meant literally (code shown/run as Python)
 gpy = gpy.replace('\\', '\\\\')
@@ -95,7 +96,7 @@ syncSubject();
 (function(){const g=new URLSearchParams(location.hash.slice(1)).get("guide");
  if(g&&GUIDES.some(x=>x.id===g))openGuide(g);else setView(currentView);})();
 '''
-script = '\n'.join([data, gnet, gpy, media, quizjs, extjs, netlabjs, accjs, boot])
+script = '\n'.join([data, gnet, gpy, media, quizjs, podvjs, extjs, netlabjs, accjs, boot])
 assert '</script' not in script.lower()
 
 html = open(BASE, encoding='utf-8').read()

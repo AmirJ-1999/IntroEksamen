@@ -10,7 +10,7 @@ Studieside til eksamen i *Introduction to IT-Security* (Python + Netværk).
 | **Flashcards** | 194 kort med let og teknisk forklaring |
 | **Python Lab** | To opgavesæt med automatiske tests: **Øvelser** (70 live-coding-opgaver) og **Mandatory opgave 1** (33 spørgsmål; svaret vises aldrig, men der er hint, model-svar og forklaret løsning). **▶ Kør** viser dit output og letlæselige fejl (type, linje, dansk forklaring). Plus en fri Python-sandbox (Pyodide i browseren) |
 | **Netværk Lab** | Multiple choice pr. lag (Grundlag, Application, Transport, Network, Link & WiFi, Wireshark): ca. 520 spørgsmål. Hvad hedder det markerede felt, peg på feltet i headeren, hvad bruges feltet til, feltstørrelser, hvad mangler i sekvensdiagrammet, sæt trin i rækkefølge, og subnet-, fragmenterings- og seq/ack-beregninger med nye tal hver gang. Forklaring efter hvert svar, eksamensøvelse med 20 blandede og "Øv svage punkter" |
-| **Podcasts** | 4 netværks-afsnit (ca. 90 min) med klikbar transskription |
+| **Podcasts** | 4 netværks-afsnit (ca. 90 min) med live undertekster og klikbar transskription. Afsnit 1 kan også ses som **video**: visuelle scener (lagmodel, TCP/UDP, DHCP, NAT, ARP, indkapsling, DNS-hierarki, HTTP, cookies, HTTPS) synkroniseret med forklaringen, med kapitler og fuld skærm. Vælg *Video* eller *Kun lyd* |
 | **Videoer** | 46 udvalgte videoer (Jim Kurose, Ben Eater, Practical Networking, Corey Schafer, NetworkChuck og Daniels Wireshark-serie) |
 
 - **Download offline** (knappen øverst): gemmer hele siden som én HTML-fil. Guides, flashcards og transskriptioner virker uden internet; Python-motoren, lyd og videoer kræver internet.
@@ -19,7 +19,7 @@ Studieside til eksamen i *Introduction to IT-Security* (Python + Netværk).
 
 ## Kildekode
 
-`index.html` er bygget af filerne i `src/`: `base_v7.html` (flashcards + live coding) plus guides (`guides_net.js`, `guides_py.js`), diagrammer og værktøjer (`data.js`, `ext.js`, `ext.css`) og medie-data (`media_meta.py`, `oembed.json`, `transcripts/`). Netværk Lab består af `quiz_net.js` (spørgsmålsbank, header-ledetråde og rækkefølger) og `netlab.js` (motoren, der også genererer spørgsmål fra headerne og diagrammerne i `data.js`). Mandatory opgave 1 læses fra `mandatory/Python_Exam_All_33_Questions.py` (spørgsmål, `my_data` og model-svar). Titler, hints og forklaringer ligger i `mandatory1_meta.py`. Build-scriptet kører model-svarene for at finde de rigtige svar og tjekker, at hver forklaret løsning giver samme svar. Genbyg med:
+`index.html` er bygget af filerne i `src/`: `base_v7.html` (flashcards + live coding) plus guides (`guides_net.js`, `guides_py.js`), diagrammer og værktøjer (`data.js`, `ext.js`, `ext.css`) og medie-data (`media_meta.py`, `oembed.json`, `transcripts/`). Videopodcasten ligger i `podvideo.js` (scener med tidsstempler pr. afsnit + renderere) og `podvideo.css`. Netværk Lab består af `quiz_net.js` (spørgsmålsbank, header-ledetråde og rækkefølger) og `netlab.js` (motoren, der også genererer spørgsmål fra headerne og diagrammerne i `data.js`). Mandatory opgave 1 læses fra `mandatory/Python_Exam_All_33_Questions.py` (spørgsmål, `my_data` og model-svar). Titler, hints og forklaringer ligger i `mandatory1_meta.py`. Build-scriptet kører model-svarene for at finde de rigtige svar og tjekker, at hver forklaret løsning giver samme svar. Genbyg med:
 
 ```bash
 cd src
