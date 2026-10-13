@@ -85,6 +85,7 @@ function reloadAppState(force=false){
   statusMap=J("its_status_clean",{});savedMap=J("its_saved_cards_v5",{});lastCard=J("its_last_card",{});
   liveProgress=J("its_live_progress_clean",{});liveCode=J("its_live_code_clean",{});
   learnId=J("its_learn_last",{});checks=J("its_checklists",{});
+  nqStats=J("its_netquiz",{});
   liveSet=localStorage.getItem("its_live_set")||liveSet;
   const sb=$("#sbCode");
   if(sb&&(force||document.activeElement!==sb))sb.value=localStorage.getItem("its_sandbox")||(force?"":sb.value);

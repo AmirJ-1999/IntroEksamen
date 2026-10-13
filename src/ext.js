@@ -1,5 +1,5 @@
 /* ===== v8 Study Lab: Lær, Podcasts, Videoer, Sandbox ===== */
-const EXT_VIEWS=["learn","podcasts","videos"];
+const EXT_VIEWS=["learn","podcasts","videos","netlab"];
 const MEDIA_BASE=location.protocol==="file:"?"https://amirj-1999.github.io/IntroEksamen/":"";
 let learnId=JSON.parse(localStorage.getItem("its_learn_last")||"{}");
 let checks=JSON.parse(localStorage.getItem("its_checklists")||"{}");
@@ -15,7 +15,7 @@ setView=function(view){
   $("#topnav")?.classList.remove("menu-open");
   if(view!=="learn"&&location.hash)history.replaceState(null,"",location.pathname+location.search);
   if(EXT_VIEWS.includes(view)){
-    if(view==="podcasts"&&subject!=="Netværk"){subject="Netværk";syncSubject();}
+    if((view==="podcasts"||view==="netlab")&&subject!=="Netværk"){subject="Netværk";syncSubject();}
     currentView=view;
     ["home","study","browse","live",...EXT_VIEWS].forEach(v=>{
       $("#"+v+"View").classList.toggle("hidden",v!==view);
@@ -24,6 +24,7 @@ setView=function(view){
     if(view==="learn")renderLearn();
     if(view==="podcasts")renderPodcasts();
     if(view==="videos")renderVideos();
+    if(view==="netlab")renderNetlab();
     window.scrollTo({top:0,behavior:"smooth"});
     return;
   }
@@ -32,10 +33,10 @@ setView=function(view){
 };
 syncSubject=function(){
   _origSync();
-  $$('.navbtn[data-view="podcasts"]').forEach(b=>b.style.display=subject==="Netværk"?"":"none");
+  $$('.navbtn[data-view="podcasts"],.navbtn[data-view="netlab"]').forEach(b=>b.style.display=subject==="Netværk"?"":"none");
 };
 changeSubject=function(s){
-  if(currentView==="podcasts"&&s!=="Netværk")currentView="home";
+  if((currentView==="podcasts"||currentView==="netlab")&&s!=="Netværk")currentView="home";
   _origChange(s);
 };
 renderHome=function(){
@@ -49,6 +50,7 @@ renderHome=function(){
   ]:[
     ["◧","Lær","Visuelle guides for hvert lag: interaktive headers, sekvensdiagrammer, subnet- og fragmenteringsberegner og et header-galleri til eksamen.",`<button class="btn primary" data-go2="learn">Åbn guides (${g})</button>`],
     ["◫","Flashcards","Ét kort ad gangen med let og teknisk forklaring. Marker Kan / Usikker / Øv igen.",`<button class="btn" data-go2="study">Start flashcards</button>`],
+    ["✓","Netværk Lab","Multiple choice pr. lag: peg på felter i headerne, find det manglende trin i diagrammer, sæt ting i rækkefølge og regn subnets.",`<button class="btn primary" data-go2="netlab">Test dig selv</button>`],
     ["♫","Podcasts","4 lydafsnit (ca. 90 min) om lagene — med klikbar transskription, så du kan læse med.",`<button class="btn" data-go2="podcasts">Lyt</button>`],
     ["▶","Videoer",`${v} udvalgte videoer, bl.a. Jim Kurose (forfatteren til jeres lærebog) og Daniels Wireshark-serie.`,`<button class="btn" data-go2="videos">Se videoer</button>`]
   ];
@@ -111,6 +113,7 @@ function showGuide(id){
     <div class="g-actions">
       ${cats.map(c=>`<button class="btn primary" data-cards="${esc(c)}">Øv flashcards: ${esc(c)}</button>`).join("")}
       ${g.live?`<button class="btn" data-livecat="${esc(g.live)}">Python Lab: ${esc(g.live)}</button>`:""}
+      ${NQ_GUIDE_TOPIC[g.group]?`<button class="btn" data-nqtopic="${NQ_GUIDE_TOPIC[g.group]}">Netværk Lab: test dig selv i ${esc(nqTopic(NQ_GUIDE_TOPIC[g.group]).name)}</button>`:""}
       <span style="flex:1"></span>
       ${i>0?`<button class="btn" data-g2="${list[i-1].id}">← ${esc(list[i-1].title)}</button>`:""}
       ${i<list.length-1?`<button class="btn" data-g2="${list[i+1].id}">${esc(list[i+1].title)} →</button>`:""}
@@ -119,6 +122,7 @@ function showGuide(id){
   $$("#guideBody [data-g2]").forEach(b=>b.onclick=()=>openGuide(b.dataset.g2));
   $$("#guideBody [data-cards]").forEach(b=>b.onclick=()=>{category=b.dataset.cards;difficulty="all";typeFilter="all";statusFilter="all";sortMode="default";search="";studyIndex=0;setView("study")});
   $$("#guideBody [data-livecat]").forEach(b=>b.onclick=()=>{liveSet="ovelser";liveCategory=b.dataset.livecat;liveIndex=0;setView("live");closeSandbox()});
+  $$("#guideBody [data-nqtopic]").forEach(b=>b.onclick=()=>{setView("netlab");nqStart(b.dataset.nqtopic)});
   $$("#guideBody [data-pod]").forEach(b=>b.onclick=()=>{setView("podcasts");setTimeout(()=>document.getElementById("pod-"+b.dataset.pod)?.scrollIntoView({behavior:"smooth",block:"start"}),60)});
 }
 function hydrate(root){
@@ -168,8 +172,10 @@ function renderFrame(el,key){
 }
 
 /* ---------- sequence diagrams ---------- */
-function renderSeq(el,key){
+/* opts.hide = index (among labelled messages) whose label is shown as "?" (Netværk Lab); opts.reveal shows it again, highlighted */
+function renderSeq(el,key,opts={}){
   const s=SEQS[key];if(!s){el.textContent="(mangler diagram: "+key+")";return}
+  let ai=-1;
   const n=s.actors.length,colW=s.colW||Math.max(170,Math.min(230,620/(n-1||1)));
   const left=s.left||95,W=left*2+colW*(n-1),rowH=s.rowH||44,top=58;
   const X=i=>left+i*colW;
@@ -183,6 +189,8 @@ function renderSeq(el,key){
       body+=`<rect x="${bx}" y="${y-2}" width="${w}" height="22" rx="6" class="${m.cls||"sv-box-gold"}"/><text x="${bx+w/2}" y="${y+13}" text-anchor="middle" class="sv-text" style="font-size:11px">${esc(m.note)}</text>`;
       y+=m.h||30;return;
     }
+    ai++;
+    const hidden=opts.hide===ai,label=hidden&&!opts.reveal?"?":m.l,qcls=hidden?(opts.reveal?" sv-q-rev":" sv-q"):"";
     if(m.same)y-=lastAdv;
     const x1=X(m.f),x2=X(m.t),dy=m.flat?0:(m.dy??18);
     if(m.f===m.t){ /* local action */
@@ -197,8 +205,9 @@ function renderSeq(el,key){
     body+=`<line x1="${x1}" y1="${y}" x2="${x2e}" y2="${y2e}" class="${cls}" ${m.lost?"":`marker-end="url(#${mid}${mk})"`}/>`;
     if(m.lost)body+=`<text x="${x2e}" y="${y2e+5}" text-anchor="middle" style="fill:var(--red);font:bold 16px Inter,sans-serif">✕</text>`;
     const lx=(x1+x2)/2,ly=y+dy/2-7;
-    body+=`<text x="${lx}" y="${ly}" text-anchor="middle" class="sv-text sv-bold" style="font-size:11.5px">${esc(m.l)}</text>`;
-    if(m.s)body+=`<text x="${lx}" y="${ly+dy/2+20}" text-anchor="middle" class="sv-small">${esc(m.s)}</text>`;
+    if(hidden)body+=`<rect x="${lx-(opts.reveal?Math.max(60,label.length*3.6+14):22)}" y="${ly-15}" width="${opts.reveal?Math.max(120,label.length*7.2+28):44}" height="22" rx="6" class="sv-q-box${opts.reveal?" rev":""}"/>`;
+    body+=`<text x="${lx}" y="${ly}" text-anchor="middle" class="sv-text sv-bold${qcls}" style="font-size:${hidden&&!opts.reveal?16:11.5}px">${esc(label)}</text>`;
+    if(m.s&&!(hidden&&!opts.reveal))body+=`<text x="${lx}" y="${ly+dy/2+20}" text-anchor="middle" class="sv-small">${esc(m.s)}</text>`;
     lastAdv=rowH+(m.s?10:0)+(m.extra||0);y+=lastAdv;
   });
   const H=y+10;

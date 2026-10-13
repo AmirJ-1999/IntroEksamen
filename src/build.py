@@ -10,6 +10,7 @@ from media_meta import VIDEOS, VIDEO_GROUPS, PODCASTS
 
 rd = lambda n: open(os.path.join(EXT, n), encoding='utf-8').read()
 css, data, gnet, gpy, extjs, accjs = rd('ext.css'), rd('data.js'), rd('guides_net.js'), rd('guides_py.js'), rd('ext.js'), rd('account.js')
+quizjs, netlabjs = rd('quiz_net.js'), rd('netlab.js')
 
 # Python-guides: every backslash is meant literally (code shown/run as Python)
 gpy = gpy.replace('\\', '\\\\')
@@ -94,7 +95,7 @@ syncSubject();
 (function(){const g=new URLSearchParams(location.hash.slice(1)).get("guide");
  if(g&&GUIDES.some(x=>x.id===g))openGuide(g);else setView(currentView);})();
 '''
-script = '\n'.join([data, gnet, gpy, media, extjs, accjs, boot])
+script = '\n'.join([data, gnet, gpy, media, quizjs, extjs, netlabjs, accjs, boot])
 assert '</script' not in script.lower()
 
 html = open(BASE, encoding='utf-8').read()
@@ -114,7 +115,7 @@ rep('<button class="download-btn" id="downloadOffline"', account_ui + '<button c
 rep('<button class="navbtn active" data-view="home">Start</button>',
     '<button class="navbtn active" data-view="home">Start</button>\n    <button class="navbtn" data-view="learn">Lær</button>')
 rep('<button class="navbtn" data-view="live">Python Lab</button>',
-    '<button class="navbtn" data-view="live">Python Lab</button>\n    <button class="navbtn" data-view="podcasts">Podcasts</button>\n    <button class="navbtn" data-view="videos">Videoer</button>\n    <button class="navbtn nav-mobile-only" id="menuDownload">⬇ Download offline</button>')
+    '<button class="navbtn" data-view="live">Python Lab</button>\n    <button class="navbtn" data-view="netlab">Netværk Lab</button>\n    <button class="navbtn" data-view="podcasts">Podcasts</button>\n    <button class="navbtn" data-view="videos">Videoer</button>\n    <button class="navbtn nav-mobile-only" id="menuDownload">⬇ Download offline</button>')
 rep('<button class="btn" id="randomLive">Tilfældig opgave</button>',
     '<button class="btn" id="randomLive">Tilfældig opgave</button>\n        <button class="btn primary" id="sandboxBtn">🧪 Fri sandbox</button>')
 rep('<div class="live-layout">', '<div class="live-layout" id="liveMain">')
@@ -142,6 +143,10 @@ views = '''
   <div class="hero"><div><div class="eyebrow">Netværk · lyt og læs med</div><h1 style="font-size:clamp(26px,3.4vw,40px)">Podcasts</h1>
     <p>Fire samtaler om lagene (ca. 90 min i alt). Tryk på et tidsstempel i transskriptionen for at hoppe dertil — den aktuelle linje markeres, mens du lytter. Transskriptionerne er automatisk genereret og kan have stavefejl.</p></div></div>
   <div class="pod-list" id="podList"></div>
+</section>
+<section id="netlabView" class="hidden">
+  <div class="live-head"><div class="live-title"><div class="eyebrow">Netværk · Test dig selv</div><h1>Netværk Lab</h1></div></div>
+  <div id="nqBody"></div>
 </section>
 <section id="videosView" class="hidden">
   <div class="hero"><div><div class="eyebrow">Videoer</div><h1 id="videosTitle" style="font-size:clamp(26px,3.4vw,40px)">Videoer</h1><p id="videosIntro"></p></div></div>

@@ -1,0 +1,291 @@
+/* ===== Netværk Lab: emner, spørgsmålsbank, header-ledetråde og rækkefølger ===== */
+/* Håndskrevne spørgsmål: a[0..c-1] er de rigtige svar (c = 1 hvis udeladt); rækkefølgen blandes ved visning.
+   v = visuel: {h: header, m: feltnavn} markerer et felt, {seq: diagram} viser et sekvensdiagram. g = guide-id. */
+const NQ_TOPICS=[
+  {id:"grundlag",name:"Grundlag",icon:"◫",desc:"Lagmodellen, PDU'er, indkapsling og forsinkelser",guide:"net-model"},
+  {id:"app",name:"Application",icon:"✉",desc:"HTTP, DNS, SMTP og sockets",guide:"net-dns"},
+  {id:"transport",name:"Transport",icon:"⇄",desc:"UDP, TCP, handshake, seq/ack, flow og congestion control",guide:"net-tcphdr"},
+  {id:"network",name:"Network",icon:"◎",desc:"IPv4/IPv6, subnetting, fragmentering, DHCP, NAT og ICMP",guide:"net-ipv4"},
+  {id:"link",name:"Link & WiFi",icon:"⌁",desc:"Ethernet, MAC, ARP, switches, CSMA og 802.11",guide:"net-ethernet"},
+  {id:"tools",name:"Wireshark & værktøjer",icon:"⌕",desc:"Filtre, ping, traceroute og kommandoer",guide:"net-wireshark"}
+];
+/* guide-gruppe → emne (knap "test dig selv" i guiderne) */
+const NQ_GUIDE_TOPIC={"Grundlag":"grundlag","Application":"app","Transport":"transport","Network":"network","Data Link & WiFi":"link","Værktøjer":"tools"};
+/* hvilket emne hver header/frame/diagram hører til */
+const NQ_HEADER_TOPIC={tcp:"transport",udp:"transport",ipv4:"network",ipv6:"network",icmp:"network",dns:"app",arp:"link",ethernet:"link"};
+const NQ_HEADER_GUIDE={tcp:"net-tcphdr",udp:"net-udp",ipv4:"net-ipv4",ipv6:"net-ipv6",icmp:"net-icmp",dns:"net-dns",arp:"net-arp",ethernet:"net-ethernet"};
+
+/* Hvad feltet bruges til, formuleret uden feltets navn (bruges til "peg på feltet" og "hvad bruges feltet til") */
+const NQ_CLUES={
+  tcp:{
+    "Source port":"Afsenderprocessens port, hos klienten typisk et tilfældigt højt nummer",
+    "Destination port":"Modtagerprocessens port, fx 443 hos en webserver",
+    "Sequence number":"Nummeret på den første databyte i segmentet",
+    "Acknowledgement number":"Den næste byte, modtageren forventer at få",
+    "Header length":"Headerens længde i 32-bit ord, så modtageren ved, hvor data starter",
+    "Flags":"SYN, ACK, FIN, RST, PSH og URG",
+    "Receive window":"Hvor mange bytes modtageren har plads til i sin buffer (flow control)",
+    "Checksum":"Fejltjek af header og data (inkl. pseudo-header med IP-adresserne)",
+    "Urgent pointer":"Peger på hastende data og bruges næsten aldrig",
+    "Options":"Variabel del med fx MSS, window scale og SACK-permitted"
+  },
+  udp:{
+    "Source port":"Afsenderprocessens port (må være 0, hvis der ikke skal svares)",
+    "Destination port":"Modtagerprocessens port, fx 53 for DNS",
+    "Length":"Hele segmentets længde i bytes, header og data",
+    "Checksum":"Fejltjek, valgfrit i IPv4 men obligatorisk i IPv6"
+  },
+  ipv4:{
+    "Version":"Fortæller hvilken IP-version headeren følger",
+    "IHL":"Headerens længde i 32-bit ord (5 = 20 bytes)",
+    "Type of Service":"Prioritering/QoS (DSCP) og ECN",
+    "Total length":"Hele datagrammets længde i bytes, header og data",
+    "Identification":"Samme værdi i alle fragmenter af ét oprindeligt datagram",
+    "Flags":"DF (Don't Fragment) og MF (More Fragments)",
+    "Fragment offset":"Hvor fragmentets data hører til, målt i enheder af 8 bytes",
+    "TTL":"Tælles ned med 1 for hvert hop, og ved 0 kasseres pakken",
+    "Protocol":"Hvilken protokol data skal afleveres til (1 = ICMP, 6 = TCP, 17 = UDP)",
+    "Header checksum":"Fejltjek af kun headeren, genberegnes ved hvert hop",
+    "Source IP address":"Afsenderens 32-bit adresse, som NAT omskriver ved udgående trafik",
+    "Destination IP address":"Modtagerens 32-bit adresse, som routerne slår op i forwarding-tabellen",
+    "Options":"Sjældne tilvalg, der gør headeren længere end 20 bytes"
+  },
+  ipv6:{
+    "Version":"Fortæller hvilken IP-version headeren følger",
+    "Traffic class":"Prioritering, svarer til IPv4's Type of Service",
+    "Flow label":"Markerer pakker i samme flow, så de kan behandles ens",
+    "Payload length":"Længden af alt efter den faste 40-byte header",
+    "Next header":"Hvilken header der kommer bagefter, svarer til IPv4's Protocol",
+    "Hop limit":"Tælles ned ved hvert hop, svarer til IPv4's TTL",
+    "Source address":"Afsenderens 128-bit adresse",
+    "Destination address":"Modtagerens 128-bit adresse"
+  },
+  icmp:{
+    "Type":"Hvilken slags besked: 8 = echo request, 0 = echo reply, 11 = time exceeded",
+    "Code":"Underkategori af beskeden, fx 3 = port unreachable under type 3",
+    "Checksum":"Fejltjek af ICMP-beskeden",
+    "Typeafhængigt felt":"Indholdet afhænger af beskeden, fx identifier og sequence number ved ping"
+  },
+  dns:{
+    "Identification":"16-bit nummer, der parrer et svar med den forespørgsel, det besvarer",
+    "Flags":"Query/reply, om rekursion ønskes eller er mulig, og om svaret er autoritativt",
+    "# questions":"Antal spørgsmål i beskeden",
+    "# answer RRs":"Antal resource records, der besvarer spørgsmålet",
+    "# authority RRs":"Antal records, der peger på autoritative navneservere",
+    "# additional RRs":"Antal ekstra records, fx IP-adressen på en navneserver",
+    "Questions":"Navnet og typen, der spørges om (fx www.dr.dk, type A)",
+    "Answers":"De resource records, der besvarer spørgsmålet"
+  },
+  arp:{
+    "Hardware type":"Linktypen, hvor 1 = Ethernet",
+    "Protocol type":"Netværksprotokollen, hvor 0x0800 = IPv4",
+    "HLEN":"Længden af en hardwareadresse (6 for MAC)",
+    "PLEN":"Længden af en protokoladresse (4 for IPv4)",
+    "Operation":"1 = request, 2 = reply",
+    "Sender MAC":"Afsenderens hardwareadresse",
+    "Sender IP":"Afsenderens IP-adresse",
+    "Target MAC":"Den hardwareadresse, der søges (nuller i en request)",
+    "Target IP":"IP-adressen, man vil finde MAC-adressen til"
+  },
+  ethernet:{
+    "Preamble":"7 bytes med 10101010, der synkroniserer modtagerens ur",
+    "SFD":"Én byte, der markerer, at selve framen begynder",
+    "Destination MAC":"Modtagerens 48-bit adresse (ff:ff:ff:ff:ff:ff ved broadcast)",
+    "Source MAC":"Afsenderens 48-bit adresse",
+    "Type":"Hvilken protokol der ligger i data (0x0800 = IPv4, 0x0806 = ARP)",
+    "Data (payload)":"46–1500 bytes indhold, typisk et IP-datagram",
+    "CRC (FCS)":"Fejltjek af framen, og ved fejl droppes den"
+  }
+};
+
+/* Sekvensdiagrammer til "hvad mangler?": emne + ekstra troværdige forkerte svar */
+const NQ_SEQS={
+  handshake:{t:"transport",g:"net-tcploss",extra:["SYN-ACK seq = x+1, ack = y","ACK seq = y, ack = x","FIN","RST","SYN seq = y"]},
+  teardown:{t:"transport",g:"net-tcploss",extra:["RST","SYN","SYN-ACK"]},
+  seqack:{t:"transport",g:"net-tcphdr",extra:["Seq=42, ACK=80, data='C'","Seq=80, ACK=42, data='C'","Seq=79, ACK=42, data='C'"]},
+  http:{t:"app",g:"net-http",extra:["DNS query","FIN","HTTP/1.1 404 Not Found","ARP request"]},
+  dnsiter:{t:"app",g:"net-dns",extra:["spørg root-serveren","HTTP GET","DHCP Discover"]},
+  smtp:{t:"app",g:"net-smtp",extra:["GET /inbox","LOGIN alice","250 OK QUIT"]},
+  dora:{t:"network",g:"net-dhcp",extra:["DHCP Release","DHCP NAK","DHCP Inform","ARP request"]},
+  traceroute:{t:"network",g:"net-icmp",extra:["ICMP type 0, code 0","ICMP type 8, code 0","UDP, TTL = 0","ICMP type 3, code 1"]},
+  arp:{t:"link",g:"net-arp",extra:["ARP reply (broadcast)","DHCP Offer","DNS query"]},
+  rtscts:{t:"link",g:"net-wifi",extra:["NAK","SYN","Beacon","Probe request"]}
+};
+
+/* Rækkefølge-opgaver: items står i rigtig rækkefølge her og blandes ved visning */
+const NQ_ORDERS=[
+  {id:"o-layers",t:"grundlag",g:"net-model",q:"Sæt de 5 lag i rækkefølge fra øverst til nederst.",items:["Application","Transport","Network","Link","Physical"],ex:"Application, Transport, Network, Link og Physical. Huskeregel: Alle Tager Nogle Lange Pauser."},
+  {id:"o-pdu",t:"grundlag",g:"net-model",q:"Sæt PDU-navnene i rækkefølge fra application-laget og nedad.",items:["Message","Segment","Datagram","Frame"],ex:"Message (application), segment (transport), datagram (network) og frame (link)."},
+  {id:"o-encap",t:"grundlag",g:"net-model",q:"Hvad sker der i hvilken rækkefølge, når en værts browser sender en request?",items:["Applikationen laver en HTTP-besked","TCP-headeren tilføjes (segment)","IP-headeren tilføjes (datagram)","Ethernet-header og trailer tilføjes (frame)","Framen sendes som bits på kablet"],ex:"Indkapsling: hvert lag pakker laget ovenover ind i sin egen header på vej ned gennem stakken."},
+  {id:"o-day",t:"grundlag",g:"net-daylife",q:"En laptop tilsluttes netværket og åbner www.dr.dk. Sæt trinene i rækkefølge.",items:["DHCP: få IP-adresse, gateway og DNS-server","ARP: find MAC-adressen på default gateway","DNS: slå www.dr.dk op","TCP three-way handshake med webserveren","HTTP GET og 200 OK med siden"],ex:"Uden IP kan intet sendes, uden gatewayens MAC kan intet forlade LAN'et, uden IP på serveren kan der ikke laves en TCP-forbindelse, og først derefter kommer HTTP."},
+  {id:"o-hs",t:"transport",g:"net-tcploss",q:"Sæt TCP-handshaket i rækkefølge.",items:["Klient → server: SYN","Server → klient: SYN-ACK","Klient → server: ACK","Data kan sendes"],ex:"SYN, SYN-ACK og ACK. Først efter de tre trin er forbindelsen oprettet, og begge sider kender hinandens startsekvensnumre."},
+  {id:"o-dora",t:"network",g:"net-dhcp",q:"Sæt DHCP-beskederne i rækkefølge.",items:["Discover","Offer","Request","ACK"],ex:"DORA: Discover (broadcast), Offer, Request (broadcast, så andre servere hører valget) og ACK."},
+  {id:"o-dns",t:"app",g:"net-dns",q:"Et DNS-opslag af www.dr.dk med tom cache. Sæt trinene i rækkefølge.",items:["Værten spørger sin lokale DNS-server (rekursivt)","Lokal DNS spørger en root-server","Root henviser til .dk-TLD-serveren","TLD henviser til dr.dk's autoritative server","Den autoritative server svarer med A-recorden","Lokal DNS sender svaret til værten (og cacher det)"],ex:"Værten spørger rekursivt, og den lokale DNS-server spørger iterativt fra root over TLD til den autoritative server."},
+  {id:"o-smtp",t:"app",g:"net-smtp",q:"Sæt SMTP-kommandoerne i den rækkefølge, klienten sender dem.",items:["HELO","MAIL FROM","RCPT TO","DATA","QUIT"],ex:"Klienten hilser, angiver afsender og modtager, sender selve beskeden efter DATA (afsluttet med en linje med kun '.') og lukker med QUIT."},
+  {id:"o-arp",t:"link",g:"net-arp",q:"Host A kender B's IP, men ikke B's MAC. Sæt trinene i rækkefølge.",items:["A slår op i sin ARP-cache, men finder intet","A sender en ARP request som broadcast (ff:ff:ff:ff:ff:ff)","B genkender sin IP og sender en ARP reply som unicast","A gemmer IP → MAC i ARP-cachen","A sender framen til B's MAC"],ex:"ARP request er broadcast, fordi A ikke kender B's MAC. Svaret er unicast direkte til A."},
+  {id:"o-trace",t:"network",g:"net-icmp",q:"Sæt traceroute i rækkefølge.",items:["Send en pakke med TTL = 1","Router 1 kasserer den og svarer ICMP Time Exceeded","Send en pakke med TTL = 2","Router 2 svarer ICMP Time Exceeded","Destinationen svarer ICMP Port Unreachable"],ex:"Hver runde øger TTL med 1, så næste router på vejen afslører sig. Destinationen svarer med Port Unreachable, fordi der sendes til en usandsynlig port."},
+  {id:"o-rts",t:"link",g:"net-wifi",q:"Sæt RTS/CTS-udvekslingen i rækkefølge.",items:["RTS fra stationen","CTS fra access pointet","DATA-framen","ACK fra access pointet"],ex:"RTS reserverer kanalen, og CTS høres af alle, også skjulte stationer, som så venter. Derefter kommer data og ACK."},
+  {id:"o-csmacd",t:"link",g:"net-switch",q:"Sæt CSMA/CD (klassisk Ethernet) i rækkefølge.",items:["Lyt på mediet (carrier sense)","Send, når mediet er ledigt","Opdag en kollision under afsendelsen","Stop og send et jam-signal","Vent en tilfældig tid (binary exponential backoff) og prøv igen"],ex:"Collision Detection: afsenderen lytter, mens den sender. Ved kollision venter den K·512 bit-tider, hvor K vælges tilfældigt i et interval, der fordobles ved hver kollision."}
+];
+
+const NQ_BANK=[
+/* ---------- Grundlag ---------- */
+{id:"gr01",t:"grundlag",g:"net-model",q:"Hvilket lag leverer data mellem processer på to værter ved hjælp af portnumre?",a:["Transport","Network","Link","Application"],ex:"Transportlaget multiplexer/demultiplexer med porte. Netværkslaget leverer kun mellem værter (IP-adresser)."},
+{id:"gr02",t:"grundlag",g:"net-model",q:"Hvad kaldes PDU'en på transportlaget?",a:["Segment","Datagram","Frame","Message"],ex:"Transport: segment. Network: datagram. Link: frame. Application: message."},
+{id:"gr03",t:"grundlag",g:"net-model",q:"Hvad kaldes PDU'en på netværkslaget?",a:["Datagram","Segment","Frame","Bit"],ex:"IP-pakker kaldes datagrammer."},
+{id:"gr04",t:"grundlag",g:"net-model",q:"Hvad kaldes PDU'en på linklaget?",a:["Frame","Datagram","Segment","Message"],ex:"Linklaget pakker datagrammet ind i en frame med header og trailer (fx Ethernet med CRC)."},
+{id:"gr05",t:"grundlag",g:"net-switch",q:"Hvilken enhed arbejder op til netværkslaget og bruger IP-adresser til at videresende?",a:["Router","Switch","Hub","Repeater"],ex:"Routeren er en lag 3-enhed. Switchen er lag 2 (MAC), og hub/repeater er lag 1."},
+{id:"gr06",t:"grundlag",g:"net-model",q:"Hvad er indkapsling?",a:["Hvert lag tilføjer sin egen header om data fra laget ovenover","Data krypteres, før det sendes","Routeren samler fragmenter til én pakke","Afsenderen deler beskeden i lige store bidder"],ex:"Fx bliver en HTTP-besked til et TCP-segment, som bliver til et IP-datagram, som bliver til en Ethernet-frame."},
+{id:"gr07",t:"grundlag",g:"net-model",c:2,q:"Hvilke lag findes kun i værterne og ikke i en almindelig router? (vælg 2)",a:["Application","Transport","Network","Link"],ex:"Routere implementerer kun network, link og physical. Transport og application er end-to-end."},
+{id:"gr08",t:"grundlag",g:"net-model",q:"Hvad betyder end-to-end-princippet i TCP/IP?",a:["Logik som pålidelighed ligger i endepunkterne, mens netværkskernen holdes simpel","Routerne garanterer, at alle pakker kommer frem","Der reserveres en fast forbindelse fra ende til ende","Kun to værter kan tale sammen ad gangen"],ex:"IP er best effort. TCP i værterne sørger for pålidelighed."},
+{id:"gr09",t:"grundlag",g:"net-model",q:"Hvad er transmission delay for en pakke på L bit over et link med R bit/s?",a:["L / R","d / s","R / L","L · R"],ex:"Transmission delay = L/R, altså tiden det tager at skubbe alle bits ud på linket. d/s er propagation delay."},
+{id:"gr10",t:"grundlag",g:"net-model",q:"Hvad bestemmer propagation delay?",a:["Afstanden divideret med signalets udbredelseshastighed","Pakkens længde divideret med linkets hastighed","Hvor mange pakker der står i kø","Hvor hurtigt routeren slår op i tabellen"],ex:"d/s, fx 2·10^8 m/s i kobber og fiber. Den afhænger ikke af pakkestørrelsen."},
+{id:"gr11",t:"grundlag",g:"net-model",q:"Hvilken forsinkelse varierer mest med mængden af trafik?",a:["Queuing delay","Propagation delay","Transmission delay","Processing delay"],ex:"Køforsinkelsen vokser kraftigt, når trafikintensiteten La/R nærmer sig 1."},
+{id:"gr12",t:"grundlag",g:"net-model",q:"Hvad sker der typisk, når en routers buffer er fuld, og der kommer en ny pakke?",a:["Pakken droppes (pakketab)","Pakken sendes tilbage til afsenderen","Routeren fragmenterer pakken","Pakken gemmes på routerens disk"],ex:"Tabet opdages og genudsendes eventuelt af TCP i endepunkterne."},
+{id:"gr13",t:"grundlag",g:"net-model",q:"Hvad kendetegner packet switching i forhold til circuit switching?",a:["Linkkapaciteten deles efter behov, og pakker kan vente i køer","Der reserveres fast båndbredde til hver forbindelse","Forsinkelsen er altid konstant","Der kan kun være én bruger pr. link"],ex:"Packet switching udnytter linket bedre ved bursty trafik, men giver variabel forsinkelse og risiko for tab."},
+{id:"gr14",t:"grundlag",g:"net-daylife",q:"En laptop er netop tilsluttet et netværk. Hvad sker der typisk først?",a:["DHCP for at få en IP-adresse","DNS-opslag af hjemmesiden","TCP-handshake med webserveren","HTTP GET"],ex:"Uden IP-adresse kan værten hverken lave DNS eller TCP. Se 'En dag i livet'."},
+{id:"gr15",t:"grundlag",g:"net-daylife",q:"Hvorfor laver værten et ARP-opslag, før den sender sin første pakke ud på internettet?",a:["Den skal kende MAC-adressen på default gateway","Den skal kende webserverens MAC-adresse","Den skal have en IP-adresse","Den skal oversætte domænenavnet"],ex:"Pakker til andre netværk sendes i en frame til routerens MAC. Den endelige værts MAC er ligegyldig."},
+{id:"gr16",t:"grundlag",g:"net-model",q:"Hvilket felt fortæller netværkslaget, hvilken transportprotokol data skal afleveres til?",a:["Protocol i IP-headeren","Destination port","EtherType","TTL"],ex:"Protocol: 6 = TCP, 17 = UDP, 1 = ICMP. EtherType gør det samme én etage længere nede."},
+{id:"gr17",t:"grundlag",g:"net-model",q:"Hvor mange bytes fylder en IPv4-header og en TCP-header tilsammen mindst?",a:["40","20","28","60"],ex:"20 B IPv4 + 20 B TCP = 40 B. Med UDP er det 20 + 8 = 28 B."},
+{id:"gr18",t:"grundlag",g:"net-model",q:"Hvilket lag hører Ethernet og WiFi (802.11) til?",a:["Link","Network","Transport","Physical alene"],ex:"De definerer både frameformat og medieadgang (CSMA/CD, CSMA/CA) på linklaget."},
+{id:"gr19",t:"grundlag",g:"net-model",q:"Hvad er throughput i en kæde af links?",a:["Begrænset af det langsomste link (flaskehalsen)","Summen af alle links hastigheder","Gennemsnittet af links hastigheder","Det hurtigste link"],ex:"End-to-end throughput = min(R1, R2, …)."},
+
+/* ---------- Application ---------- */
+{id:"ap01",t:"app",g:"net-http",q:"Hvilken transportprotokol og port bruger almindelig HTTP?",a:["TCP port 80","UDP port 80","TCP port 443","UDP port 53"],ex:"HTTP over TCP på port 80. HTTPS (HTTP over TLS) bruger TCP 443."},
+{id:"ap02",t:"app",g:"net-http",q:"Hvilken port bruger HTTPS?",a:["443","80","8080","22"],ex:"TLS-krypteret HTTP kører på TCP 443."},
+{id:"ap03",t:"app",g:"net-dns",q:"Hvad bruger DNS normalt til forespørgsler?",a:["UDP port 53","TCP port 80","UDP port 67","TCP port 25"],ex:"Korte forespørgsler går over UDP 53. TCP 53 bruges til store svar og zone transfers."},
+{id:"ap04",t:"app",g:"net-http",q:"Hvad er forskellen på persistent og non-persistent HTTP?",a:["Persistent genbruger den samme TCP-forbindelse til flere objekter","Persistent gemmer siden på disken","Non-persistent bruger UDP","Persistent kræver cookies"],ex:"Non-persistent åbner en ny TCP-forbindelse pr. objekt og koster et ekstra RTT til handshake hver gang."},
+{id:"ap05",t:"app",g:"net-http",q:"Hvor lang tid tager det at hente ét objekt med non-persistent HTTP (ses bort fra transmissionstid)?",a:["2 RTT","1 RTT","3 RTT","½ RTT"],ex:"1 RTT til TCP-handshake og 1 RTT til request/response."},
+{id:"ap06",t:"app",g:"net-http",q:"Hvad betyder HTTP-statuskode 404?",a:["Not Found","Moved Permanently","OK","Bad Request"],ex:"200 OK, 301 Moved Permanently, 304 Not Modified, 400 Bad Request, 404 Not Found og 505 HTTP Version Not Supported."},
+{id:"ap07",t:"app",g:"net-http",q:"Hvad betyder HTTP-statuskode 301?",a:["Moved Permanently","Not Modified","Not Found","Internal Server Error"],ex:"Objektet er flyttet permanent. Den nye adresse står i Location-headeren."},
+{id:"ap08",t:"app",g:"net-http",c:2,q:"Hvilke er HTTP-request-metoder? (vælg 2)",a:["GET","POST","SYN","ACK"],ex:"GET, POST, HEAD, PUT og DELETE er HTTP-metoder. SYN og ACK er TCP-flag."},
+{id:"ap09",t:"app",g:"net-http",q:"HTTP er stateless. Hvordan husker en webside alligevel, at du er logget ind?",a:["Cookies","TTL","Sekvensnumre","ARP-cachen"],ex:"Serveren sender Set-Cookie, og browseren sender cookien med i de næste requests."},
+{id:"ap10",t:"app",g:"net-http",q:"Hvad svarer en server på en conditional GET, hvis objektet ikke er ændret?",a:["304 Not Modified","200 OK","301 Moved Permanently","404 Not Found"],ex:"Cachen sender If-Modified-Since. Ved 304 sendes intet objekt, og cachen bruger sin kopi."},
+{id:"ap11",t:"app",g:"net-http",q:"Hvad er formålet med en web cache (proxy)?",a:["At gemme kopier tæt på klienten og spare svartid og båndbredde","At kryptere al trafik","At tildele IP-adresser","At oversætte domænenavne"],ex:"Mange requests kan besvares lokalt, så adgangslinket aflastes."},
+{id:"ap12",t:"app",g:"net-dns",q:"Hvilken DNS-record oversætter et navn til en IPv4-adresse?",a:["A","AAAA","MX","NS"],ex:"A = IPv4, AAAA = IPv6, MX = mailserver, NS = navneserver og CNAME = alias."},
+{id:"ap13",t:"app",g:"net-dns",q:"Hvad indeholder en AAAA-record?",a:["En IPv6-adresse","En IPv4-adresse","Domænets mailserver","Et alias"],ex:"AAAA er IPv6-varianten af A-recorden (128-bit adresse)."},
+{id:"ap14",t:"app",g:"net-dns",q:"Hvad bruges en MX-record til?",a:["At finde mailserveren for et domæne","At finde domænets webserver","At angive et alias","At angive TTL for cachen"],ex:"Når der sendes mail til bob@dr.dk, slås MX for dr.dk op."},
+{id:"ap15",t:"app",g:"net-dns",q:"Hvad er en CNAME-record?",a:["Et alias, der peger på et kanonisk navn","Navnet på den autoritative server","En IPv6-adresse","En omvendt opslagsrecord"],ex:"Fx www.firma.dk → firma.webhotel.net."},
+{id:"ap16",t:"app",g:"net-dns",q:"Hvad fortæller en NS-record?",a:["Hvilken navneserver der er autoritativ for domænet","Hvilken IP-adresse værten har","Hvilken mailserver domænet bruger","Hvor længe svaret må caches"],ex:"TLD-serveren svarer med NS (plus en A-record for serveren som 'additional') for at henvise videre."},
+{id:"ap17",t:"app",g:"net-dns",q:"Hvad betyder det, at en DNS-forespørgsel er iterativ?",a:["Den spurgte server svarer med en henvisning til den næste server at spørge","Den spurgte server finder selv hele svaret","Forespørgslen sendes til alle servere på én gang","Svaret gentages, indtil det er modtaget"],ex:"Root og TLD svarer iterativt med henvisninger. Den lokale DNS-server går selv videre."},
+{id:"ap18",t:"app",g:"net-dns",q:"Hvem spørger typisk rekursivt?",a:["Værten spørger sin lokale DNS-server","Root-serveren spørger TLD-serveren","TLD-serveren spørger værten","Den autoritative server spørger root"],ex:"Værten vil have det endelige svar fra sin lokale DNS-server, som så klarer resten iterativt."},
+{id:"ap19",t:"app",g:"net-dns",q:"Hvorfor er DNS distribueret og hierarkisk i stedet for én central server?",a:["Skalerbarhed og ingen single point of failure","Fordi UDP kun kan nå ét hop","For at undgå caching","Fordi IP-adresser er hemmelige"],ex:"Én central server ville være en flaskehals, for langt væk for mange og umulig at vedligeholde."},
+{id:"ap20",t:"app",g:"net-dns",q:"Hvad betyder TTL på en DNS-record?",a:["Hvor længe svaret må gemmes i en cache","Hvor mange hop forespørgslen må tage","Hvor lang tid serveren har til at svare","Antallet af records i svaret"],ex:"DNS-TTL handler om caching og har intet med IP's TTL-felt at gøre."},
+{id:"ap21",t:"app",g:"net-dns",q:"Hvilken server kender IP-adressen på www.dr.dk direkte?",a:["Den autoritative server for dr.dk","En root-server",".dk-TLD-serveren","Værtens egen DHCP-server"],ex:"Root kender TLD-serverne, TLD kender de autoritative servere, og kun den autoritative har selve recorden."},
+{id:"ap22",t:"app",g:"net-dns",q:"Hvordan parres et DNS-svar med den rigtige forespørgsel?",a:["Med det 16-bit Identification-felt","Med kildeporten alene","Med TTL","Med antallet af answer RRs"],ex:"Svaret får samme ID som forespørgslen.",v:{h:"dns",m:"Identification"}},
+{id:"ap23",t:"app",g:"net-smtp",q:"Hvilken transportprotokol og port bruger SMTP mellem mailservere?",a:["TCP port 25","UDP port 25","TCP port 110","TCP port 143"],ex:"SMTP er push over TCP 25. POP3 (110) og IMAP (143) bruges til at hente mail."},
+{id:"ap24",t:"app",g:"net-smtp",q:"Hvilken protokol bruger din mailklient til at hente mail fra serveren?",a:["IMAP (eller POP3)","SMTP","DNS","ARP"],ex:"SMTP skubber mail mellem servere og fra klient til server. Hentning sker med IMAP, POP3 eller HTTP (webmail)."},
+{id:"ap25",t:"app",g:"net-smtp",q:"Hvilken SMTP-kommando angiver modtageren?",a:["RCPT TO","MAIL FROM","HELO","DATA"],ex:"MAIL FROM er afsender, RCPT TO er modtager, og DATA indleder selve beskeden."},
+{id:"ap26",t:"app",g:"net-udp",q:"Hvad identificerer en TCP-socket entydigt på en server?",a:["Kilde-IP, kildeport, destinations-IP og destinationsport","Kun destinationsporten","Kun kilde-IP-adressen","MAC-adressen og porten"],ex:"Derfor kan en webserver have mange forbindelser på port 443 samtidig. En UDP-socket identificeres kun af destinations-IP og -port."},
+{id:"ap27",t:"app",g:"net-udp",q:"Hvilken socket-type bruger UDP i Python?",a:["socket.SOCK_DGRAM","socket.SOCK_STREAM","socket.SOCK_RAW","socket.AF_INET6"],ex:"SOCK_DGRAM = datagrammer (UDP). SOCK_STREAM = byte-strøm (TCP)."},
+{id:"ap28",t:"app",g:"net-udp",q:"Hvilket kald bruger en TCP-server til at tage imod en ny forbindelse?",a:["accept()","recvfrom()","sendto()","connect()"],ex:"listen() gør socketen klar, og accept() returnerer en ny socket til den konkrete klient."},
+{id:"ap29",t:"app",g:"net-http",q:"Hvad ligger i den første linje af en HTTP-request?",a:["Metode, URL og HTTP-version, fx GET /index.html HTTP/1.1","Statuskode og statusbesked","Host- og Cookie-headerne","Sekvens- og ack-nummeret"],ex:"Request line: metode, sti og version. Svaret starter med en status line, fx HTTP/1.1 200 OK."},
+
+/* ---------- Transport ---------- */
+{id:"tr01",t:"transport",g:"net-tcphdr",c:3,q:"Hvilke egenskaber har TCP? (vælg 3)",a:["Connection-oriented (handshake)","Pålidelig, ordnet levering","Flow og congestion control","Bevarer beskedgrænser","Garanteret båndbredde"],ex:"TCP leverer en pålidelig byte-strøm, og beskedgrænser bevares ikke. Ingen transportprotokol på internettet garanterer båndbredde."},
+{id:"tr02",t:"transport",g:"net-udp",q:"Hvorfor vælger man UDP i stedet for TCP til fx DNS og live-video?",a:["Ingen handshake og lavt overhead, så forsinkelsen er lav","UDP er mere pålidelig","UDP har congestion control","UDP krypterer data"],ex:"UDP har en header på 8 bytes og ingen forbindelsesopsætning. Applikationen tåler eller håndterer selv tab."},
+{id:"tr03",t:"transport",g:"net-udp",q:"Hvor stor er en UDP-header?",a:["8 bytes","20 bytes","4 bytes","40 bytes"],ex:"Fire felter á 16 bit: source port, destination port, length og checksum."},
+{id:"tr04",t:"transport",g:"net-tcphdr",q:"Hvor stor er en TCP-header mindst?",a:["20 bytes","8 bytes","40 bytes","60 bytes"],ex:"20 bytes uden options og maksimalt 60 bytes (Header length = 15)."},
+{id:"tr05",t:"transport",g:"net-tcploss",q:"Klientens SYN har seq = x og ingen data. Hvorfor er ack i SYN-ACK så x + 1?",a:["SYN tæller som én byte i sekvensrummet","Fordi headeren er 1 byte","Fordi serveren altid lægger 1 til","Fordi ACK-flaget fylder 1 byte"],ex:"SYN og FIN forbruger hvert ét sekvensnummer. Derfor kvitteres der med x + 1."},
+{id:"tr06",t:"transport",g:"net-tcphdr",q:"Hvad betyder værdien i det markerede felt?",a:["Nummeret på den næste byte, modtageren forventer","Nummeret på den sidst modtagne byte","Antallet af modtagne segmenter","Hvor mange bytes modtageren har plads til"],ex:"TCP-ACK er kumulativ: ack = n betyder, at alle bytes til og med n−1 er modtaget.",v:{h:"tcp",m:"Acknowledgement number"}},
+{id:"tr07",t:"transport",g:"net-flow",q:"Hvad bruges det markerede felt til?",a:["Flow control: modtageren fortæller, hvor meget plads der er i bufferen","Congestion control: netværkets kapacitet","At nummerere segmenterne","At fejltjekke segmentet"],ex:"Receive window (rwnd) beskytter modtageren mod at blive oversvømmet.",v:{h:"tcp",m:"Receive window"}},
+{id:"tr08",t:"transport",g:"net-flow",q:"Hvad er forskellen på flow control og congestion control?",a:["Flow control beskytter modtageren, og congestion control beskytter netværket","De er det samme","Flow control er til UDP og congestion control til TCP","Flow control styres af routerne"],ex:"Afsenderen sender højst min(rwnd, cwnd) ubekræftede bytes."},
+{id:"tr09",t:"transport",g:"net-flow",q:"Hvad sker der med cwnd i slow start?",a:["Den fordobles hver RTT (eksponentiel vækst)","Den vokser med 1 MSS pr. RTT","Den halveres hver RTT","Den er konstant"],ex:"Slow start starter ved 1 MSS og fordobles, indtil ssthresh nås eller der sker tab. Derefter følger congestion avoidance (lineær vækst)."},
+{id:"tr10",t:"transport",g:"net-flow",q:"Hvad betyder AIMD i TCP congestion control?",a:["Additive increase, multiplicative decrease","Automatic increase, manual decrease","Acknowledge in multiple directions","Adaptive interval, maximum delay"],ex:"cwnd vokser med 1 MSS pr. RTT og halveres ved tab. Det giver savtakkemønstret."},
+{id:"tr11",t:"transport",g:"net-flow",q:"Hvordan reagerer TCP Reno på 3 duplicate ACKs?",a:["Fast retransmit, og cwnd halveres (fast recovery)","cwnd sættes til 1 MSS, og der startes slow start","Forbindelsen lukkes","Den ignorerer dem"],ex:"3 dup-ACKs er et mildt tegn, fordi senere segmenter kommer frem. Ved timeout er det alvorligere, og cwnd falder til 1 MSS."},
+{id:"tr12",t:"transport",g:"net-tcploss",q:"Hvad er MSS?",a:["Den største mængde applikationsdata i ét TCP-segment","Den største IP-pakke på linket","Det største receive window","Antallet af segmenter pr. RTT"],ex:"Over Ethernet typisk 1460 B (1500 MTU − 20 IP − 20 TCP). MSS aftales i handshaket."},
+{id:"tr13",t:"transport",g:"net-tcploss",q:"Hvor aftales MSS og SACK-permitted?",a:["I TCP-options i SYN og SYN-ACK","I IP-headerens options","I hvert eneste datasegment","I DNS-opslaget"],ex:"Options sendes i handshaket, og derefter kender begge sider hinandens muligheder.",v:{h:"tcp",m:"Options"}},
+{id:"tr14",t:"transport",g:"net-tcploss",q:"Hvad er fordelen ved SACK?",a:["Afsenderen kan nøjes med at genudsende de segmenter, der faktisk mangler","Segmenter krypteres","Handshaket springes over","Headeren bliver mindre"],ex:"Modtageren fortæller, hvilke blokke ud over hullet den har (SLE/SRE), så der ikke sendes for meget igen."},
+{id:"tr15",t:"transport",g:"net-tcploss",q:"Hvilket flag afbryder en TCP-forbindelse brat?",a:["RST","FIN","PSH","URG"],ex:"FIN er en pæn lukning (én retning ad gangen). RST nulstiller forbindelsen med det samme, fx til en lukket port."},
+{id:"tr16",t:"transport",g:"net-tcploss",q:"Hvor mange segmenter bruges normalt til at lukke en TCP-forbindelse?",a:["4 (FIN, ACK, FIN, ACK)","3 (SYN, SYN-ACK, ACK)","2 (FIN, ACK)","1 (RST)"],ex:"Hver retning lukkes for sig. Nogle gange kombineres serverens ACK og FIN, så det bliver 3."},
+{id:"tr17",t:"transport",g:"net-udp",q:"En browser sender sit første SYN til en webserver. Hvad er typisk source og destination port?",a:["Source er en tilfældig høj port, og destination er 443","Source og destination er begge 443","Source er 443, og destination er en tilfældig høj port","Source er 80, og destination er 53"],ex:"Klienten bruger en ephemeral port (fx 52344), og serveren lytter på den kendte port."},
+{id:"tr18",t:"transport",g:"net-udp",q:"Hvad bruger transportlaget til at aflevere data til den rigtige proces?",a:["Portnumre","MAC-adresser","IP-adresser alene","TTL"],ex:"Demultiplexing sker på portnumre (for TCP alle fire værdier: IP'er og porte)."},
+{id:"tr19",t:"transport",g:"net-udp",q:"Hvilket interval er well-known ports?",a:["0–1023","1024–49151","49152–65535","0–255"],ex:"Fx 22 SSH, 25 SMTP, 53 DNS, 80 HTTP og 443 HTTPS."},
+{id:"tr20",t:"transport",g:"net-tcphdr",q:"Hvad dækker TCP's checksum?",a:["Header og data samt en pseudo-header med IP-adresserne","Kun headeren","Kun data","Hele Ethernet-framen"],ex:"Pseudo-headeren sikrer, at segmentet er havnet hos den rigtige vært."},
+{id:"tr21",t:"transport",g:"net-udp",q:"Hvad sker der med et UDP-segment, hvis checksummen ikke passer?",a:["Det kasseres (evt. med en advarsel), og intet genudsendes","Afsenderen genudsender det automatisk","Modtageren retter fejlen","Det leveres alligevel med et fejlflag"],ex:"UDP har ingen genudsendelse. Det er op til applikationen."},
+{id:"tr22",t:"transport",g:"net-tcphdr",q:"Hvilken protokol leverer en byte-strøm i stedet for separate beskeder?",a:["TCP","UDP","ICMP","IP"],ex:"TCP kan dele og samle data vilkårligt. Applikationen skal selv finde beskedgrænser."},
+{id:"tr23",t:"transport",g:"net-tcploss",q:"Hvordan bestemmer TCP sin retransmission timeout?",a:["Ud fra den målte RTT plus en sikkerhedsmargin for variationen","Den er altid 1 sekund","Ud fra receive window","Ud fra TTL"],ex:"TimeoutInterval = EstimatedRTT + 4 · DevRTT."},
+{id:"tr24",t:"transport",g:"net-tcploss",q:"Ved Go-Back-N tabes ét segment. Hvad sender afsenderen igen?",a:["Det tabte segment og alle efterfølgende ubekræftede segmenter","Kun det tabte segment","Ingenting, modtageren beder om det","Kun det seneste segment"],ex:"Selective Repeat genudsender kun det tabte. TCP ligger imellem, især med SACK."},
+{id:"tr25",t:"transport",g:"net-tcploss",q:"Hvorfor bruger TCP pipelining i stedet for stop-and-wait?",a:["For at udnytte linket bedre ved at have flere segmenter undervejs","For at undgå handshake","For at spare sekvensnumre","For at gøre headeren mindre"],ex:"Stop-and-wait sender ét segment pr. RTT, og på lange links står linket næsten altid stille."},
+{id:"tr26",t:"transport",g:"net-tcploss",q:"Hvad er formålet med three-way handshake?",a:["At synkronisere startsekvensnumre og aftale parametre før data","At kryptere forbindelsen","At finde MAC-adressen","At reservere båndbredde i routerne"],ex:"Begge sider vælger et tilfældigt startsekvensnummer (ISN) og bekræfter det andet."},
+{id:"tr27",t:"transport",g:"net-flow",q:"Modtageren sender receive window = 0. Hvad gør afsenderen?",a:["Holder pause med data, men sender små window probes","Sender alt den har med det samme","Lukker forbindelsen","Halverer cwnd"],ex:"Når der igen bliver plads, annoncerer modtageren et større vindue."},
+{id:"tr28",t:"transport",g:"net-udp",q:"Hvilken port bruger SSH?",a:["22","23","21","25"],ex:"21 FTP, 22 SSH, 23 Telnet og 25 SMTP."},
+{id:"tr29",t:"transport",g:"net-tcphdr",q:"Hvilke flag er sat i det andet segment i et three-way handshake?",a:["SYN og ACK","Kun SYN","Kun ACK","FIN og ACK"],ex:"SYN-ACK: serveren sender sit eget SYN og kvitterer samtidig for klientens.",v:{h:"tcp",m:"Flags"}},
+
+/* ---------- Network ---------- */
+{id:"nw01",t:"network",g:"net-subnet",q:"Hvor mange bit er en IPv4-adresse?",a:["32","48","64","128"],ex:"IPv4 = 32 bit (4 bytes), MAC = 48 bit og IPv6 = 128 bit."},
+{id:"nw02",t:"network",g:"net-ipv6",q:"Hvor mange bit er en IPv6-adresse?",a:["128","64","32","256"],ex:"Skrives som 8 grupper á 16 bit i hex, fx 2001:db8::1."},
+{id:"nw03",t:"network",g:"net-subnet",q:"Hvilken adresse er privat (RFC 1918)?",a:["192.168.1.20","8.8.8.8","172.32.0.1","11.0.0.1"],ex:"Private intervaller: 10.0.0.0/8, 172.16.0.0/12 (172.16–172.31) og 192.168.0.0/16. 172.32.x.x er altså offentlig."},
+{id:"nw04",t:"network",g:"net-subnet",c:3,q:"Hvilke intervaller er private IPv4-adresser? (vælg 3)",a:["10.0.0.0/8","172.16.0.0/12","192.168.0.0/16","169.254.0.0/16","100.0.0.0/8"],ex:"169.254.0.0/16 er link-local (APIPA), som bruges, når DHCP fejler, men det er ikke RFC 1918."},
+{id:"nw05",t:"network",g:"net-subnet",q:"Hvad er 127.0.0.1?",a:["Loopback, altså værten selv","Default gateway","Broadcast-adressen","Den første offentlige adresse"],ex:"Trafik til 127.0.0.0/8 forlader aldrig maskinen."},
+{id:"nw06",t:"network",g:"net-dhcp",q:"En pc har fået adressen 169.254.23.7. Hvad betyder det typisk?",a:["Den fik ikke svar fra en DHCP-server","Den er bag NAT","Den har en IPv6-adresse","Den er en router"],ex:"Link-local (APIPA) vælges automatisk, når DHCP fejler."},
+{id:"nw07",t:"network",g:"net-subnet",q:"Hvad betyder /24 i 192.168.1.0/24?",a:["De første 24 bit er netværksdelen","Der er 24 værter","Masken er 255.255.0.0","Der er 24 subnets"],ex:"/24 = 255.255.255.0, og de sidste 8 bit er værtsdelen (254 brugbare værter)."},
+{id:"nw08",t:"network",g:"net-ipv4",q:"Hvordan beslutter en router, hvor en pakke skal sendes hen?",a:["Den slår destinations-IP op i forwarding-tabellen med longest prefix match","Den spørger DNS","Den sender den ud af alle porte","Den kigger på kilde-MAC-adressen"],ex:"Det mest specifikke match (længste præfiks) vinder."},
+{id:"nw09",t:"network",g:"net-subnet",q:"Forwarding-tabel: 10.0.0.0/8 → A, 10.1.0.0/16 → B, 10.1.2.0/24 → C. Hvor sendes en pakke til 10.1.2.5?",a:["C","B","A","Den droppes"],ex:"Alle tre matcher, men /24 er det længste præfiks."},
+{id:"nw10",t:"network",g:"net-subnet",q:"Samme tabel: 10.0.0.0/8 → A, 10.1.0.0/16 → B, 10.1.2.0/24 → C. Hvor sendes 10.1.9.9?",a:["B","C","A","Den droppes"],ex:"10.1.9.9 ligger ikke i 10.1.2.0/24, men i 10.1.0.0/16."},
+{id:"nw11",t:"network",g:"net-ipv4",q:"Hvad er formålet med det markerede felt?",a:["At forhindre pakker i at cirkulere for evigt","At prioritere pakken","At angive pakkens længde","At samle fragmenter"],ex:"TTL tælles ned ved hvert hop. Ved 0 kasseres pakken, og der sendes ICMP type 11 (Time Exceeded).",v:{h:"ipv4",m:"TTL"}},
+{id:"nw12",t:"network",g:"net-frag",q:"Hvor samles IPv4-fragmenter igen?",a:["Kun hos den endelige modtager","I den næste router","I hver router på vejen","Hos afsenderen"],ex:"Routerne fragmenterer om nødvendigt, men samler aldrig."},
+{id:"nw13",t:"network",g:"net-frag",q:"Hvordan håndteres for store pakker i IPv6?",a:["Routerne fragmenterer ikke, men sender ICMPv6 Packet Too Big tilbage","Routerne fragmenterer som i IPv4","Pakken bliver komprimeret","Den sendes via TCP i stedet"],ex:"Kun afsenderen må fragmentere i IPv6 (via en extension header)."},
+{id:"nw14",t:"network",g:"net-frag",q:"I hvilken enhed måles fragment offset?",a:["8 bytes","1 byte","4 bytes","32 bit-ord"],ex:"13 bit kan ikke tælle til 65 535, så offset ganges med 8. Offset 185 = byte 1480.",v:{h:"ipv4",m:"Fragment offset"}},
+{id:"nw15",t:"network",g:"net-frag",q:"Hvad er MF-flaget sat til i det sidste fragment?",a:["0","1","Det samme som DF","Det afhænger af TTL"],ex:"MF = 1 på alle fragmenter undtagen det sidste. Sådan ved modtageren, hvornår den har det hele."},
+{id:"nw16",t:"network",g:"net-frag",q:"En pakke med DF = 1 er for stor til næste link. Hvad sker der?",a:["Den kasseres, og afsenderen får ICMP Destination Unreachable (fragmentation needed)","Den fragmenteres alligevel","Den sendes langsommere","DF ignoreres"],ex:"Det er grundlaget for Path MTU Discovery (ICMP type 3, code 4)."},
+{id:"nw17",t:"network",g:"net-ipv4",q:"Hvorfor skal IPv4's header checksum genberegnes i hver router?",a:["Fordi TTL ændres ved hvert hop","Fordi payloaden ændres","Fordi MAC-adressen ændres","Det skal den ikke"],ex:"Det er en af grundene til, at IPv6 har fjernet header checksum helt."},
+{id:"nw18",t:"network",g:"net-ipv6",c:2,q:"Hvad er fjernet eller ændret i IPv6 i forhold til IPv4? (vælg 2)",a:["Der er ingen header checksum","Routere fragmenterer ikke","Adresserne er 64 bit","Headeren er variabel på 20–60 bytes"],ex:"IPv6 har en fast header på 40 bytes og 128-bit adresser. Checksum og fragmentering i routerne er væk."},
+{id:"nw19",t:"network",g:"net-ipv6",q:"Hvor stor er IPv6's faste header?",a:["40 bytes","20 bytes","60 bytes","128 bytes"],ex:"Fast størrelse gør den hurtigere at behandle. Ekstra funktioner ligger i extension headers."},
+{id:"nw20",t:"network",g:"net-dhcp",c:3,q:"Hvad får en klient typisk fra DHCP? (vælg 3)",a:["IP-adresse og subnetmaske","Default gateway","DNS-server","Sin MAC-adresse","Webserverens portnummer"],ex:"Plus lease time. MAC-adressen er brændt ind i netværkskortet."},
+{id:"nw21",t:"network",g:"net-dhcp",q:"Hvilken transportprotokol og hvilke porte bruger DHCP?",a:["UDP, server 67 og klient 68","TCP 67 og 68","UDP 53","TCP 80"],ex:"Klienten har ingen IP endnu, så der kan ikke laves en TCP-forbindelse."},
+{id:"nw22",t:"network",g:"net-dhcp",q:"Hvorfor sendes DHCP Discover som broadcast?",a:["Klienten kender hverken sin egen IP eller serverens IP","For at nå alle routere på internettet","Fordi DHCP bruger TCP","For at undgå NAT"],ex:"Den sendes fra 0.0.0.0 til 255.255.255.255."},
+{id:"nw23",t:"network",g:"net-dhcp",q:"Hvad er DHCP lease time?",a:["Hvor længe klienten må bruge adressen, før den skal fornyes","Hvor længe Discover venter på svar","Pakkens TTL","Hvor længe DNS-svar caches"],ex:"Klienten fornyer typisk, når halvdelen af lease-tiden er gået."},
+{id:"nw24",t:"network",g:"net-nat",q:"Hvad omskriver en NAT-router i udgående pakker?",a:["Kilde-IP og kildeport","Destinations-IP og destinationsport","Kun TTL","MAC-adresserne alene"],ex:"Den private (IP, port) erstattes af (offentlig IP, ny port), og mappingen gemmes i NAT-tabellen."},
+{id:"nw25",t:"network",g:"net-nat",q:"Hvad er hovedfordelen ved NAT?",a:["Mange enheder kan dele én offentlig IPv4-adresse","Pakkerne bliver krypteret","Routing bliver hurtigere","Man undgår DNS"],ex:"NAT er en stor del af grunden til, at IPv4-adresserne ikke er løbet helt tør."},
+{id:"nw26",t:"network",g:"net-nat",q:"Hvad er en ulempe ved NAT?",a:["Indgående forbindelser til en server bag NAT kræver port forwarding","Den kan kun bruges med UDP","Den kræver IPv6","Den fjerner TTL"],ex:"NAT bryder end-to-end-princippet, fordi en router ændrer portnumre (et transportlags-felt)."},
+{id:"nw27",t:"network",g:"net-icmp",q:"Hvilken ICMP-type er en echo request (ping)?",a:["8","0","11","3"],ex:"Echo request = 8, echo reply = 0, time exceeded = 11 og destination unreachable = 3."},
+{id:"nw28",t:"network",g:"net-icmp",q:"Hvordan finder traceroute routerne på vejen?",a:["Den sender pakker med stigende TTL, og routerne svarer med ICMP Time Exceeded","Den spørger hver router om dens navn","Den læser routing-tabellerne","Den bruger ARP på hvert hop"],ex:"TTL = 1 afslører router 1, TTL = 2 afslører router 2 og så videre."},
+{id:"nw29",t:"network",g:"net-icmp",q:"Hvilken ICMP-besked betyder 'port unreachable'?",a:["Type 3, code 3","Type 11, code 0","Type 0, code 0","Type 8, code 0"],ex:"Traceroute ved, at den har nået destinationen, når den får type 3 code 3."},
+{id:"nw30",t:"network",g:"net-subnet",q:"Hvad er default gateway?",a:["Routeren på dit eget subnet, som pakker til andre netværk sendes til","Den nærmeste DNS-server","Den første switch","Internetudbyderens webserver"],ex:"Værten sammenligner destinationen med sin subnetmaske. Er den uden for subnettet, går pakken til gatewayen."},
+{id:"nw31",t:"network",g:"net-subnet",q:"Hvilken CIDR svarer subnetmasken 255.255.255.192 til?",a:["/26","/24","/25","/27"],ex:"192 = 11000000, så 24 + 2 = 26 bit."},
+{id:"nw32",t:"network",g:"net-ipv4",q:"Hvad er forskellen på forwarding og routing?",a:["Forwarding flytter en pakke fra input- til output-port, og routing beregner ruterne","Det er det samme","Routing sker i værten, og forwarding sker i DNS","Forwarding bruger MAC, og routing bruger porte"],ex:"Forwarding er data plane (lokalt og hurtigt). Routing er control plane (netværksdækkende algoritmer)."},
+{id:"nw33",t:"network",g:"net-ipv4",q:"Hvad står der i det markerede felt, når IPv4-datagrammet indeholder et TCP-segment?",a:["6","17","1","4"],ex:"Protocol: 1 = ICMP, 6 = TCP og 17 = UDP.",v:{h:"ipv4",m:"Protocol"}},
+{id:"nw34",t:"network",g:"net-ipv4",q:"IHL er 5. Hvor lang er IPv4-headeren?",a:["20 bytes","5 bytes","40 bytes","10 bytes"],ex:"IHL tæller 32-bit ord: 5 · 4 = 20 bytes.",v:{h:"ipv4",m:"IHL"}},
+
+/* ---------- Link & WiFi ---------- */
+{id:"lk01",t:"link",g:"net-ethernet",q:"Hvor mange bit er en MAC-adresse?",a:["48","32","64","128"],ex:"6 bytes, skrevet som fx a4:67:06:8d:83:a1."},
+{id:"lk02",t:"link",g:"net-ethernet",q:"Hvad er Ethernet-broadcast-adressen?",a:["ff:ff:ff:ff:ff:ff","00:00:00:00:00:00","255.255.255.255","01:00:5e:00:00:00"],ex:"Alle stationer på LAN'et modtager frames til ff:ff:ff:ff:ff:ff, fx en ARP request."},
+{id:"lk03",t:"link",g:"net-arp",q:"Hvordan sendes en ARP request og en ARP reply?",a:["Request som broadcast og reply som unicast","Begge som broadcast","Begge som unicast","Request som unicast og reply som broadcast"],ex:"Spørgeren kender ikke modtagerens MAC. Det gør den, der svarer."},
+{id:"lk04",t:"link",g:"net-arp",q:"Hvad gemmer ARP-cachen?",a:["Sammenhængen mellem IP- og MAC-adresser på LAN'et, med en udløbstid","Domænenavne og IP-adresser","Portnumre og processer","Routing-tabellen"],ex:"Se den med 'arp -a'. Indgange forældes efter et stykke tid."},
+{id:"lk05",t:"link",g:"net-switch",q:"Hvad gør en switch med en frame til en ukendt destinations-MAC?",a:["Flooder den ud af alle porte undtagen den, den kom ind på","Dropper den","Sender den til routeren","Sender en ARP request"],ex:"Når modtageren svarer, lærer switchen, hvilken port den sidder på."},
+{id:"lk06",t:"link",g:"net-switch",q:"Hvordan lærer en switch, hvilke MAC-adresser der sidder på hvilke porte?",a:["Den noterer kilde-MAC'en på hver indkommende frame sammen med porten","Den spørger en DHCP-server","Den bruger ARP","En administrator skal indtaste dem"],ex:"Self-learning: switch-tabellen bygges automatisk og forældes."},
+{id:"lk07",t:"link",g:"net-switch",c:2,q:"Hvad er rigtigt om switch og router? (vælg 2)",a:["En switch videresender på MAC-adresser (lag 2)","En router videresender på IP-adresser (lag 3)","En switch ændrer IP-headerens TTL","En router flooder ukendte adresser"],ex:"En router tæller TTL ned og laver en ny frame på hvert link. En switch er usynlig for værterne."},
+{id:"lk08",t:"link",g:"net-ethernet",q:"Hvad betyder EtherType 0x0806?",a:["ARP","IPv4","IPv6","VLAN-tag"],ex:"0x0800 = IPv4, 0x0806 = ARP og 0x86DD = IPv6.",v:{f:"ethernet",m:"Type"}},
+{id:"lk09",t:"link",g:"net-ethernet",q:"Hvad er Ethernets mindste payload?",a:["46 bytes","64 bytes","20 bytes","0 bytes"],ex:"Kortere data paddes op til 46 B, så framen bliver mindst 64 B. Det er nødvendigt for CSMA/CD."},
+{id:"lk10",t:"link",g:"net-ethernet",q:"Hvad er Ethernets MTU (største payload)?",a:["1500 bytes","1460 bytes","9000 bytes","65 535 bytes"],ex:"1500 B. Med 20 B IP- og 20 B TCP-header giver det MSS 1460."},
+{id:"lk11",t:"link",g:"net-ethernet",q:"Hvad sker der, når CRC i en Ethernet-frame ikke passer?",a:["Framen droppes uden genudsendelse på linklaget","Afsenderen genudsender den med det samme","Modtageren retter fejlen","Den sendes videre med et fejlflag"],ex:"Ethernet er upålideligt. Det er TCP, der opdager tabet og sender igen.",v:{f:"ethernet",m:"CRC (FCS)"}},
+{id:"lk12",t:"link",g:"net-wifi",q:"Hvorfor bruger WiFi CSMA/CA i stedet for CSMA/CD?",a:["En radio kan ikke lytte efter kollisioner, mens den sender, og hidden terminals ses ikke","WiFi har ingen kollisioner","CSMA/CD er for langsomt til radio","Fordi WiFi bruger IPv6"],ex:"Derfor undgår WiFi kollisioner (CA) med backoff og ACK, i stedet for at opdage dem (CD)."},
+{id:"lk13",t:"link",g:"net-wifi",q:"Hvad er hidden terminal-problemet?",a:["To stationer kan høre access pointet, men ikke hinanden","En station skjuler sin MAC-adresse","Access pointet sender ikke beacons","Signalet når ikke frem til routeren"],ex:"De kan begge tro, at kanalen er fri, og kollidere hos AP'et. RTS/CTS afhjælper det."},
+{id:"lk14",t:"link",g:"net-wifi",q:"Hvordan hjælper RTS/CTS mod hidden terminals?",a:["CTS fra AP'et høres af alle, så andre stationer venter i den reserverede tid","RTS krypterer framen","CTS øger sendestyrken","De skifter kanal automatisk"],ex:"Også den skjulte station hører CTS og holder sig væk."},
+{id:"lk15",t:"link",g:"net-wifi",q:"Hvorfor sender modtageren i 802.11 en ACK for hver frame?",a:["Afsenderen kan ikke selv opdage kollisioner","For at aftale MSS","For at opdatere ARP-cachen","For at kryptere næste frame"],ex:"Kommer der ingen ACK, antager afsenderen, at framen er tabt, og prøver igen efter backoff."},
+{id:"lk16",t:"link",g:"net-wifi",q:"Hvor mange adressefelter har en 802.11-dataframe?",a:["4 (typisk bruges 3)","2","1","6"],ex:"Modtager (AP), afsender og routerens MAC. Det fjerde bruges ved trådløse broer."},
+{id:"lk17",t:"link",g:"net-daylife",q:"En pakke skal fra din pc til en server på internettet. Hvilken destinations-MAC står i framen, der forlader pc'en?",a:["MAC-adressen på default gateway","Serverens MAC-adresse","Broadcast ff:ff:ff:ff:ff:ff","DNS-serverens MAC-adresse"],ex:"MAC-adresser gælder kun på det lokale link. Destinations-IP'en er stadig serverens."},
+{id:"lk18",t:"link",g:"net-daylife",q:"Hvad ændres ved hvert hop gennem routere (uden NAT)?",a:["Kilde- og destinations-MAC samt TTL","Kilde- og destinations-IP","Portnumrene","Sekvensnumrene"],ex:"IP-adresserne er end-to-end. Hver router laver en ny frame med nye MAC-adresser og tæller TTL ned."},
+{id:"lk19",t:"link",g:"net-switch",q:"Hvad gør en hub?",a:["Gentager bits ud af alle porte, så alle deler ét kollisionsdomæne","Videresender frames ud fra MAC-adresser","Router pakker ud fra IP","Tildeler IP-adresser"],ex:"En hub er en lag 1-enhed og er i dag erstattet af switches."},
+{id:"lk20",t:"link",g:"net-wifi",q:"Hvad er SSID?",a:["Netværksnavnet, som access pointet annoncerer i beacon frames","Access pointets MAC-adresse","Krypteringsnøglen","Kanalnummeret"],ex:"Stationer finder netværk ved at lytte efter beacons (passiv scanning) eller ved at sende probe requests (aktiv scanning)."},
+{id:"lk21",t:"link",g:"net-arp",q:"Hvad står der i det markerede felt i en ARP reply?",a:["2","1","0","0x0806"],ex:"Operation: 1 = request og 2 = reply.",v:{h:"arp",m:"Operation"}},
+{id:"lk22",t:"link",g:"net-arp",q:"Hvad står der i Target MAC i en ARP request?",a:["Nuller, fordi det er den adresse, der søges","ff:ff:ff:ff:ff:ff","Afsenderens egen MAC","Routerens MAC"],ex:"Selve framen sendes til broadcast, mens ARP-feltet Target MAC er tomt (nuller).",v:{h:"arp",m:"Target MAC"}},
+
+/* ---------- Wireshark & værktøjer ---------- */
+{id:"tl01",t:"tools",g:"net-wireshark",q:"Hvilket Wireshark-displayfilter viser kun DNS-trafik?",a:["dns","port 53","udp.dns","show dns"],ex:"Displayfiltre bruger protokolnavne og felter. 'port 53' er capture-filter-syntaks (BPF)."},
+{id:"tl02",t:"tools",g:"net-wireshark",q:"Hvilket displayfilter viser trafik til eller fra 192.168.1.10?",a:["ip.addr == 192.168.1.10","host 192.168.1.10","ip = 192.168.1.10","addr 192.168.1.10"],ex:"ip.addr matcher både kilde og destination. ip.src og ip.dst matcher kun én retning."},
+{id:"tl03",t:"tools",g:"net-wireshark",q:"Hvilket displayfilter viser TCP-trafik på port 443?",a:["tcp.port == 443","port 443","tcp == 443","https.port 443"],ex:"tcp.port matcher både source og destination port."},
+{id:"tl04",t:"tools",g:"net-wireshark",q:"Hvad er forskellen på et capture filter og et display filter?",a:["Capture filter bestemmer, hvad der optages, og display filter skjuler kun pakker i visningen","Det er det samme","Display filter sletter pakker permanent","Capture filter virker kun på UDP"],ex:"Capture filtre bruger BPF-syntaks (fx 'port 53'). Display filtre bruger Wiresharks feltnavne (fx 'dns')."},
+{id:"tl05",t:"tools",g:"net-wireshark",q:"Hvilket filter finder starten af TCP-handshakes?",a:["tcp.flags.syn == 1 && tcp.flags.ack == 0","tcp.ack == 0","tcp.handshake","syn"],ex:"Det viser kun det første SYN. Fjern ack-betingelsen for også at se SYN-ACK."},
+{id:"tl06",t:"tools",g:"net-wireshark",q:"Hvilken protokol bruger ping?",a:["ICMP echo request og echo reply","TCP port 7","UDP port 53","ARP"],ex:"Type 8 (request) og type 0 (reply)."},
+{id:"tl07",t:"tools",g:"net-wireshark",q:"Hvilken kommando viser din IP-konfiguration i Windows?",a:["ipconfig","ifconfig","ip route","arp -a"],ex:"På Linux bruges 'ip a' (eller ifconfig) og på macOS ifconfig."},
+{id:"tl08",t:"tools",g:"net-wireshark",q:"Hvad gør nslookup eller dig?",a:["Laver DNS-opslag","Viser routerne på vejen","Viser ARP-cachen","Måler båndbredde"],ex:"Fx 'nslookup www.dr.dk' eller 'dig www.dr.dk A'."},
+{id:"tl09",t:"tools",g:"net-wireshark",q:"Hvad viser 'arp -a'?",a:["ARP-cachen med IP-til-MAC-sammenhænge","Alle åbne porte","Routing-tabellen","DNS-cachen"],ex:"Godt til at se gatewayens MAC-adresse."},
+{id:"tl10",t:"tools",g:"net-wireshark",q:"Hvilket værktøj viser aktive forbindelser og lyttende porte?",a:["netstat (eller ss på Linux)","ping","nslookup","tracert"],ex:"Fx 'netstat -an' viser alle sockets og deres tilstand (LISTEN, ESTABLISHED …)."},
+{id:"tl11",t:"tools",g:"net-wireshark",q:"Hvorfor starter sekvensnumrene ved 0 eller 1 i Wireshark?",a:["Wireshark viser relative sekvensnumre i forhold til det tilfældige startnummer","TCP starter altid ved 0","Fordi forbindelsen er krypteret","Fordi det er UDP"],ex:"Det rå nummer (raw) er tilfældigt. Wireshark trækker ISN fra for at gøre det læsbart."},
+{id:"tl12",t:"tools",g:"net-wireshark",q:"Hvad betyder [TCP Retransmission] i Wireshark?",a:["Et segment er sendt igen, typisk efter tab eller timeout","Forbindelsen er lukket","Et nyt handshake er startet","Pakken er fragmenteret"],ex:"Sammen med [TCP Dup ACK] er det et tegn på pakketab."},
+{id:"tl13",t:"tools",g:"net-wireshark",q:"Hvad gør 'Follow TCP Stream'?",a:["Samler payloaden fra én TCP-forbindelse til en læsbar samtale","Følger pakken gennem routerne","Starter en ny optagelse","Dekrypterer TLS automatisk"],ex:"Praktisk til at læse en HTTP-request og -response i klartekst."},
+{id:"tl14",t:"tools",g:"net-icmp",q:"Hvad viser tracert eller traceroute?",a:["Routerne (hop) på vejen til en destination og svartiden til hver","Alle værter på dit LAN","DNS-serverens svar","Hvilke porte der er åbne"],ex:"Bygger på stigende TTL og ICMP Time Exceeded."},
+{id:"tl15",t:"tools",g:"net-wireshark",q:"Hvilket filter viser kun DHCP-trafik i Wireshark?",a:["dhcp","udp.port == 53","bootp.ip","arp"],ex:"Ældre Wireshark-versioner kaldte det 'bootp'. DHCP kører på UDP 67/68."}
+];
