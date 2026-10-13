@@ -270,22 +270,32 @@ function renderPodcasts(){
     <div class="pod-head"><div class="pod-num">${i+1}</div><div><h3>${esc(p.title)}</h3><div class="pod-sub">${p.mins} min · ${esc(p.layers)}</div></div></div>
     <p>${p.desc}</p>
     <audio controls preload="none" src="${MEDIA_BASE}podcasts/${p.file}"></audio>
+    <div class="pod-cc idle" aria-hidden="true"><div class="cc-prev"></div><div class="cc-now">Underteksterne vises her, når du trykker afspil.</div></div>
     <b style="font-size:12px">Hovedpointer</b>
     <ul class="pod-take">${p.take.map(t=>`<li>${t}</li>`).join("")}</ul>
     ${p.caveat?`<div class="g-box warn" style="margin-top:10px"><b class="t">Vær kritisk</b><p>${p.caveat}</p></div>`:""}
-    <div class="pod-tools"><button class="btn" data-tr="${p.id}">Vis transskription</button>${(p.guides||[]).map(g=>{const gg=GUIDES.find(x=>x.id===g);return gg?`<button class="btn" data-pg="${g}">Guide: ${esc(gg.title)}</button>`:""}).join("")}</div>
+    <div class="pod-tools"><button class="btn" data-cc aria-pressed="true">Undertekster: til</button><button class="btn" data-tr="${p.id}">Vis transskription</button>${(p.guides||[]).map(g=>{const gg=GUIDES.find(x=>x.id===g);return gg?`<button class="btn" data-pg="${g}">Guide: ${esc(gg.title)}</button>`:""}).join("")}</div>
     <div class="transcript" id="tr-${p.id}"><input class="input tr-search" placeholder="Søg i transskriptionen…"><div class="tr-lines">${p.lines.map(l=>`<div class="tl" data-t="${l[0]}"><button data-seek="${l[0]}">${fmt(l[0])}</button><span>${esc(l[1])}</span></div>`).join("")}</div></div>
   </article>`).join("");
   $$("#podList [data-tr]").forEach(b=>b.onclick=()=>{const t=$("#tr-"+b.dataset.tr);t.classList.toggle("open");b.textContent=t.classList.contains("open")?"Skjul transskription":"Vis transskription"});
   $$("#podList [data-pg]").forEach(b=>b.onclick=()=>openGuide(b.dataset.pg));
-  $$("#podList .pod").forEach(pod=>{
-    const audio=pod.querySelector("audio"),lines=[...pod.querySelectorAll(".tl")];
+  /* subtitles under the player: on/off is remembered for all episodes */
+  const setCC=on=>{try{localStorage.setItem("its_pod_cc",on?"1":"0")}catch{}
+    $$("#podList .pod").forEach(p=>p.classList.toggle("cc-off",!on));
+    $$("#podList [data-cc]").forEach(b=>{b.textContent=`Undertekster: ${on?"til":"fra"}`;b.setAttribute("aria-pressed",String(on))})};
+  setCC(localStorage.getItem("its_pod_cc")!=="0");
+  $$("#podList [data-cc]").forEach(b=>b.onclick=()=>setCC(b.getAttribute("aria-pressed")!=="true"));
+  $$("#podList .pod").forEach((pod,pi)=>{
+    const audio=pod.querySelector("audio"),lines=[...pod.querySelectorAll(".tl")],text=PODCASTS[pi].lines.map(l=>l[1]);
+    const cc=pod.querySelector(".pod-cc"),ccPrev=cc.querySelector(".cc-prev"),ccNow=cc.querySelector(".cc-now");
     pod.querySelectorAll("[data-seek]").forEach(b=>b.onclick=()=>{audio.currentTime=+b.dataset.seek;audio.play()});
     let last=-1;
     audio.addEventListener("timeupdate",()=>{
       const t=audio.currentTime;let idx=-1;
       for(let i=0;i<lines.length;i++){if(+lines[i].dataset.t<=t)idx=i;else break}
-      if(idx!==last){lines[last]?.classList.remove("now");lines[idx]?.classList.add("now");last=idx;
+      if(idx!==last){
+        cc.classList.remove("idle");ccPrev.textContent=text[idx-1]||"";ccNow.textContent=text[idx]||"";
+        lines[last]?.classList.remove("now");lines[idx]?.classList.add("now");last=idx;
         const tr=pod.querySelector(".transcript");if(tr.classList.contains("open")&&lines[idx]){const box=tr.getBoundingClientRect(),r=lines[idx].getBoundingClientRect();if(r.top<box.top||r.bottom>box.bottom)tr.scrollTop+=r.top-box.top-120}}
     });
     pod.querySelector(".tr-search").oninput=e=>{const q=e.target.value.toLowerCase().trim();let first=null;
