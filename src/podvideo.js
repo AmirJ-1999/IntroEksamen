@@ -156,6 +156,131 @@ p1:[
 ]
 };
 
+POD_VIDEO.p2=[
+ {t:"0:00",ch:"Intro",kind:"points",kick:"Afsnit 2 · Netværk",title:"Tusindvis af pakker. Hvor skal de hen?",items:[
+  {t:"0:05",i:"📦",x:"Lige nu modtager din enhed tusindvis af usynlige datapakker"},
+  {t:"0:13",i:"🎧",x:"Nogle af dem er den lydfil, du hører"},
+  {t:"0:17",i:"🔔",x:"Andre er en notifikation eller en kalender, der synkroniserer"},
+  {t:"0:23",i:"❓",x:"Hvordan ved enheden, hvilken pakke der hører til hvad?"}]},
+ {t:"0:31",kind:"title",kick:"Svaret ligger i maskinrummet",title:"Transportlagets mekanik med TCP og UDP",sub:"Mekanisk forståelse, ikke udenadslære",items:[{t:"0:38",x:"Transportlaget",k:"badge"}]},
+ {t:"1:06",kind:"points",kick:"Skabelonen for hvert koncept",title:"Tre spørgsmål hver gang",items:[
+  {t:"1:16",i:"❓",x:"Hvad er det?"},
+  {t:"1:17",i:"⚙",x:"Hvad gør det?"},
+  {t:"1:18",i:"💡",x:"Hvorfor er det overhovedet nødvendigt?"}]},
+ {t:"1:33",ch:"Lagene",kind:"stack",hi:"transport",kick:"Den store sammenhæng",title:"Fem lag, der samarbejder vertikalt",items:[
+  {t:"1:42",x:"Application: dine programmer, fx HTTP"},
+  {t:"1:48",x:"Transport: TCP og UDP, dagens emne"},
+  {t:"1:55",x:"Network: IP-adresser · Link: MAC-adresser"},
+  {t:"2:01",x:"Physical: rå bits som elektriske signaler"}]},
+ {t:"2:14",ch:"Indkapsling",kind:"points",kick:"Den klassiske forvirring",title:"Hvorfor har dataen så mange navne?",items:[
+  {t:"2:20",i:"🏷",x:"Message, segment, datagram, frame, bits …"},
+  {t:"2:32",i:"🪆",x:"Det er ikke de samme data: hvert lag pakker ind (encapsulation)"},
+  {t:"3:02",i:"✉",x:"Et brev lægges i en kuvert …"},
+  {t:"3:05",i:"📦",x:"… kuverten i en forsendelsesæske med fragtlabel …"},
+  {t:"3:10",i:"🚢",x:"… og æsken i en stor stålcontainer"}]},
+ {t:"3:14",kind:"encap",dir:"down",kick:"Indkapsling",title:"Navnet fortæller, hvilken container vi kigger på",items:[
+  {t:"3:21",x:"Message på application"},
+  {t:"3:23",x:"Segment på transport: TCP sætter sin header på"},
+  {t:"3:33",x:"Datagram på network: IP-headeren kommer på"},
+  {t:"3:37",x:"Frame på link"},
+  {t:"3:40",x:"Bits på det fysiske lag"},
+  {t:"3:47",x:"message → segment → datagram → frame → bits",k:"sum"}]},
+ {t:"3:57",ch:"Porte og sockets",kind:"cards",kick:"Internettet er en stor by",title:"Bygning, lejlighed og dør",items:[
+  {t:"4:16",i:"🏢",x:"Bygningen = IP-adressen",d:"Finder frem til selve maskinen (netværkslaget)"},
+  {t:"4:41",i:"🏠",x:"Lejligheden = portnummeret",d:"Hvert program har sit eget nummer (transportlaget)"},
+  {t:"4:49",i:"🚪",x:"Døren = socket",d:"Åbningen, hvor programmet sidder og lytter efter data"}]},
+ {t:"5:04",kind:"mux",kick:"Mange programmer på én gang",title:"Multiplexing og demultiplexing",apps:[["🌐","Browser","443"],["🎵","Spotify","4070"],["📅","Kalender","993"]],items:[
+  {t:"5:09",x:"Browserfaner, musik og spil sender og modtager samtidig"},
+  {t:"5:24",x:"Multiplexing hos afsenderen: portnumre på, flettet til én strøm"},
+  {t:"5:42",x:"Demultiplexing hos modtageren: sorteret efter destinationsport"},
+  {t:"5:57",x:"Derfor ender lydfilen ikke i kalenderen",k:"sum"}]},
+ {t:"6:01",ch:"TCP vs UDP",kind:"compare",kick:"De to brødre",title:"TCP eller UDP: hvad koster pålidelighed?",cols:[{i:"📮",n:"TCP",s:"Transmission Control Protocol",c:"transport"},{i:"🚒",n:"UDP",s:"User Datagram Protocol",c:"app"}],items:[
+  {t:"6:19",c:0,x:"Garanterer, at alt ankommer i korrekt rækkefølge"},
+  {t:"6:30",c:0,x:"Det koster på hastigheden"},
+  {t:"6:35",c:0,x:"Tung header: mindst 20 bytes"},
+  {t:"6:51",c:1,x:"Ingen forbindelse: spørger ikke, om modtageren er klar"},
+  {t:"6:58",c:1,x:"Garanterer ingenting, kaster data blindt af sted"},
+  {t:"7:02",c:0,x:"Anbefalet post: underskrift for hver pakke"},
+  {t:"7:09",c:1,x:"En brandslange, der sprøjter pakker mod bygningen"},
+  {t:"7:22",c:1,x:"Header på kun 8 bytes"},
+  {t:"7:27",c:"b",x:"Hurtigt DNS-opslag? Så er UDP perfekt"}]},
+ {t:"7:41",ch:"Handshake",kind:"arrows",kick:"TCP er forbindelsesorienteret",title:"Three-way handshake",a:["💻|Klient (browser)","🖥|Server"],items:[
+  {t:"7:58",c:0,x:"SYN",s:"«Jeg vil gerne forbinde. Mit startnummer er x»"},
+  {t:"8:13",c:1,x:"SYN + ACK",s:"«Modtaget, og her er mit eget startnummer y»"},
+  {t:"8:29",c:0,x:"ACK",s:"«Jeg har også hørt dig»"},
+  {t:"8:48",c:"n",x:"En lille forsinkelse, men her aftales sequence- og acknowledgement-numre"}]},
+ {t:"9:00",ch:"Seq og ACK",kind:"arrows",kick:"Rækkefølge",title:"Sequence number og acknowledgement number",a:["💻|Afsender","💻|Modtager"],items:[
+  {t:"9:04",c:"n",x:"Hver eneste byte får et nummer"},
+  {t:"9:08",c:"n",x:"Sequence number = nummeret på den første byte i segmentet"},
+  {t:"9:21",c:"n",x:"ACK number = den næste byte, modtageren forventer"},
+  {t:"9:36",c:0,x:"seq = 1 · 100 bytes data",s:"bytes 1–100"},
+  {t:"9:45",c:1,x:"ACK = 101",s:"«fik 1–100, næste jeg forventer er 101»"}]},
+ {t:"9:56",kind:"arrows",kick:"Når netværket svigter",title:"Pakketab og retransmission",a:["💻|Afsender","💻|Modtager"],items:[
+  {t:"9:57",c:0,x:"seq = 101 · 100 bytes",lost:1},
+  {t:"10:00",c:"n",x:"⏱ TCP har en timer for hver afsendt pakke"},
+  {t:"10:07",c:"n",x:"Intet ACK, før tiden løber ud? Så er pakken tabt"},
+  {t:"10:09",c:0,x:"seq = 101 · 100 bytes",s:"retransmission"},
+  {t:"10:11",c:1,x:"ACK = 201"}]},
+ {t:"10:13",kind:"compare",kick:"Selective Acknowledgement",title:"Uden SACK eller med SACK?",cols:[{i:"😩",n:"Uden SACK",s:"kun hele uafbrudte blokke",c:"link"},{i:"🎯",n:"Med SACK",s:"Selective Acknowledgement",c:"app"}],items:[
+  {t:"10:17",c:0,x:"Modtageren kan kun bekræfte uafbrudte blokke af bytes"},
+  {t:"10:23",c:0,x:"Pakke 50 tabt: «jeg mangler 50!», selvom 51–1000 er kommet"},
+  {t:"10:34",c:0,x:"Afsenderen gensender det hele: spild af netværk"},
+  {t:"10:43",c:1,x:"Modtageren siger præcist, hvilket hul der mangler"},
+  {t:"10:53",c:1,x:"SLE = SACK Left Edge · SRE = SACK Right Edge"},
+  {t:"11:00",c:1,x:"Kanterne på data, der allerede er modtaget længere fremme"},
+  {t:"11:08",c:"b",x:"Kun hullet bliver sendt igen"}]},
+ {t:"11:12",ch:"Flow vs congestion",kind:"compare",kick:"To begreber, der ofte forveksles",title:"Hvem beskytter vi?",cols:[{i:"🥛",n:"Flow control",s:"vandglasset",c:"app"},{i:"🛣",n:"Congestion control",s:"motorvejen",c:"network"}],items:[
+  {t:"11:32",c:0,x:"Beskytter modtageren"},
+  {t:"11:37",c:0,x:"Modtagerens buffer er begrænset, som et vandglas"},
+  {t:"11:43",c:0,x:"Hæld ikke hurtigere, end glasset kan rumme"},
+  {t:"11:56",c:1,x:"Beskytter selve netværket mellem dem"},
+  {t:"12:00",c:1,x:"Trafikprop ved en central router"},
+  {t:"12:07",c:1,x:"Afsenderen tvinges til at bremse"},
+  {t:"12:14",c:"b",x:"Flow control beskytter modtageren · congestion control beskytter motorvejen"}]},
+ {t:"12:19",ch:"TCP-headeren",kind:"hdr",h:"tcp",kick:"Eksamen: felt for felt",title:"TCP-headeren oppefra og ned",items:[
+  {t:"12:35",m:["Source port","Destination port"],x:"Porte (16 bit): lejlighedsnummeret. Ingen IP-adresser her!"},
+  {t:"12:53",m:["Sequence number","Acknowledgement number"],x:"Seq og ACK (32 bit): rækkefølge og genudsendelse"},
+  {t:"13:07",m:["Header length"],x:"Header length: 20–60 bytes på grund af options. Hvor starter data?"},
+  {t:"13:30",m:["Flags"],x:"Flagene: seks klassiske"}]},
+ {t:"13:35",kind:"cards",three:1,kick:"TCP-flag",title:"De seks klassiske flag",items:[
+  {t:"13:39",i:"URG",x:"Urgent",d:"Det haster, læs det med det samme"},
+  {t:"13:45",i:"ACK",x:"Acknowledgement",d:"Ack-feltet indeholder en gyldig værdi"},
+  {t:"13:51",i:"PSH",x:"Push",d:"Skub data op til applikationen med det samme"},
+  {t:"14:07",i:"RST",x:"Reset",d:"River forbindelsen over uden varsel"},
+  {t:"14:12",i:"SYN",x:"Synchronize",d:"Starter en forbindelse (handshake)"},
+  {t:"14:17",i:"FIN",x:"Finish",d:"Normal, planlagt afslutning"}]},
+ {t:"14:21",kind:"compare",kick:"TCP-flag",title:"FIN eller RST?",cols:[{i:"👋",n:"FIN",s:"pæn afslutning",c:"app"},{i:"💥",n:"RST",s:"brat afbrydelse",c:"link"}],items:[
+  {t:"14:24",c:0,x:"«Tak for i dag», røret lægges pænt på"},
+  {t:"14:28",c:1,x:"Røret smækkes på midt i en sætning, fordi noget gik galt"},
+  {t:"14:43",c:"b",x:"SYN-ACK er ikke ét flag: SYN og ACK er sat samtidig"}]},
+ {t:"14:52",kind:"hdr",h:"tcp",kick:"Eksamen: felt for felt",title:"TCP-headeren: resten",items:[
+  {t:"14:52",m:["Receive window"],x:"Receive window: plads i bufferen (flow control, vandglasset)"},
+  {t:"15:11",m:["Checksum"],x:"Checksum: opdager fejl, men reparerer intet. Fejl = kasseres i stilhed"},
+  {t:"15:27",m:["Data (payload)"],x:"Payload: selve dataene"}]},
+ {t:"15:34",ch:"UDP-headeren",kind:"hdr",h:"udp",kick:"Fra cockpit til løbehjul",title:"UDP-headeren: kun fire felter",items:[
+  {t:"15:44",m:["Source port","Destination port","Length","Checksum"],x:"Source port, destination port, length og checksum: 8 bytes i alt"},
+  {t:"15:56",x:"Intet sequence number, intet ACK, intet window"},
+  {t:"16:05",x:"Fejl i checksum: pakken slettes, og applikationen må selv rydde op"},
+  {t:"16:30",m:["Length"],x:"Length = header + data (TCP's header length tæller kun headeren)"},
+  {t:"16:44",x:"50 bytes data + 8 bytes header = 58 i length-feltet",k:"sum"}]},
+ {t:"16:58",ch:"Eksamens-pingpong",kind:"quiz",kick:"Eksamensscenarie",title:"WiFi dør i 2 sekunder midt i en stor TCP-download. Hvorfor crasher filen ikke?",items:[
+  {t:"17:31",i:"🚪",x:"Porten identificerer forbindelsen (socket'en), mens IP kun identificerer bygningen"},
+  {t:"17:53",i:"🔢",x:"Seq viser, hvor dataene hører til. ACK siger «næste byte, jeg mangler, er X»"},
+  {t:"18:15",i:"🥛",x:"Window size: flow control, så gensendelsen ikke drukner modtageren"},
+  {t:"18:38",i:"🚒",x:"Med UDP: ingen seq og ingen retransmission, så data er tabt, medmindre appen redder det"}]},
+ {t:"18:59",ch:"Afslutning",kind:"cards",kick:"Tag det med til eksamen",title:"Når du går i stå: grib analogierne",items:[
+  {t:"18:59",i:"❓",x:"Hvad, hvordan, hvorfor?",d:"Hvad er det? Hvad gør det? Hvorfor findes det?"},
+  {t:"19:10",i:"🥛",x:"Vandglasset",d:"Flow control"},
+  {t:"19:11",i:"🛣",x:"Motorvejen",d:"Congestion control"},
+  {t:"19:13",i:"🏢",x:"Bygningen og døren",d:"IP-adresse vs. port og socket"}]},
+ {t:"19:37",kind:"points",kick:"Ét klik, set indefra",title:"Held og lykke ved det grønne bord",items:[
+  {t:"19:37",i:"👆",x:"Dit klik knuses til en strøm af usynlige pakker"},
+  {t:"19:44",i:"🏢",x:"De finder den rigtige bygning i verden (IP)"},
+  {t:"19:46",i:"🚪",x:"… og den rigtige lejlighed og dør (port og socket)"},
+  {t:"19:51",i:"🎼",x:"TCP dirigerer: undgår trafikkøer og sørger for, at vandglasset aldrig løber over"},
+  {t:"20:12",i:"🍀",x:"Du har byggeklodserne. Held og lykke!"}]}
+];
+
 /* ---------- scene renderers: (scene, visible items, index of first new item) → HTML ---------- */
 const pvNew=(i,nw)=>i>=nw?" pv-new":"";
 const pvHead=s=>`<div class="pv-kick">${esc(s.kick||"")}</div><h3 class="pv-title">${esc(s.title)}</h3>`;
@@ -189,8 +314,35 @@ const PV_RENDER={
     return pvHead(s)+`<div class="pv-flow">${s.nodes.map((nd,i)=>`${i?`<span class="pv-arrow${i<n?" on":""}">→</span>`:""}<div class="pv-node${i<n?" on":""}${i===n-1?" cur":""}${i<n&&steps[i]._i>=nw?" pv-new":""}"><span>${nd.i}</span><b>${esc(nd.n)}</b><small>${i<n?esc(nd.s):"&nbsp;"}</small></div>`).join("")}</div>
       ${notes.map(x=>`<div class="${x.k==="sum"?"pv-banner":"pv-note"}${pvNew(x._i,nw)}">${esc(x.x)}</div>`).join("")}`;
   },
+  /* two lifelines with arrows: items c:0 = left→right, c:1 = right→left, c:"n" = note, lost:1 = dropped */
+  arrows(s,vis,nw){
+    const [L,R]=s.a.map(a=>a.split("|"));
+    return pvHead(s)+`<div class="pv-seq"><div class="pv-seqhead"><div><span>${L[0]}</span><b>${esc(L[1])}</b></div><div><span>${R[0]}</span><b>${esc(R[1])}</b></div></div>
+      <div class="pv-seqbody">${vis.map(m=>m.c==="n"
+        ?`<div class="pv-note${pvNew(m._i,nw)}">${esc(m.x)}</div>`
+        :`<div class="pv-msg ${m.c?"rl":"lr"}${m.lost?" lost":""}${pvNew(m._i,nw)}"><b>${esc(m.x)}</b><i></i>${m.s?`<small>${esc(m.s)}</small>`:""}</div>`).join("")}</div></div>`;
+  },
+  /* multiplexing: sender apps → one stream → receiver apps (k = how far the story has come) */
+  mux(s,vis,nw){
+    const k=vis.filter(x=>x.k!=="sum").length,sum=vis.find(x=>x.k==="sum");
+    const app=(a,i,side)=>`<div class="pv-app a${i}${side==="r"&&k>=3?" on":""}"><span>${a[0]}</span><b>${esc(a[1])}</b><code>:${a[2]}</code></div>`;
+    return pvHead(s)+`<div class="pv-mux">
+      <div class="pv-muxcol"><small>Afsender</small>${s.apps.map((a,i)=>app(a,i,"l")).join("")}</div>
+      <div class="pv-stream${k>=2?" on":""}"><small>${k>=3?"demultiplexing →":k>=2?"multiplexing →":"&nbsp;"}</small><div>${k>=2?[0,1,2,0,2,1,0].map(i=>`<span class="a${i}">:${s.apps[i][2]}</span>`).join(""):""}</div></div>
+      <div class="pv-muxcol"><small>Modtager</small>${s.apps.map((a,i)=>app(a,i,"r")).join("")}</div></div>
+      ${pvList(vis.filter(x=>x.k!=="sum"),nw,"pv-points pv-compact")}${sum?`<div class="pv-banner${pvNew(sum._i,nw)}">${esc(sum.x)}</div>`:""}`;
+  },
+  /* a real header from HEADERS; the fields named by the newest item (m) light up, earlier ones stay marked */
+  hdr(s,vis,nw){
+    const def=HEADERS[s.h],cur=[...vis].reverse().find(x=>x.m),now=new Set(cur?cur.m:[]),done=new Set(vis.flatMap(x=>x.m||[]));
+    const cells=[];let pos=0;
+    def.fields.forEach(f=>{let rem=f.b,first=true;while(rem>0){const take=Math.min(rem,32-pos);cells.push({f,span:take,cont:!first});pos=(pos+take)%32;rem-=take;first=false}});
+    const sum=vis.find(x=>x.k==="sum");
+    return pvHead(s)+`<div class="pv-hdr">${cells.map(c=>`<div class="pv-hf${now.has(c.f.n)?" on":done.has(c.f.n)?" done":""}${c.f.var?" var":""}" style="grid-column:span ${c.span}">${esc(c.f.n)}${c.cont?" (forts.)":""}${c.span>=8&&!c.f.var?`<small>${c.f.b} bit</small>`:""}</div>`).join("")}</div>
+      ${pvList(vis.filter(x=>x.k!=="sum"),nw,"pv-points pv-compact")}${sum?`<div class="pv-banner${pvNew(sum._i,nw)}">${esc(sum.x)}</div>`:""}`;
+  },
   cards(s,vis,nw){
-    return pvHead(s)+`<div class="pv-cards">${vis.map(c=>`<div class="pv-card${pvNew(c._i,nw)}"><span class="pv-cardicon">${esc(c.i)}</span><b>${esc(c.x)}</b><small>${esc(c.d)}</small></div>`).join("")}</div>`;
+    return pvHead(s)+`<div class="pv-cards${s.three?" three":""}">${vis.map(c=>`<div class="pv-card${pvNew(c._i,nw)}"><span class="pv-cardicon">${esc(c.i)}</span><b>${esc(c.x)}</b><small>${esc(c.d)}</small></div>`).join("")}</div>`;
   },
   quiz(s,vis,nw){
     return `<div class="pv-kick">${esc(s.kick)}</div><div class="pv-question">❓ ${esc(s.title)}</div>`+(vis.length?pvList(vis,nw,"pv-points pv-answer"):`<div class="pv-think">Tænk over det selv, før svaret kommer …</div>`);
