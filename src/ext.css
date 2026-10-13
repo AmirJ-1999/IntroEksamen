@@ -368,3 +368,61 @@ body[data-view="live"] .main{max-width:1560px}
 
 @media(max-width:900px){.account-wrap{margin-left:auto}.download-btn{margin-left:8px}.download-btn~.theme-toggle{margin-left:8px}}
 @media(max-width:560px){.account-btn span{display:none}.account-btn{padding:8px 10px}.account-menu{right:-60px}}
+
+/* ===== v12: phones — compact chrome, foldable task list, tidy action grid ===== */
+.nav-mobile-only{display:none}
+.ex-toggle{display:none}
+@media(max-width:900px){
+  .ex-toggle{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;border:0;background:transparent;color:var(--text);padding:2px 0;text-align:left;font-size:14px;font-weight:700;line-height:1.3}
+  .ex-toggle small{display:block;font-size:11px;font-weight:500;color:var(--muted);margin-bottom:2px}
+  .ex-toggle b{flex:0 0 auto;font-size:12px;font-weight:600;color:var(--teal);border:1px solid var(--line);border-radius:999px;padding:6px 10px;background:var(--panel3)}
+  .ex-toggle i{display:inline-block;font-style:normal;transition:transform .15s}
+  .exercise-list.open .ex-toggle i{transform:rotate(180deg)}
+  .exercise-list:not(.open)>h3,.exercise-list:not(.open)>p,.exercise-list:not(.open)>.live-coverage,.exercise-list:not(.open)>.exercise-items{display:none}
+  .exercise-list.open .ex-toggle{margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid var(--line)}
+  .exercise-list.open .exercise-items{max-height:none;overflow:visible}
+  #liveMain .lab{scroll-margin-top:calc(var(--nav-h) + 10px)}
+}
+@media(max-width:640px){
+  .btn{padding:10px 12px;font-size:13px}
+  .lab-head h2{font-size:19px}
+  .lab-head p{font-size:14px}
+  /* action buttons as an even grid: Kør / Kør tests, then the three helpers, then timer + navigation */
+  #liveMain .lab-bottom{display:grid;gap:8px}
+  #liveMain .lab-bottom .group{display:grid;gap:6px;width:100%}
+  #liveMain .lab-bottom .group:first-child{grid-template-columns:repeat(6,minmax(0,1fr))}
+  #runCode,#runTests{grid-column:span 3;font-size:14px;padding:11px}
+  #hintBtn,#solutionBtn,#annotatedBtn{grid-column:span 2;padding-left:4px;padding-right:4px;line-height:1.2}
+  #liveMain .lab-bottom .group:last-child{grid-template-columns:auto 1fr 48px 48px;align-items:stretch}
+  #liveMain .lab-bottom .timer{display:flex;align-items:center}
+  .live-toolbar{display:grid;grid-template-columns:1fr 1fr}
+  .live-toolbar .select,.live-toolbar .btn{width:100%;min-width:0}
+}
+@media(max-width:560px){
+  /* top bar: logo, account, one theme button, menu (download lives in the menu) */
+  .download-btn{display:none}
+  .topnav.menu-open .nav-mobile-only{display:block;border-top:1px solid var(--line);border-radius:0 0 10px 10px;margin-top:4px}
+  .theme-toggle button:not(.active){display:none}
+  .theme-toggle button.active{box-shadow:none;background:transparent}
+  .account-wrap{margin-left:auto}
+  .mobile-menu{margin-left:6px!important;padding:8px 12px}
+  /* subject switch: two compact buttons side by side instead of two tall cards */
+  .subject-focus-inner{padding:8px 12px}
+  .subject-focus-label{display:none}
+  .subject-switch-large{grid-template-columns:1fr 1fr;gap:6px}
+  .subject-switch-large button{justify-content:center;padding:8px 10px;gap:8px}
+  .subject-switch-large small{display:none}
+  .subject-switch-large .subject-icon{width:26px;height:26px;flex-basis:26px;font-size:13px;border-radius:8px}
+  .subject-switch-large b{font-size:14px}
+  .live-head h1{font-size:26px}
+  .set-tab{padding:8px 10px}
+  .set-tab b{font-size:12.5px}
+}
+.test.idle b{display:inline;font-size:inherit;margin:0}
+@media(max-width:560px){
+  .start-card{min-height:0;padding:16px 16px 18px}
+  .start-card .icon{margin-bottom:8px}
+  .start-card p{margin-bottom:12px}
+  .hero-actions .btn{flex:1 1 auto}
+}
+@media(max-width:900px){.topnav.menu-open .nav-center{background:var(--panel)}}

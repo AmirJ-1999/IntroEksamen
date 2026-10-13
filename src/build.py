@@ -114,7 +114,7 @@ rep('<button class="download-btn" id="downloadOffline"', account_ui + '<button c
 rep('<button class="navbtn active" data-view="home">Start</button>',
     '<button class="navbtn active" data-view="home">Start</button>\n    <button class="navbtn" data-view="learn">Lær</button>')
 rep('<button class="navbtn" data-view="live">Python Lab</button>',
-    '<button class="navbtn" data-view="live">Python Lab</button>\n    <button class="navbtn" data-view="podcasts">Podcasts</button>\n    <button class="navbtn" data-view="videos">Videoer</button>')
+    '<button class="navbtn" data-view="live">Python Lab</button>\n    <button class="navbtn" data-view="podcasts">Podcasts</button>\n    <button class="navbtn" data-view="videos">Videoer</button>\n    <button class="navbtn nav-mobile-only" id="menuDownload">⬇ Download offline</button>')
 rep('<button class="btn" id="randomLive">Tilfældig opgave</button>',
     '<button class="btn" id="randomLive">Tilfældig opgave</button>\n        <button class="btn primary" id="sandboxBtn">🧪 Fri sandbox</button>')
 rep('<div class="live-layout">', '<div class="live-layout" id="liveMain">')
