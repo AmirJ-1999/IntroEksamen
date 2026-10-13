@@ -58,8 +58,8 @@ p1:[
   {t:"7:20",x:"IP-adressen fortæller den endelige destination"},
   {t:"7:24",x:"… men ikke, hvordan man tager det allernæste skridt"}]},
  {t:"7:29",kind:"hops",kick:"Lag 2",title:"IP er «New York» på brevet. Link er vejen til næste postcentral",items:[
-  {t:"7:29",x:"IP: den endelige destination, hele vejen"},
-  {t:"7:40",x:"Link: kun til den næste fysiske enhed (det næste hop)"},
+  {t:"7:29",ip:1,x:"IP: den endelige destination, hele vejen"},
+  {t:"7:40",mac:1,x:"Link: kun til den næste fysiske enhed (det næste hop)"},
   {t:"7:54",x:"MAC-adressen er brændt ind i netkortet og ændrer sig aldrig"},
   {t:"7:59",x:"IP-adressen skifter efter, hvilket netværk du er på"}]},
  {t:"8:06",kind:"chat",kick:"Lag 2 · ARP",title:"ARP: fra IP-adresse til MAC-adresse",a:["💻|Din computer","📡|Routeren 192.168.1.1"],items:[
@@ -416,6 +416,108 @@ POD_VIDEO.p3=[
   {t:"28:10",i:"🌍",x:"Med IPv6 kan alle enheder få en unik, offentlig adresse. Tænk over det …"}]}
 ];
 
+POD_VIDEO.p4=[
+ {t:"0:00",ch:"Intro",kind:"points",kick:"Afsnit 4 · Netværk",title:"Din telefon skriger ud i rummet",items:[
+  {t:"0:06",i:"📱",x:"Telefonen ligger stille og ser lydløs ud"},
+  {t:"0:13",i:"📡",x:"… men den sender usynlige radiobølger til alle i nærheden"},
+  {t:"0:24",i:"❓",x:"For at finde ud af, hvem der ejer en bestemt lokal adresse"},
+  {t:"0:32",i:"🎼",x:"Et kaotisk, men smukt koreograferet system"}]},
+ {t:"0:48",kind:"title",kick:"Ned i maskinrummet",title:"Linklaget, ARP og WiFi",sub:"Forstå logikken, så forsvinder behovet for udenadslære",items:[{t:"1:00",x:"Linklaget",k:"badge"},{t:"1:01",x:"WiFi",k:"badge"}]},
+ {t:"1:46",ch:"Lagene",kind:"stack",hi:"link",kick:"Det store overblik",title:"Fem lag, der samarbejder",items:[
+  {t:"2:06",x:"Application: HTTP, DNS, SMTP"},
+  {t:"2:32",x:"Transport: TCP og UDP, kommunikation mellem processer"},
+  {t:"2:53",x:"Network: IP-adresser og routere finder vej"},
+  {t:"3:17",x:"Link: sender frames over det næste link (Ethernet, MAC)"},
+  {t:"3:33",x:"Physical: bits som elektriske impulser og radiobølger"}]},
+ {t:"3:42",ch:"Indkapsling",kind:"encap",dir:"down",kick:"Eksamensspørgsmål: hvorfor skifter dataen navn?",title:"Konvolut uden om konvolut",items:[
+  {t:"4:13",x:"Message på applikationslaget"},
+  {t:"4:16",x:"Segment, når TCP pakker den ind"},
+  {t:"4:22",x:"Datagram på netværkslaget"},
+  {t:"4:29",x:"Frame på linklaget"},
+  {t:"4:33",x:"Bits på det fysiske lag"},
+  {t:"4:48",x:"message → segment → datagram → frame → bits",k:"sum"}]},
+ {t:"5:02",ch:"IP vs MAC",kind:"compare",kick:"Træk en klar streg i sandet",title:"IP-adresse eller MAC-adresse?",cols:[{i:"🌍",n:"IP-adresse",s:"netværkslaget",c:"network"},{i:"👤",n:"MAC-adresse",s:"linklaget",c:"link"}],items:[
+  {t:"5:20",c:0,x:"Hvor skal dataen hen globalt?"},
+  {t:"5:23",c:0,x:"Gennem flere forskellige netværk"},
+  {t:"5:27",c:1,x:"48 bit, brændt ind i netkortet"},
+  {t:"5:30",c:1,x:"Hvem skal fysisk modtage framen på det lokale link?"},
+  {t:"5:36",c:"b",x:"IP = hvor · MAC = hvem"}]},
+ {t:"5:40",ch:"ARP",kind:"arrows",kick:"Address Resolution Protocol",title:"ARP: fra kendt IP til ukendt MAC",a:["💻|Computer A","💻|Computer B"],items:[
+  {t:"5:45",c:"n",x:"A kender B's IP-adresse, men mangler B's MAC-adresse"},
+  {t:"6:09",c:0,x:"ARP request · broadcast",s:"«Hvem har 192.168.1.20?» til ff:ff:ff:ff:ff:ff"},
+  {t:"6:26",c:"n",x:"Broadcast, fordi A endnu ikke kender modtagerens MAC"},
+  {t:"6:45",c:1,x:"ARP reply · unicast",s:"«Det er mig: a4:67:06:8d:83:a1»"},
+  {t:"6:52",c:"n",x:"Unicast, fordi B kender A's MAC fra requesten"}]},
+ {t:"7:04",kind:"points",kick:"ARP-cachen",title:"Hvorfor gemme svaret?",items:[
+  {t:"7:13",i:"📁",x:"Sender du en stor fil, vil du ikke råbe ud for hver eneste frame"},
+  {t:"7:19",i:"📢",x:"Det ville spamme netværket i stykker"},
+  {t:"7:21",i:"💾",x:"Svaret gemmes i en midlertidig tabel: ARP-cachen"}]},
+ {t:"7:32",kind:"compare",kick:"Pas på: to slags TTL",title:"TTL i ARP-cachen er ikke TTL i IPv4",cols:[{i:"⏱",n:"ARP-cachens TTL",s:"måler tid",c:"link"},{i:"🔢",n:"IPv4's TTL",s:"måler hop",c:"network"}],items:[
+  {t:"7:47",c:0,x:"Sekunder eller minutter"},
+  {t:"7:53",c:0,x:"Adressen smides ud, så tabellen er opdateret, hvis en computer slukkes eller flyttes"},
+  {t:"8:00",c:1,x:"En hoptæller, der tæller ned pr. router"},
+  {t:"8:07",c:1,x:"Så pakker ikke cirkulerer for evigt på internettet"}]},
+ {t:"8:11",kind:"hops",kick:"Klassisk eksamensspørgsmål",title:"Hvad hvis B er på et andet netværk?",nodes:[["💻","Computer A"],["📡","Router (gateway)"],["🌐","…"],["🌐","…"],["💻","Computer B"]],ipText:"IP-destination: B's IP-adresse (uændret hele vejen)",macText:"MAC-destination: routerens MAC (næste stop)",macWidth:50,items:[
+  {t:"8:24",mac:1,x:"Framen sendes til routerens MAC-adresse: default gateway"},
+  {t:"8:29",ip:1,x:"IP-destinationen i datagrammet er stadig B's IP-adresse"},
+  {t:"8:35",x:"IP peger mod det endelige mål, MAC peger på næste stop"}]},
+ {t:"8:44",ch:"Ethernet-framen",kind:"hdr",h:"ethernet",kick:"Åbn konvolutten",title:"Ethernet-framen felt for felt",items:[
+  {t:"8:58",m:["Preamble"],x:"Preamble: synkronisering, så de er enige om rytmen"},
+  {t:"9:09",m:["Destination MAC"],x:"Destination MAC: hvem framen skal afleveres til lokalt"},
+  {t:"9:13",m:["Source MAC"],x:"Source MAC: hvem framen kommer fra"},
+  {t:"9:24",m:["Type"],x:"Type: hvilken protokol der ligger i payloaden, fx IPv4"},
+  {t:"9:46",m:["Data (payload)"],x:"Data: payloaden, altså IP-datagrammet"},
+  {t:"9:51",m:["CRC (FCS)"],x:"CRC: Cyclic Redundancy Check"}]},
+ {t:"9:58",kind:"compare",kick:"Har intet med hinanden at gøre",title:"Type eller CRC?",cols:[{i:"🧭",n:"Type",s:"vejviser",c:"app"},{i:"🧮",n:"CRC",s:"fejltjek",c:"link"}],items:[
+  {t:"10:09",c:0,x:"Fortæller, hvilken protokol dataen tilhører"},
+  {t:"10:12",c:0,x:"Indholdet sendes videre til den rigtige proces, fx IPv4"},
+  {t:"10:19",c:1,x:"Matematik, der opdager bitfejl fra støj på linjen"},
+  {t:"10:39",c:1,x:"Fejl? Framen droppes, ingen genudsendelse"},
+  {t:"10:49",c:1,x:"TCP højere oppe opdager tabet og beder om retransmission"},
+  {t:"10:55",c:"b",x:"Linklaget fjerner bare alt, der er defekt"}]},
+ {t:"11:00",ch:"Switch vs router",kind:"compare",kick:"Huskeregel til eksaminator",title:"Switch eller router?",cols:[{i:"🔀",n:"Switch",s:"linklaget",c:"link"},{i:"📡",n:"Router",s:"netværkslaget",c:"network"}],items:[
+  {t:"11:11",c:"b",x:"Switch = MAC · Router = IP"},
+  {t:"11:22",c:0,x:"Videresender frames efter destinations-MAC"},
+  {t:"11:27",c:0,x:"Lærer MAC-adresserne på sine porte"},
+  {t:"11:29",c:1,x:"Videresender IP-datagrammer efter IP-adresser"}]},
+ {t:"11:40",ch:"WiFi og CSMA",kind:"points",kick:"Når kablet forsvinder",title:"Luften er et delt medium",items:[
+  {t:"11:57",i:"🔌",x:"Et kabel er et lukket system"},
+  {t:"11:59",i:"🌫",x:"Luften deles af alle"},
+  {t:"12:05",i:"👂",x:"CSMA: Carrier Sense Multiple Access"},
+  {t:"12:09",i:"🗣",x:"Carrier sense: lyt, før du sender"}]},
+ {t:"12:16",kind:"compare",kick:"Eksamensspørgsmål",title:"CSMA/CD eller CSMA/CA?",cols:[{i:"🔌",n:"CSMA/CD",s:"Collision Detection · Ethernet",c:"transport"},{i:"📶",n:"CSMA/CA",s:"Collision Avoidance · WiFi",c:"app"}],items:[
+  {t:"12:24",c:0,x:"Netværkskortet mærker spændingen og opdager kollisioner, mens det sender"},
+  {t:"12:29",c:0,x:"Kollision? Stop og prøv igen lidt senere"},
+  {t:"12:50",c:1,x:"En antenne kan ikke lytte efter kollisioner, mens den selv sender"},
+  {t:"13:00",c:1,x:"Undgå dem i stedet: lyt, og er der optaget, så vent en tilfældig periode"},
+  {t:"13:07",c:"b",x:"Man trækker lod om, hvem der må sende næste gang"}]},
+ {t:"13:11",ch:"Hidden terminal",kind:"hidden",kick:"Når avoidance ikke er nok",title:"Hidden terminal-problemet",items:[
+  {t:"13:23",x:"Et access point i midten, computer A og B i hver sin ende af bygningen"},
+  {t:"13:31",x:"Både A og B kan nå access pointet"},
+  {t:"13:34",x:"… men A og B kan ikke høre hinanden"},
+  {t:"13:44",x:"Begge tror, luften er fri, og sender samtidig"},
+  {t:"13:48",x:"Framerne kolliderer ved access pointet, og data går tabt"}]},
+ {t:"14:01",kind:"arrows",kick:"Løsningen",title:"RTS/CTS: Request to Send og Clear to Send",a:["💻|Computer A","📡|Access point"],items:[
+  {t:"14:11",c:0,x:"RTS",s:"en lille frame: «Må jeg sende data nu?»"},
+  {t:"14:18",c:1,x:"CTS",s:"«Værsgo» (høres også af B)"},
+  {t:"14:25",c:"n",x:"B hører CTS og holder sig i ro i et bestemt tidsrum"},
+  {t:"14:38",c:0,x:"DATA",s:"den store frame kommer igennem uden kollision"}]},
+ {t:"14:47",kind:"points",kick:"Husk laget under",title:"Linklaget og det fysiske lag",items:[
+  {t:"14:51",i:"🧩",x:"Linklaget styrer framen, tjekker for fejl og bestemmer, hvem der må sende hvornår"},
+  {t:"14:56",i:"📡",x:"Det fysiske lag oversætter bits til radiobølger"}]},
+ {t:"15:03",ch:"Opsummering",kind:"hdr",h:"ethernet",kick:"Med ind til eksamensbordet",title:"Øv dig på diagrammet",items:[
+  {t:"15:08",x:"Sæt fingeren på hvert felt i framen, og forklar, hvad det gør"},
+  {t:"15:11",m:["Preamble","Destination MAC","Source MAC","Type","Data (payload)","CRC (FCS)"],x:"Preamble, destination MAC, source MAC, type, data, CRC"},
+  {t:"15:18",x:"Forklar ARP request, ARP reply og cachen fra start til slut"},
+  {t:"15:30",x:"Forstå, hvorfor de er der: ikke bare huske"}]},
+ {t:"15:40",ch:"Afslutning",kind:"points",kick:"Næste gang du sidder på en café",title:"En usynlig symfoni",items:[
+  {t:"15:46",i:"☕",x:"Kig op og forestil dig det usynlige kaos i rummet"},
+  {t:"15:54",i:"📢",x:"Hundredvis af ARP-broadcasts flyver rundt"},
+  {t:"15:58",i:"📶",x:"Telefoner tager lynhurtige CSMA/CA-beslutninger"},
+  {t:"16:04",i:"🎟",x:"… og trækker lod om sendetiden med RTS og CTS"},
+  {t:"16:17",i:"🍀",x:"Held og lykke med den mundtlige eksamen!"}]}
+];
+
 /* ---------- scene renderers: (scene, visible items, index of first new item) → HTML ---------- */
 const pvNew=(i,nw)=>i>=nw?" pv-new":"";
 const pvHead=s=>`<div class="pv-kick">${esc(s.kick||"")}</div><h3 class="pv-title">${esc(s.title)}</h3>`;
@@ -425,7 +527,7 @@ const PV_RENDER={
     const url=vis.find(x=>x.k==="url"),badges=vis.filter(x=>x.k==="badge");
     return `<div class="pv-center">${s.kick?`<div class="pv-kick">${esc(s.kick)}</div>`:""}<h2 class="pv-big">${esc(s.title)}</h2>${s.sub?`<p class="pv-sub">${esc(s.sub)}</p>`:""}
       ${url?`<div class="pv-browser"><span class="pv-dots"><i></i><i></i><i></i></span><span class="pv-url">${esc(url.x)}<b class="pv-caret"></b></span><span class="pv-key">⏎ Enter</span></div>`:""}
-      ${badges.map(b=>`<div class="pv-badge${pvNew(b._i,nw)}">${esc(b.x)}</div>`).join("")}</div>`;
+      ${badges.length?`<div class="pv-badges">${badges.map(b=>`<div class="pv-badge${pvNew(b._i,nw)}">${esc(b.x)}</div>`).join("")}</div>`:""}</div>`;
   },
   points(s,vis,nw){return pvHead(s)+pvList(vis,nw)},
   stack(s,vis,nw){
@@ -469,11 +571,17 @@ const PV_RENDER={
   },
   /* a real header from HEADERS; the fields named by the newest item (m) light up, earlier ones stay marked */
   hdr(s,vis,nw){
-    const def=HEADERS[s.h],cur=[...vis].reverse().find(x=>x.m),now=new Set(cur?cur.m:[]),done=new Set(vis.flatMap(x=>x.m||[]));
-    const cells=[];let pos=0;
-    def.fields.forEach(f=>{let rem=f.b,first=true;while(rem>0){const take=Math.min(rem,32-pos);cells.push({f,span:take,cont:!first});pos=(pos+take)%32;rem-=take;first=false}});
+    const frame=!HEADERS[s.h],def=HEADERS[s.h]||FRAMES[s.h],cur=[...vis].reverse().find(x=>x.m),now=new Set(cur?cur.m:[]),done=new Set(vis.flatMap(x=>x.m||[]));
+    const cls=f=>`pv-hf${now.has(f.n)?" on":done.has(f.n)?" done":""}${f.var?" var":""}`;
     const sum=vis.find(x=>x.k==="sum");
-    return pvHead(s)+`<div class="pv-hdr">${cells.map(c=>`<div class="pv-hf${now.has(c.f.n)?" on":done.has(c.f.n)?" done":""}${c.f.var?" var":""}" style="grid-column:span ${c.span}">${esc(c.f.n)}${c.cont?" (forts.)":""}${c.span>=8&&!c.f.var?`<small>${c.f.b} bit</small>`:""}</div>`).join("")}</div>
+    let grid;
+    if(frame)grid=`<div class="pv-fbar">${def.fields.map(f=>`<div class="${cls(f)}" style="flex-grow:${f.w}">${esc(f.n)}<small>${esc(f.size)}</small></div>`).join("")}</div>`;
+    else{
+      const cells=[];let pos=0;
+      def.fields.forEach(f=>{let rem=f.b,first=true;while(rem>0){const take=Math.min(rem,32-pos);cells.push({f,span:take,cont:!first});pos=(pos+take)%32;rem-=take;first=false}});
+      grid=`<div class="pv-hdr">${cells.map(c=>`<div class="${cls(c.f)}" style="grid-column:span ${c.span}">${esc(c.f.n)}${c.cont?" (forts.)":""}${c.span>=8&&!c.f.var?`<small>${c.f.b} bit</small>`:""}</div>`).join("")}</div>`;
+    }
+    return pvHead(s)+grid+`
       ${pvList(vis.filter(x=>x.k!=="sum"),nw,"pv-points pv-compact")}${sum?`<div class="pv-banner${pvNew(sum._i,nw)}">${esc(sum.x)}</div>`:""}`;
   },
   /* an IPv4 address as 32 bits: network part (street) vs host part (house number) */
@@ -534,13 +642,27 @@ const PV_RENDER={
     return pvHead(s)+`<div class="pv-encap"><div class="pv-packet">${parts.join("")||`<div class="pv-pk empty">🪆</div>`}</div>
       <div class="pv-pdu">${bits?"0100 1011 0110 0001 0111 0100 … <b>bits</b>":L?`= <b>${pdu}</b>`:"&nbsp;"}</div></div>${pvList(vis.filter(x=>x.k!=="sum"),nw,"pv-points pv-compact")}${sum?`<div class="pv-banner${pvNew(sum._i,nw)}">${esc(sum.x)}</div>`:""}`;
   },
+  /* IP is end-to-end, MAC only the next hop. Items with ip:1 / mac:1 switch the two bars on */
   hops(s,vis,nw){
-    const k=vis.length;
-    const nodes=[["💻","Din computer"],["📡","Din router"],["🏢","Udbyder"],["🌐","…"],["🖥","Server i USA"]];
+    const ip=vis.some(x=>x.ip),mac=vis.some(x=>x.mac);
+    const nodes=s.nodes||[["💻","Din computer"],["📡","Din router"],["🏢","Udbyder"],["🌐","…"],["🖥","Server i USA"]];
     return pvHead(s)+`<div class="pv-hops">
-      <div class="pv-ipbar${k>=1?" on":""}">IP-destination: serveren i USA (hele vejen)</div>
-      <div class="pv-hoprow">${nodes.map((n,i)=>`${i?`<span class="pv-hop${i===1&&k>=2?" on":""}"></span>`:""}<div class="pv-node on${(i<=1&&k>=2)?" cur":""}"><span>${n[0]}</span><b>${n[1]}</b></div>`).join("")}</div>
-      <div class="pv-macbar${k>=2?" on":""}">${k>=3?"MAC-adresser: kun det næste hop":"&nbsp;"}</div></div>${pvList(vis,nw,"pv-points pv-compact")}`;
+      <div class="pv-ipbar${ip?" on":""}">${esc(s.ipText||"IP-destination: serveren i USA (hele vejen)")}</div>
+      <div class="pv-hoprow">${nodes.map((n,i)=>`${i?`<span class="pv-hop${i===1&&mac?" on":""}"></span>`:""}<div class="pv-node on${(i<=1&&mac)?" cur":""}"><span>${n[0]}</span><b>${esc(n[1])}</b></div>`).join("")}</div>
+      <div class="pv-macbar${mac?" on":""}" style="width:${s.macWidth||39}%">${mac?esc(s.macText||"MAC-adresser: kun det næste hop"):"&nbsp;"}</div></div>${pvList(vis,nw,"pv-points pv-compact")}`;
+  },
+  /* hidden terminal: A and B both reach the access point but can't hear each other */
+  hidden(s,vis,nw){
+    const k=vis.length;
+    return pvHead(s)+`<div class="pv-hidden">
+      <div class="pv-deaf${k>=3?" on":""}">${k>=3?"✕ A og B kan ikke høre hinanden":"&nbsp;"}</div>
+      <div class="pv-hrow">
+        <div class="pv-node on${k>=4?" cur":""}"><span>💻</span><b>Computer A</b></div>
+        <span class="pv-wave${k>=2?" on":""}${k>=4?" send":""}">${k>=4?"frame →":"((( )))"}</span>
+        <div class="pv-node on${k>=5?" dead":""}"><span>${k>=5?"💥":"📡"}</span><b>Access point</b></div>
+        <span class="pv-wave${k>=2?" on":""}${k>=4?" send":""}">${k>=4?"← frame":"((( )))"}</span>
+        <div class="pv-node on${k>=4?" cur":""}"><span>💻</span><b>Computer B</b></div>
+      </div></div>${pvList(vis,nw,"pv-points pv-compact")}`;
   },
   nat(s,vis,nw){
     const k=vis.length;

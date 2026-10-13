@@ -308,3 +308,29 @@
 .pv-seq.dense .pv-msg b{font-size:1.7cqw}.pv-seq.dense .pv-msg small{font-size:1.3cqw}
 .pv-seq.dense .pv-note{font-size:1.55cqw;padding:.6cqw 1.6cqw}
 @media(max-width:640px){.pv-seq.dense .pv-seqhead span{font-size:6cqw}.pv-seq.dense .pv-msg b{font-size:3.2cqw}.pv-seq.dense .pv-msg small{font-size:2.5cqw}.pv-seq.dense .pv-note{font-size:2.8cqw}}
+
+/* ----- Ethernet frame as a bar (widths from FRAMES) ----- */
+.pv-fbar{display:flex;gap:.4cqw;margin:.6cqw 0}
+.pv-fbar .pv-hf{flex:1 1 0;min-height:7cqw;font-size:1.6cqw}
+.pv-fbar .pv-hf small{font-size:1.2cqw}
+
+/* ----- hidden terminal ----- */
+.pv-hidden{display:flex;flex-direction:column;gap:1.4cqw;margin:1cqw 0}
+.pv-deaf{align-self:center;min-height:3cqw;padding:.5cqw 1.8cqw;border-radius:99cqw;border:.2cqw dashed transparent;font-size:1.7cqw;font-weight:800;color:#ff7474}
+.pv-deaf.on{border-color:#ff7474;background:rgba(255,116,116,.08)}
+.pv-hrow{display:flex;align-items:center;gap:1cqw}
+.pv-hrow .pv-node{opacity:1}
+.pv-wave{flex:1;text-align:center;font-family:"SFMono-Regular",Consolas,monospace;font-size:1.8cqw;font-weight:800;color:rgba(255,255,255,.18);border-bottom:.3cqw dotted rgba(255,255,255,.15);padding-bottom:.4cqw}
+.pv-wave.on{color:#55d1c7;border-bottom-color:#55d1c7}
+.pv-wave.send{color:#f0c75e;border-bottom:.3cqw solid #f0c75e}
+@media(max-width:640px){
+  .pv-fbar{flex-wrap:wrap}.pv-fbar .pv-hf{flex:1 1 28%!important;font-size:2.6cqw;min-height:9cqw}.pv-fbar .pv-hf small{font-size:2.1cqw;display:block}
+  .pv-deaf{font-size:2.8cqw}.pv-wave{font-size:2.6cqw}.pv-hrow{gap:1.4cqw}.pv-hrow .pv-node b{font-size:2.4cqw}
+}
+.pv-badges{display:flex;flex-wrap:wrap;justify-content:center;gap:1.2cqw}
+@media(max-width:640px){
+  .pv-hrow{gap:.8cqw}
+  .pv-hrow .pv-node{flex:0 0 22%;flex-direction:column;gap:.8cqw;padding:1.6cqw .6cqw;text-align:center}
+  .pv-hrow .pv-node span{font-size:6cqw}.pv-hrow .pv-node b{min-width:0;font-size:2.5cqw}
+  .pv-wave{font-size:2.2cqw;min-width:0}
+}
