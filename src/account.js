@@ -23,8 +23,9 @@ Storage.prototype.removeItem=function(k){
 };
 function saveSyncMeta(){_setItem.call(localStorage,"its_sync_meta",JSON.stringify(syncMeta))}
 function markDirty(){
+  if(!account)return;   // logged out: nothing to sync (logging in merges this browser's progress anyway)
   changeSeq++;syncMeta.dirty=true;saveSyncMeta();
-  if(account){clearTimeout(syncTimer);syncTimer=setTimeout(pushSync,3000);setSyncState("pending")}
+  clearTimeout(syncTimer);syncTimer=setTimeout(pushSync,3000);setSyncState("pending");
 }
 
 function localSnapshot(){
@@ -58,17 +59,18 @@ function applySnapshot(snap,{replace=false}={}){
   }finally{applyingRemote=false}
   if(changed)reloadAppState();
 }
-function reloadAppState(){
+function reloadAppState(force=false){
   const J=(k,d)=>{try{const v=JSON.parse(localStorage.getItem(k)||"null");return v??d}catch{return d}};
   subject=localStorage.getItem("its_subject")||subject;
   statusMap=J("its_status_clean",{});savedMap=J("its_saved_cards_v5",{});lastCard=J("its_last_card",{});
   liveProgress=J("its_live_progress_clean",{});liveCode=J("its_live_code_clean",{});
   learnId=J("its_learn_last",{});checks=J("its_checklists",{});
   liveSet=localStorage.getItem("its_live_set")||liveSet;
-  const sb=$("#sbCode");if(sb&&document.activeElement!==sb&&localStorage.getItem("its_sandbox"))sb.value=localStorage.getItem("its_sandbox");
+  const sb=$("#sbCode");
+  if(sb&&(force||document.activeElement!==sb))sb.value=localStorage.getItem("its_sandbox")||(force?"":sb.value);
   // don't yank the page while the user is typing; the next view change renders the new state
   const typing=["TEXTAREA","INPUT"].includes(document.activeElement?.tagName);
-  if(typing)return;
+  if(typing&&!force)return;
   const y=scrollY,scrollTo0=window.scrollTo;window.scrollTo=()=>{};   // re-render in place, keep the scroll position
   try{syncSubject();setView(currentView)}finally{window.scrollTo=scrollTo0;scrollTo0.call(window,{top:y,behavior:"instant"})}
 }
@@ -146,7 +148,7 @@ function syncLabel(){
 function fillAccountMenu(){
   $("#accountMenu").innerHTML=`<div class="acc-who">Logget ind som<b>${esc(account.username)}</b></div>
     <div class="acc-status" data-sync="${syncState}"><i></i>${esc(syncLabel())}</div>
-    <p class="acc-note">Flashcards, gemte kort, Python Lab-fremgang og din kode gemmes på kontoen.</p>
+    <p class="acc-note">Flashcards, gemte kort, Python Lab-fremgang og din kode gemmes på kontoen. Når du logger ud, fjernes de fra denne browser.</p>
     <button class="btn" id="accSyncNow">⟳ Synkronisér nu</button><button class="btn" id="accLogout">Log ud</button>`;
   $("#accSyncNow").onclick=()=>{syncMeta.dirty?pushSync():pullSync()};
   $("#accLogout").onclick=logout;
@@ -186,12 +188,22 @@ async function submitAuth(e){
   }catch(e2){err.textContent="Kunne ikke forbinde til serveren. Tjek din internetforbindelse."}
   finally{$("#accSubmit").disabled=false}
 }
+/* Log out = save the last changes to the account, then remove this account's progress from the
+   browser, so the next person on the same device starts clean (the theme stays). */
 async function logout(){
   toggleAccountMenu(false);
+  clearTimeout(syncTimer);
+  while(syncBusy)await new Promise(r=>setTimeout(r,100));
   if(syncMeta.dirty)await pushSync();
+  if(!account)return;   // session had already expired (pushSync logged out and kept the data)
+  if(syncMeta.dirty&&!confirm("Dine seneste ændringer kunne ikke gemmes på kontoen (ingen forbindelse?).\n\nLog ud alligevel? Så går de ændringer tabt."))return;
   try{await api("/api/logout",{method:"POST"})}catch{}
-  account=null;localStorage.removeItem("its_account");syncMeta={rev:0,dirty:false,last:0};saveSyncMeta();
-  setSyncState("idle");toast("Du er logget ud. Din fremgang er stadig gemt på kontoen og i denne browser.");
+  account=null;_removeItem.call(localStorage,"its_account");syncMeta={rev:0,dirty:false,last:0};saveSyncMeta();
+  applyingRemote=true;
+  try{for(const k of Object.keys(localSnapshot()))localStorage.removeItem(k)}finally{applyingRemote=false}
+  stopTerminal($("#results"));stopTerminal($("#sbOut"));$("#sbOut").innerHTML="";
+  reloadAppState(true);
+  setSyncState("idle");toast("Du er logget ud, og din fremgang er fjernet fra denne browser. Den ligger stadig på kontoen.");
 }
 function toast(msg){
   let t=$("#toast");if(!t){t=document.createElement("div");t.id="toast";t.className="toast";t.setAttribute("role","status");document.body.appendChild(t)}
