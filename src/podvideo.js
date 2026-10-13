@@ -84,7 +84,7 @@ p1:[
   {t:"11:04",x:"Transportlaget samler segmenterne"},
   {t:"11:05",x:"Applikationen modtager den intakte message"}]},
  {t:"11:14",ch:"DNS",kind:"title",kick:"Tilbage til lag 5",title:"Applikationslaget i dybden",sub:"Men først mangler computeren IP-adressen på dr.dk",items:[{t:"11:40",x:"DNS · Domain Name System",k:"badge"}]},
- {t:"11:44",kind:"analogy",icon:"📇",from:"dr.dk",to:"192.0.2.10",kick:"DNS",title:"DNS er internettets kontaktbog",items:[
+ {t:"11:44",kind:"analogy",icon:"📇",from:"dr.dk",to:"192.0.2.10",note:"(eksempel-IP)",kick:"DNS",title:"DNS er internettets kontaktbog",items:[
   {t:"11:55",x:"Du trykker på et navn, og telefonen ringer et skjult nummer op"},
   {t:"12:03",x:"Domænenavn (til mennesker) → IP-adresse (til maskiner)"},
   {t:"12:10",x:"Typisk UDP på port 53"}]},
@@ -281,6 +281,141 @@ POD_VIDEO.p2=[
   {t:"20:12",i:"🍀",x:"Du har byggeklodserne. Held og lykke!"}]}
 ];
 
+POD_VIDEO.p3=[
+ {t:"0:00",ch:"Intro",kind:"quiz",kick:"Afsnit 3 · Netværk",title:"Hvad forhindrer en forvildet pakke i at køre i ring og crashe hele internettet?",items:[
+  {t:"0:12",i:"🔤",x:"Svaret gemmer sig i tre bittesmå bogstaver i hver eneste pakke. Det afsløres senere"}]},
+ {t:"0:25",kind:"title",kick:"Lydbog 3",title:"Bliv klar til eksamen i netværkslaget",sub:"Fra tør teori til forståelse, der trækker karakteren op",items:[{t:"0:35",x:"Netværkslaget",k:"badge"}]},
+ {t:"0:48",kind:"points",kick:"Strategien",title:"Forstå logikken, så behøver du ikke huske",items:[
+  {t:"0:52",i:"📋",x:"En lang liste af akronymer er ikke nok"},
+  {t:"0:58",i:"🃏",x:"Udenadslære falder sammen, når eksaminator spørger til den virkelige verden"},
+  {t:"1:08",i:"🛠",x:"Hvorfor er netværket bygget sådan? Hvilke problemer løste ingeniørerne?"},
+  {t:"1:15",i:"💡",x:"Forstår du logikken, giver resten sig selv"}]},
+ {t:"1:22",ch:"Lagene",kind:"stack",hi:"network",kick:"Konteksten",title:"Et strengt opdelt samarbejde",items:[
+  {t:"1:47",x:"Application: HTTP, DNS, SMTP"},
+  {t:"2:09",x:"Transport: TCP og UDP styrer samtalen mellem processerne"},
+  {t:"2:33",x:"Network: IP-adresser og routing hele vejen frem"},
+  {t:"2:49",x:"Link: kun næste fysiske hop (Ethernet, MAC)"},
+  {t:"3:07",x:"Physical: bits som lys eller radiobølger"}]},
+ {t:"3:32",ch:"Indkapsling",kind:"points",kick:"Hvorfor skifter dataen navn?",title:"Det er ikke den samme klump data længere",items:[
+  {t:"3:36",i:"🏷",x:"Message, segment, datagram, frame, bits"},
+  {t:"3:52",i:"➕",x:"Hvert lag tilføjer sine egne styreinformationer"},
+  {t:"4:01",i:"🪆",x:"Det kaldes encapsulation, altså indkapsling"},
+  {t:"4:18",i:"📦",x:"Bedre billede: at sende skrøbelig elektronik med posten"}]},
+ {t:"4:24",kind:"encap",dir:"down",kick:"Indkapsling",title:"Skrøbelig elektronik med posten",items:[
+  {t:"4:26",x:"Message: selve elektronikken (beskeden)"},
+  {t:"4:36",x:"Segment: pakket i stødabsorberende skum (transport-header)"},
+  {t:"4:50",x:"Datagram: papkasse med GPS-etiket (IP-adresser)"},
+  {t:"5:03",x:"Frame: aflåst stålcontainer til den første lastbil"},
+  {t:"5:18",x:"Bits: bevægelse ude på vejen"},
+  {t:"5:24",x:"message → segment → datagram → frame → bits",k:"sum"}]},
+ {t:"5:32",ch:"Netværkslaget",kind:"points",kick:"Lad os åbne papkassen",title:"Netværkslagets kernemission",items:[
+  {t:"5:46",i:"🏷",x:"IP-adressering"},
+  {t:"5:52",i:"🚚",x:"Transport af IP-datagrammer fra afsender til destination på tværs af netværk"},
+  {t:"6:01",i:"🔢",x:"IPv4: adresser på præcis 32 bit"},
+  {t:"6:09",i:"📡",x:"Routerne modtager, inspicerer og beslutter, hvor datagrammet skal hen"}]},
+ {t:"6:19",ch:"Routing vs forwarding",kind:"compare",kick:"Dumper man, hvis man blander dem sammen",title:"Routing eller forwarding?",cols:[{i:"🗺",n:"Routing",s:"planlægningen",c:"transport"},{i:"↪",n:"Forwarding",s:"handlingen",c:"app"}],items:[
+  {t:"6:40",c:0,x:"Intelligent, tidskrævende planlægning"},
+  {t:"6:45",c:0,x:"Algoritmer udveksler info med andre routere og tegner kortet"},
+  {t:"6:58",c:0,x:"Som Google Maps, der regner den hurtigste rute ud"},
+  {t:"7:13",c:1,x:"Lynhurtig, konkret handling inde i routeren"},
+  {t:"7:18",c:1,x:"Ind på port 1 → slå op i tabellen → ud af port 4"},
+  {t:"7:30",c:1,x:"Tager en brøkdel af et millisekund"},
+  {t:"7:32",c:"b",x:"Routing planlægger rejsen · forwarding drejer rattet"}]},
+ {t:"7:41",ch:"Subnet og CIDR",kind:"cidr",ip:"192.168.1.37",prefix:24,kick:"Subnet og CIDR",title:"Hvad betyder /24?",items:[
+  {t:"8:04",x:"Subnet: et lokalt net, hvor enhederne taler direkte sammen"},
+  {t:"8:22",x:"/24: de første 24 af 32 bit er netværkets navn"},
+  {t:"8:32",x:"Netværksdelen er by- og gadenavnet: alle på subnettet bor på samme gade"},
+  {t:"8:42",x:"De sidste bit er husnummeret på den enkelte computer"}]},
+ {t:"8:47",kind:"analogy",icon:"🚪",from:"anden gade",to:"default gateway",kick:"Når adressen ligger på en anden gade",title:"Default gateway: udgangsdøren til verden",items:[
+  {t:"8:54",x:"Computeren kender sin egen gade (sit subnet)"},
+  {t:"9:03",x:"En anden gade? Så kan pakken ikke leveres direkte"},
+  {t:"9:10",x:"Den sendes til default gateway"},
+  {t:"9:17",x:"Routeren i bygningen, der ved, hvordan man kommer til alle de andre gader"}]},
+ {t:"9:27",ch:"IPv4-headeren",kind:"hdr",h:"ipv4",kick:"Fragtsedlen på papkassen",title:"IPv4-headeren: hvad og hvorfor",items:[
+  {t:"9:51",x:"Routeren læser fragtsedlen uden at åbne pakken og læse din e-mail"},
+  {t:"10:16",m:["Version"],x:"Version (4 bit): «det her er IPv4», bestemmer, hvordan resten læses"},
+  {t:"10:34",m:["IHL"],x:"Header length: options gør headeren variabel, så det er bogmærket for, hvor data starter"},
+  {t:"11:17",m:["Type of Service"],x:"Type of Service: prioritet, fx et live videoopkald"},
+  {t:"11:29",m:["Total length"],x:"Total length: hele datagrammets størrelse"}]},
+ {t:"11:34",ch:"Fragmentering",kind:"hdr",h:"ipv4",kick:"Sofaen gennem kælderdøren 🛋",title:"Fragmentering: tre felter, der arbejder sammen",items:[
+  {t:"11:38",m:["Identification","Flags","Fragment offset"],x:"Identification, flags og fragment offset"},
+  {t:"11:52",x:"Næste link har en lille max framestørrelse: datagrammet kan ikke komme igennem"},
+  {t:"12:12",x:"Routeren hakker det op i mindre fragmenter, som man skruer benene af en sofa"},
+  {t:"12:29",m:["Identification"],x:"Identification: samme ID på alle stykker af den samme sofa"},
+  {t:"12:36",m:["Flags"],x:"Flags: «der er flere stykker på vej, bliv ved med at vente»"},
+  {t:"12:43",m:["Fragment offset"],x:"Fragment offset: hvor stykket hører til, når de samles"}]},
+ {t:"12:52",ch:"TTL",kind:"ttl",kick:"Svaret på intro-spørgsmålet",title:"TTL: Time To Live",items:[
+  {t:"13:04",x:"De tre bogstaver: TTL, Time To Live"},
+  {t:"13:10",x:"Uden TTL ville en pakke i et routing-loop drukne netværket"},
+  {t:"13:23",x:"TTL er bare et tal, der fx starter på 64"},
+  {t:"13:28",x:"Hver router trækker 1 fra: 63, 62, 61 …"},
+  {t:"13:42",x:"Rammer den 0, slettes pakken med det samme"},
+  {t:"13:50",x:"Pakken dør, og internettets båndbredde er reddet",k:"sum"}]},
+ {t:"13:58",kind:"hdr",h:"ipv4",kick:"IPv4-headeren",title:"Protocol, checksum og adresserne",items:[
+  {t:"13:58",m:["Protocol"],x:"Protocol: hvilket transportlag venter hos modtageren (TCP = 6, UDP = 17)"},
+  {t:"14:24",m:["Header checksum"],x:"Header checksum: opdager støj, men kun i headeren"},
+  {t:"14:44",x:"Fejl i fragtsedlen? Slet pakken, ellers kan den ende hos en forkert modtager"},
+  {t:"15:03",x:"Payloaden tjekkes af transportlaget, så routeren kan være hurtig"},
+  {t:"15:23",m:["Source IP address","Destination IP address"],x:"Source og destination IP: afsender og modtager"},
+  {t:"15:29",m:["Data (payload)"],x:"Data: segmentet, som papkassen transporterer"}]},
+ {t:"15:38",ch:"DHCP",kind:"points",kick:"Hjem ad døren",title:"Telefonen vil på WiFi, men har ingen IP",items:[
+  {t:"15:48",i:"📱",x:"Uden IP-adresse kan telefonen ikke sende datagrammer"},
+  {t:"15:59",i:"🏷",x:"DHCP: Dynamic Host Configuration Protocol (applikationslaget)"},
+  {t:"16:09",i:"🏢",x:"DHCP-serveren sidder typisk i hjemmerouteren"},
+  {t:"16:16",i:"4️⃣",x:"Fire trin, som huskes med DORA"},
+  {t:"16:25",i:"🤔",x:"Paradoks: hvordan spørger man uden en adresse at spørge fra?"}]},
+ {t:"16:38",kind:"arrows",kick:"DHCP",title:"DORA løser paradokset",a:["📱|Telefon (ingen IP)","🏢|DHCP-server"],items:[
+  {t:"16:43",c:"n",x:"Ingen identitet og kender ikke serverens adresse: start med broadcast"},
+  {t:"16:56",c:0,x:"D · Discover",s:"broadcast: «Er der en DHCP-server, der kan høre mig?»"},
+  {t:"17:05",c:1,x:"O · Offer",s:"«Her er en ledig IP-adresse»"},
+  {t:"17:13",c:0,x:"R · Request",s:"«Jeg tager det tilbud» (andre servere tager deres tilbage)"},
+  {t:"17:49",c:1,x:"A · ACK",s:"adressen er udlejet i en lease time"},
+  {t:"18:02",c:"n",x:"Plus subnetmaske, default gateway og DNS-server: hele overlevelsespakken"}]},
+ {t:"18:16",ch:"NAT",kind:"nat",kick:"Network Address Translation",title:"30 enheder, én offentlig IP",items:[
+  {t:"18:30",x:"30 enheder, men udbyderen giver kun én offentlig IP"},
+  {t:"18:52",x:"NAT: Network Address Translation"},
+  {t:"19:02",x:"Indadtil: private adresser, fx 192.168.1.10"},
+  {t:"19:32",x:"Routeren noterer forespørgslen i sin NAT-tabel"},
+  {t:"19:36",x:"Den private source-IP byttes ud med husstandens offentlige IP"},
+  {t:"20:16",x:"Svaret slås op via portnummeret (NAT kigger op i transportlaget)"}]},
+ {t:"20:50",ch:"ICMP og traceroute",kind:"points",kick:"Når noget går galt",title:"ICMP: internettets nødblus",items:[
+  {t:"21:07",i:"🤐",x:"IP har ingen mekanisme til at advare afsenderen"},
+  {t:"21:15",i:"🏷",x:"ICMP: Internet Control Message Protocol"},
+  {t:"21:23",i:"🚨",x:"Kan destinationen ikke nås, sender routeren en ICMP-fejl tilbage til kilden"},
+  {t:"21:36",i:"🏓",x:"Ping: echo request og echo reply"}]},
+ {t:"21:48",kind:"trace",kick:"Traceroute",title:"Tving routerne til at afsløre sig selv",items:[
+  {t:"22:15",x:"Traceroute udnytter TTL"},
+  {t:"22:23",ttl:1,x:"TTL = 1"},
+  {t:"22:52",x:"Nu kender du router 1's IP-adresse"},
+  {t:"22:57",ttl:2,x:"TTL = 2"},
+  {t:"23:05",ttl:3,x:"TTL = 3"},
+  {t:"23:08",x:"Routerne tvinges én efter én til at fejle og sende et nødblus",k:"sum"}]},
+ {t:"23:15",ch:"IPv6",kind:"compare",kick:"Den sidste tunge sten",title:"IPv4 eller IPv6?",cols:[{i:"4️⃣",n:"IPv4",s:"internettets ungdom",c:"network"},{i:"6️⃣",n:"IPv6",s:"fremtiden",c:"transport"}],items:[
+  {t:"23:19",c:0,x:"32-bit adresser, og vi løber tør"},
+  {t:"23:28",c:1,x:"128-bit adresser, så vi løber aldrig tør igen"},
+  {t:"23:38",c:1,x:"Fast header på præcis 40 bytes"},
+  {t:"23:47",c:0,x:"Variabel header (options), så header length skal læses først"},
+  {t:"24:08",c:1,x:"Strippet for unødvendige felter: lynhurtig forwarding i hardware"},
+  {t:"24:20",c:"b",x:"I IPv6 ligger alt altid på præcis samme plads"}]},
+ {t:"24:23",kind:"tunnel",kick:"IPv6 møder gamle IPv4-netværk",title:"Tunneling",items:[
+  {t:"24:31",x:"En ny computer sender et IPv6-datagram ud i et gammelt netværk"},
+  {t:"24:42",x:"IPv6-datagrammet lægges som payload i en IPv4-papkasse"},
+  {t:"24:52",x:"De gamle IPv4-routere læser kun den ydre IPv4-header"},
+  {t:"25:02",x:"Ved moderne hardware pakkes det ud igen"}]},
+ {t:"25:08",ch:"Faldgruber",kind:"cards",one:1,kick:"Tre klassiske faldgruber til eksamen",title:"Lynkontrol",items:[
+  {t:"25:35",i:"1",x:"Routing vs forwarding?",d:"Routing: algoritmernes kortlægning af ruten. Forwarding: routeren sender pakken ud af det rigtige kabel"},
+  {t:"25:58",i:"2",x:"Hvorfor header length i IPv4?",d:"Headeren kan variere pga. options. Routeren skal vide, hvor instruktionerne slutter og data starter"},
+  {t:"26:24",i:"3",x:"TTL vs ARP-cachens levetid?",d:"ARP-cachen måler tid (minutter og sekunder). TTL måler hop: én ned pr. router"}]},
+ {t:"26:55",ch:"Afslutning",kind:"points",kick:"Bedste råd",title:"Spørg hele tiden: hvorfor?",items:[
+  {t:"26:58",i:"🚫",x:"Undgå udenadslære for enhver pris"},
+  {t:"27:02",i:"❓",x:"Spørg hvorfor for hvert lag, hver protokol og hvert felt"},
+  {t:"27:09",i:"💬",x:"Forstår du behovet bag fx NAT, bliver eksamenssamtalen flydende"}]},
+ {t:"27:24",kind:"quiz",kick:"En tankevækker til eksamen",title:"NAT gav en utilsigtet sikkerhedsmur. Hvad sker der, når alt kører IPv6?",items:[
+  {t:"27:50",i:"📺",x:"Angribere udefra kan ikke ramme dit smart-TV, for det har ingen offentlig adresse"},
+  {t:"27:55",i:"🛡",x:"NAT-tabellen afviser trafik, der ikke er bedt om indefra"},
+  {t:"28:10",i:"🌍",x:"Med IPv6 kan alle enheder få en unik, offentlig adresse. Tænk over det …"}]}
+];
+
 /* ---------- scene renderers: (scene, visible items, index of first new item) → HTML ---------- */
 const pvNew=(i,nw)=>i>=nw?" pv-new":"";
 const pvHead=s=>`<div class="pv-kick">${esc(s.kick||"")}</div><h3 class="pv-title">${esc(s.title)}</h3>`;
@@ -317,7 +452,7 @@ const PV_RENDER={
   /* two lifelines with arrows: items c:0 = left→right, c:1 = right→left, c:"n" = note, lost:1 = dropped */
   arrows(s,vis,nw){
     const [L,R]=s.a.map(a=>a.split("|"));
-    return pvHead(s)+`<div class="pv-seq"><div class="pv-seqhead"><div><span>${L[0]}</span><b>${esc(L[1])}</b></div><div><span>${R[0]}</span><b>${esc(R[1])}</b></div></div>
+    return pvHead(s)+`<div class="pv-seq${vis.length>=6?" dense":""}"><div class="pv-seqhead"><div><span>${L[0]}</span><b>${esc(L[1])}</b></div><div><span>${R[0]}</span><b>${esc(R[1])}</b></div></div>
       <div class="pv-seqbody">${vis.map(m=>m.c==="n"
         ?`<div class="pv-note${pvNew(m._i,nw)}">${esc(m.x)}</div>`
         :`<div class="pv-msg ${m.c?"rl":"lr"}${m.lost?" lost":""}${pvNew(m._i,nw)}"><b>${esc(m.x)}</b><i></i>${m.s?`<small>${esc(m.s)}</small>`:""}</div>`).join("")}</div></div>`;
@@ -341,14 +476,47 @@ const PV_RENDER={
     return pvHead(s)+`<div class="pv-hdr">${cells.map(c=>`<div class="pv-hf${now.has(c.f.n)?" on":done.has(c.f.n)?" done":""}${c.f.var?" var":""}" style="grid-column:span ${c.span}">${esc(c.f.n)}${c.cont?" (forts.)":""}${c.span>=8&&!c.f.var?`<small>${c.f.b} bit</small>`:""}</div>`).join("")}</div>
       ${pvList(vis.filter(x=>x.k!=="sum"),nw,"pv-points pv-compact")}${sum?`<div class="pv-banner${pvNew(sum._i,nw)}">${esc(sum.x)}</div>`:""}`;
   },
+  /* an IPv4 address as 32 bits: network part (street) vs host part (house number) */
+  cidr(s,vis,nw){
+    const k=vis.length,P=s.prefix,oct=s.ip.split(".").map(Number);
+    const bits=oct.map((o,oi)=>`<div class="pv-oct"><span>${o}</span><div>${o.toString(2).padStart(8,"0").split("").map((b,bi)=>`<i class="${k>=2?(oi*8+bi<P?"net":"host"):""}">${b}</i>`).join("")}</div></div>`).join("");
+    return pvHead(s)+`<div class="pv-cidr"><div class="pv-ipline"><code>${esc(s.ip)}</code><b>/${P}</b></div><div class="pv-bits">${bits}</div>
+      <div class="pv-cidrlab"><span class="net${k>=3?" on":""}" style="flex:${P}">${k>=3?`netværksdel (${P} bit): by og gade`:"&nbsp;"}</span><span class="host${k>=4?" on":""}" style="flex:${32-P}">${k>=4?"vært: husnummer":"&nbsp;"}</span></div></div>${pvList(vis,nw,"pv-points pv-compact")}`;
+  },
+  /* TTL counting down hop by hop until the packet is dropped */
+  ttl(s,vis,nw){
+    const k=vis.filter(x=>x.k!=="sum").length,sum=vis.find(x=>x.k==="sum");
+    const nodes=[["💻","Afsender",64],["📡","Router",63],["📡","Router",62],["📡","Router",61],["📡","…",1],["📡","Router",0]];
+    return pvHead(s)+`<div class="pv-ttl">${k>=2?`<div class="pv-loop">🔁 To fejlkonfigurerede routere sender pakken frem og tilbage</div>`:""}<div class="pv-hoprow">${nodes.map((n,i)=>{
+        const show=i===0?k>=3:i<5?k>=4:k>=5,dead=i===5&&k>=5;
+        return `${i?`<span class="pv-hop${show?" on":""}"></span>`:""}<div class="pv-node on${dead?" dead":""}"><span>${n[0]}</span><b>${n[1]}</b><em class="${show?"":"off"}">TTL ${show?n[2]:"?"}${dead?" ✕":""}</em></div>`}).join("")}</div></div>
+      ${pvList(vis.filter(x=>x.k!=="sum"),nw,"pv-points pv-compact")}${sum?`<div class="pv-banner${pvNew(sum._i,nw)}">${esc(sum.x)}</div>`:""}`;
+  },
+  /* traceroute: each probe (item.ttl = n) dies at router n, which answers with ICMP */
+  trace(s,vis,nw){
+    const nodes=[["💻","Dig"],["📡","Router 1"],["📡","Router 2"],["📡","Router 3"],["🖥","Server"]],sum=vis.find(x=>x.k==="sum");
+    const probes=vis.filter(x=>x.ttl),notes=vis.filter(x=>!x.ttl&&x.k!=="sum");
+    return pvHead(s)+`<div class="pv-trace"><div class="pv-trow head">${nodes.map(n=>`<div class="pv-tnode"><span>${n[0]}</span><b>${n[1]}</b></div>`).join("")}</div>
+      ${probes.map(p=>`<div class="pv-trow${pvNew(p._i,nw)}"><div class="pv-tbar" style="grid-column:1 / ${p.ttl+1}">TTL = ${p.ttl} →</div><div class="pv-tdie" style="grid-column:${p.ttl+1}">✕<small>↩ ICMP time exceeded</small></div></div>`).join("")}</div>
+      ${pvList(notes,nw,"pv-points pv-compact")}${sum?`<div class="pv-banner${pvNew(sum._i,nw)}">${esc(sum.x)}</div>`:""}`;
+  },
+  /* tunneling: an IPv6 datagram carried as the payload of an IPv4 datagram */
+  tunnel(s,vis,nw){
+    const k=vis.length;
+    const v6=`<div class="pv-pk l-transport">IPv6-header<small>128-bit adresser</small></div><div class="pv-pk l-app data">TCP + data<small>payload</small></div>`;
+    return pvHead(s)+`<div class="pv-encap">${k>=2
+        ?`<div class="pv-packet"><div class="pv-pk l-network${k>=3?" glow":""}">IPv4-header<small>${k>=3?"det eneste gamle routere læser":"ydre papkasse"}</small></div><div class="pv-inner">${v6}</div></div>`
+        :`<div class="pv-packet">${v6}</div>`}
+      <div class="pv-pdu">${k>=4?"moderne router: IPv4-headeren fjernes → IPv6 kører videre":k>=2?"IPv6-datagram = <b>payload</b> i et IPv4-datagram":"et moderne IPv6-datagram …"}</div></div>${pvList(vis,nw,"pv-points pv-compact")}`;
+  },
   cards(s,vis,nw){
-    return pvHead(s)+`<div class="pv-cards${s.three?" three":""}">${vis.map(c=>`<div class="pv-card${pvNew(c._i,nw)}"><span class="pv-cardicon">${esc(c.i)}</span><b>${esc(c.x)}</b><small>${esc(c.d)}</small></div>`).join("")}</div>`;
+    return pvHead(s)+`<div class="pv-cards${s.three?" three":""}${s.one?" one":""}">${vis.map(c=>`<div class="pv-card${pvNew(c._i,nw)}"><span class="pv-cardicon">${esc(c.i)}</span><b>${esc(c.x)}</b><small>${esc(c.d)}</small></div>`).join("")}</div>`;
   },
   quiz(s,vis,nw){
     return `<div class="pv-kick">${esc(s.kick)}</div><div class="pv-question">❓ ${esc(s.title)}</div>`+(vis.length?pvList(vis,nw,"pv-points pv-answer"):`<div class="pv-think">Tænk over det selv, før svaret kommer …</div>`);
   },
   analogy(s,vis,nw){
-    return pvHead(s)+`<div class="pv-split"><div class="pv-analogy"><span class="pv-bigicon">${s.icon}</span><div class="pv-map"><span>${esc(s.from)}</span><i>→</i><code>${esc(s.to)}</code></div><small>(eksempel-IP)</small></div><div class="pv-side">${pvList(vis,nw)}</div></div>`;
+    return pvHead(s)+`<div class="pv-split"><div class="pv-analogy"><span class="pv-bigicon">${s.icon}</span><div class="pv-map"><span>${esc(s.from)}</span><i>→</i><code>${esc(s.to)}</code></div>${s.note?`<small>${esc(s.note)}</small>`:""}</div><div class="pv-side">${pvList(vis,nw)}</div></div>`;
   },
   encap(s,vis,nw){
     const k=vis.filter(x=>x.k!=="sum").length,sum=vis.find(x=>x.k==="sum");

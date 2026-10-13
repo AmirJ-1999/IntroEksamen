@@ -252,3 +252,59 @@
   .pv-hdr{gap:.5cqw}.pv-hf{font-size:2.6cqw;min-height:7.5cqw;padding:.6cqw .2cqw;overflow-wrap:anywhere;hyphens:auto}.pv-hf small{display:none}
   .pv-cards.three{grid-template-columns:1fr 1fr}
 }
+
+/* ----- CIDR: 32 bits split in network and host part ----- */
+.pv-cidr{display:flex;flex-direction:column;align-items:center;gap:1.2cqw;margin:.6cqw 0}
+.pv-ipline{font-size:3.4cqw;font-weight:800}.pv-ipline code{font-size:3.2cqw}.pv-ipline b{color:#55d1c7;margin-left:.4cqw}
+.pv-bits{display:flex;gap:1.2cqw}
+.pv-oct{display:flex;flex-direction:column;align-items:center;gap:.5cqw}
+.pv-oct span{font-size:2cqw;font-weight:800;color:#c7d5e3}
+.pv-oct div{display:flex;gap:.2cqw}
+.pv-oct i{display:grid;place-items:center;width:2.3cqw;height:3cqw;border-radius:.4cqw;font-style:normal;font-family:"SFMono-Regular",Consolas,monospace;font-size:1.6cqw;background:rgba(255,255,255,.06);border:.15cqw solid rgba(255,255,255,.14);transition:all .3s}
+.pv-oct i.net{background:rgba(85,209,199,.2);border-color:#55d1c7;color:#dff7f4}
+.pv-oct i.host{background:rgba(240,199,94,.2);border-color:#f0c75e;color:#fff4d6}
+.pv-cidrlab{display:flex;gap:1cqw;width:min(100%,82cqw);font-size:1.6cqw;font-weight:700}
+.pv-cidrlab span{text-align:center;padding:.6cqw;border-radius:.8cqw;border:.15cqw dashed transparent}
+.pv-cidrlab .net.on{color:#55d1c7;border-color:#55d1c7}.pv-cidrlab .host.on{color:#f0c75e;border-color:#f0c75e}
+
+/* ----- TTL countdown ----- */
+.pv-ttl{display:flex;flex-direction:column;gap:1.2cqw;margin:.8cqw 0}
+.pv-loop{align-self:center;font-size:1.7cqw;color:#ff9b69;padding:.5cqw 1.6cqw;border-radius:99cqw;border:.15cqw dashed #ff9b69}
+.pv-node em{font-style:normal;font-family:"SFMono-Regular",Consolas,monospace;font-size:1.5cqw;font-weight:800;color:#f0c75e;padding:.2cqw .8cqw;border-radius:.6cqw;background:rgba(240,199,94,.12)}
+.pv-node em.off{opacity:.35}
+.pv-node.dead{border-color:#ff7474;background:rgba(255,116,116,.12);box-shadow:0 0 2cqw rgba(255,116,116,.3)}
+.pv-node.dead em{color:#ff9b9b;background:rgba(255,116,116,.18)}
+.pv-ttl .pv-hoprow .pv-node{padding:1cqw .5cqw}
+
+/* ----- traceroute probes ----- */
+.pv-trace{display:flex;flex-direction:column;gap:.9cqw;margin:.4cqw 0}
+.pv-trow{display:grid;grid-template-columns:repeat(5,1fr);gap:.8cqw;align-items:center}
+.pv-tnode{display:flex;flex-direction:column;align-items:center;gap:.3cqw;padding:.8cqw;border-radius:1cqw;background:rgba(255,255,255,.05);border:.15cqw solid rgba(255,255,255,.12)}
+.pv-tnode span{font-size:2.8cqw;line-height:1}.pv-tnode b{font-size:1.4cqw}
+.pv-tbar{padding:.6cqw 1cqw;border-radius:.8cqw;background:rgba(85,209,199,.18);border:.15cqw solid #55d1c7;font-family:"SFMono-Regular",Consolas,monospace;font-size:1.5cqw;font-weight:800;text-align:right}
+.pv-tdie{display:flex;flex-direction:column;align-items:center;color:#ff7474;font-size:2.4cqw;font-weight:900;line-height:1}
+.pv-tdie small{font-size:1.2cqw;font-weight:700;color:#f0c75e;margin-top:.3cqw;text-align:center}
+
+/* ----- tunneling ----- */
+.pv-inner{display:flex;gap:.4cqw;padding:.6cqw;border-radius:1.2cqw;border:.2cqw dashed #f0c75e;background:rgba(240,199,94,.06)}
+.pv-cards.one{grid-template-columns:1fr}
+
+@media(max-width:640px){
+  .pv-ipline{font-size:5.4cqw}.pv-ipline code{font-size:5cqw}
+  .pv-bits{gap:1.6cqw;flex-wrap:wrap;justify-content:center}.pv-oct span{font-size:3.4cqw}
+  .pv-oct i{width:4.6cqw;height:5.6cqw;font-size:3cqw}
+  .pv-cidrlab{font-size:2.8cqw;flex-direction:column;width:100%}.pv-cidrlab span{flex:none!important}
+  .pv-loop{font-size:2.8cqw;text-align:center}
+  .pv-node em{font-size:2.4cqw}
+  .pv-ttl .pv-hoprow{flex-wrap:wrap;justify-content:center;gap:1.4cqw}.pv-ttl .pv-hop{display:none}
+  .pv-ttl .pv-hoprow .pv-node{flex:0 0 28%}
+  .pv-tnode span{font-size:5cqw}.pv-tnode b{font-size:2.3cqw;text-align:center}.pv-tnode{padding:1cqw .4cqw}
+  .pv-tbar{font-size:2.6cqw;padding:1cqw}.pv-tdie{font-size:4cqw}.pv-tdie small{font-size:2.1cqw}
+  .pv-inner{flex-wrap:wrap;justify-content:center}
+}
+/* arrow diagrams with many steps: tighter rows so everything fits */
+.pv-seq.dense .pv-seqhead span{font-size:2.6cqw}.pv-seq.dense .pv-seqhead b{font-size:1.3cqw}
+.pv-seq.dense .pv-seqbody{gap:.7cqw;padding:.4cqw 0}
+.pv-seq.dense .pv-msg b{font-size:1.7cqw}.pv-seq.dense .pv-msg small{font-size:1.3cqw}
+.pv-seq.dense .pv-note{font-size:1.55cqw;padding:.6cqw 1.6cqw}
+@media(max-width:640px){.pv-seq.dense .pv-seqhead span{font-size:6cqw}.pv-seq.dense .pv-msg b{font-size:3.2cqw}.pv-seq.dense .pv-msg small{font-size:2.5cqw}.pv-seq.dense .pv-note{font-size:2.8cqw}}
