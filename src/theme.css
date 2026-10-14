@@ -735,3 +735,30 @@ body:not([data-view="learn"]) .read-bar{opacity:0}
   .exam-pill{right:12px;bottom:12px}
 }
 @media (prefers-reduced-motion:reduce){.ex-clock.low b,.ex-reveal-name.landed,.ex-ring .fg,.ex-task,.ex-ask,.ex-editor,.ex-check,.ex-hint,.ex-res-part,.srs-done,.ex-toast,.exam-pill{animation:none}}
+
+/* ===== Python editor ===== */
+:root{--sy-kw:#a626a4;--sy-st:#3f8a2e;--sy-nu:#c2570c;--sy-cm:#8a95a5;--sy-fn:#2563eb;--sy-bi:#0e7f86;--sy-co:#c2570c;--sy-ca:#3b5bdb;--sy-de:#b45309;--ped-active:rgba(20,120,200,.06);--ped-sel:rgba(59,130,246,.24)}
+:root[data-theme="dark"]{--sy-kw:#e38df5;--sy-st:#9ad97a;--sy-nu:#f7a668;--sy-cm:#6b7a90;--sy-fn:#7cb4ff;--sy-bi:#5fe0d4;--sy-co:#f7a668;--sy-ca:#a5b8ff;--sy-de:#f5c56a;--ped-active:rgba(255,255,255,.035);--ped-sel:rgba(96,165,250,.3)}
+.ped{position:relative;display:flex;align-items:stretch;background:var(--code-bg);min-width:0}
+.ped-gutter{position:relative;flex:0 0 auto;overflow:hidden;border-right:1px solid var(--code-line);background:color-mix(in srgb,var(--code-line) 22%,var(--code-bg));user-select:none}
+.ped-nums{position:absolute;top:0;left:0;right:0;display:flex;flex-direction:column;align-items:flex-end;padding:0 10px 0 12px;color:color-mix(in srgb,var(--muted) 70%,transparent);font-variant-numeric:tabular-nums;will-change:transform}
+.ped-nums span{display:block}
+.ped-nums span.on{color:var(--text);font-weight:700}
+.ped-nums span.err{color:#fff;background:var(--red);border-radius:5px;margin-right:-6px;padding-right:6px;font-weight:700}
+.ped-body{position:relative;flex:1;min-width:0}
+.ped-hl{position:absolute;inset:0;margin:0;border:0;border-radius:0;background:transparent;overflow:hidden;white-space:pre;color:var(--editor-text);pointer-events:none}
+.ped-hl code{display:block;width:max-content;min-width:100%;padding:0;border:0;background:none;color:inherit;font:inherit;white-space:pre}
+.ped-active{position:absolute;left:0;right:0;top:0;pointer-events:none;background:var(--ped-active);opacity:0;transition:opacity .2s}
+.ped.focus .ped-active{opacity:1}
+.ped .ped-input{position:relative;display:block;background:transparent!important;color:transparent!important;caret-color:var(--editor-text);white-space:pre;overflow:auto;-webkit-text-fill-color:transparent}
+.ped .ped-input::selection{background:var(--ped-sel);color:transparent;-webkit-text-fill-color:transparent}
+.ped .ped-input:focus{box-shadow:none}
+.ped:focus-within{box-shadow:inset 0 0 0 2px color-mix(in srgb,var(--teal) 40%,transparent)}
+.sy-kw{color:var(--sy-kw);font-weight:600}.sy-st{color:var(--sy-st)}.sy-nu,.sy-co{color:var(--sy-nu)}.sy-co{font-weight:600}
+.sy-cm{color:var(--sy-cm);font-style:italic}.sy-fn{color:var(--sy-fn);font-weight:600}.sy-bi{color:var(--sy-bi)}.sy-ca{color:var(--sy-ca)}.sy-de{color:var(--sy-de)}
+.ex-editor .ped{border-radius:0}
+
+/* plan ring when every goal is done: trophy above the text, kept inside the ring */
+.plan-ring>div{max-width:74%;text-align:center}
+.plan-ring>div>.ic{display:block;flex:0 0 auto;position:static;transform:none;margin:0 auto 4px}
+.plan-ring.all span{font-size:10.5px;line-height:1.25;white-space:normal}

@@ -469,7 +469,6 @@ $("#sandboxBtn").onclick=()=>$("#sandboxPanel").classList.contains("hidden")?ope
 $("#sbRun").onclick=runSandbox;
 $("#sbClear").onclick=()=>{$("#sbCode").value="";stopTerminal($("#sbOut"));$("#sbOut").innerHTML=""};
 $("#sbCode").addEventListener("keydown",e=>{
-  if(e.key==="Tab"){e.preventDefault();const t=e.target,s=t.selectionStart,en=t.selectionEnd;t.value=t.value.slice(0,s)+"    "+t.value.slice(en);t.selectionStart=t.selectionEnd=s+4}
   if((e.ctrlKey||e.metaKey)&&e.key==="Enter"){e.preventDefault();runSandbox()}
 });
 

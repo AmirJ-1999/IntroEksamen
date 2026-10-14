@@ -156,7 +156,7 @@ function exPyHTML(){
       <p class="ex-note">${icon("info")}Koden fra de forrige opgaver bliver stående. Byg videre på den, ligesom til eksamen.</p>
     </div>
     <div class="ex-editor">
-      <div class="ex-ed-head"><span class="g-code-lang"><i class="g-dots"><b></b><b></b><b></b></i>main.py</span><span class="ex-ed-keys">Ctrl+Enter tjekker · Tab rykker ind</span></div>
+      <div class="ex-ed-head"><span class="g-code-lang"><i class="g-dots"><b></b><b></b><b></b></i>main.py</span><span class="ex-ed-keys">Ctrl+Enter tjekker · Ctrl+/ kommentar</span></div>
       <textarea class="code-input" id="exCode" spellcheck="false" autocapitalize="off" autocomplete="off" aria-label="Din kode">${esc(P.code)}</textarea>
       <div class="ex-ed-actions"><button class="btn" id="exRun">${icon("play")}Kør</button><button class="btn run" id="exCheck">${icon("checkCircle")}Tjek opgaven</button>
         <span class="ex-flex"></span><button class="btn ${r.st==="passed"?"primary":""}" id="exNext">${next}${icon("arrowRight")}</button></div>
@@ -219,10 +219,10 @@ function exBindRun(){
   }
   /* code */
   const ta=$("#exCode");if(!ta)return;
+  pyEditor(ta);
   const st=exChain().steps[S.idx];
   ta.oninput=()=>{exam.py.code=ta.value;exSave()};
   ta.onkeydown=e=>{
-    if(e.key==="Tab"){e.preventDefault();const s=ta.selectionStart,en=ta.selectionEnd;ta.value=ta.value.slice(0,s)+"    "+ta.value.slice(en);ta.selectionStart=ta.selectionEnd=s+4;ta.oninput()}
     if((e.ctrlKey||e.metaKey)&&e.key==="Enter"){e.preventDefault();e.shiftKey?exRunCode():exCheck()}
   };
   const busy=b=>{["#exRun","#exCheck"].forEach(s=>{const x=$(s);if(x)x.disabled=b})};
