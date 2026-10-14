@@ -6,7 +6,7 @@
    the page opens or gets focus. Conflicts (two devices saved) are merged key by key. */
 const SYNC_API=(localStorage.getItem("its_dev_api")||"https://studylab-sync.amirjawad79.workers.dev").replace(/\/$/,"");
 const GUEST_KEY="its_guest_backup", PENDING_KEY="its_account_pending";
-const SYNC_LOCAL_ONLY=new Set(["its_theme","its_account","its_sync_meta","its_dev_api",GUEST_KEY,PENDING_KEY]);
+const SYNC_LOCAL_ONLY=new Set(["its_theme","its_account","its_sync_meta","its_dev_api","its_exam_cur",GUEST_KEY,PENDING_KEY]);
 const isSyncedKey=k=>k.startsWith("its_")&&!SYNC_LOCAL_ONLY.has(k);
 let account=null, syncMeta={rev:0,dirty:false,last:0};
 try{account=JSON.parse(localStorage.getItem("its_account")||"null");syncMeta={...syncMeta,...JSON.parse(localStorage.getItem("its_sync_meta")||"{}")}}catch{}

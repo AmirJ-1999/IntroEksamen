@@ -11,6 +11,7 @@ from media_meta import VIDEOS, VIDEO_GROUPS, PODCASTS
 rd = lambda n: open(os.path.join(EXT, n), encoding='utf-8').read()
 css, data, gnet, gpy, extjs, accjs = rd('ext.css'), rd('data.js'), rd('guides_net.js'), rd('guides_py.js'), rd('ext.js'), rd('account.js')
 quizjs, netlabjs, podvjs = rd('quiz_net.js'), rd('netlab.js'), rd('podvideo.js')
+srsjs, examdata, examjs = rd('srs.js'), rd('exam_data.js'), rd('exam.js')
 css += '\n' + rd('podvideo.css') + '\n' + rd('theme.css')
 iconsjs = rd('icons.js')
 
@@ -97,7 +98,7 @@ syncSubject();
 (function(){const g=new URLSearchParams(location.hash.slice(1)).get("guide");
  if(g&&GUIDES.some(x=>x.id===g))openGuide(g);else setView(currentView);})();
 '''
-script = '\n'.join([data, gnet, gpy, media, quizjs, podvjs, extjs, netlabjs, accjs, boot])
+script = '\n'.join([data, gnet, gpy, media, quizjs, podvjs, extjs, netlabjs, srsjs, examdata, examjs, accjs, boot])
 assert '</script' not in script.lower()
 
 html = open(BASE, encoding='utf-8').read()
@@ -156,6 +157,7 @@ views = '''
   <div class="live-head"><div class="live-title"><div class="eyebrow">Netværk · Test dig selv</div><h1>Netværk Lab</h1></div></div>
   <div id="nqBody"></div>
 </section>
+<section id="examView" class="hidden"><div id="examBody"></div></section>
 <section id="videosView" class="hidden">
   <div class="hero"><div><div class="eyebrow">Videoer</div><h1 id="videosTitle" style="font-size:clamp(26px,3.4vw,40px)">Videoer</h1><p id="videosIntro"></p></div></div>
   <div class="chips" id="videoChips" style="margin-bottom:6px"></div>

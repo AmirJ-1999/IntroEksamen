@@ -630,6 +630,7 @@ function subjectCards(){return ALL_CARDS.filter(c=>c.subject===subject)}
 function categories(){return ["Alle",...new Set(subjectCards().map(c=>c.category))]}
 function types(){return ["all",...new Set(subjectCards().map(c=>c.type))]}
 function filteredCards(){
+  const srs=srsLoad(),today=srsToday(),fresh=statusFilter==="today"?srsNewToday():[];
   let arr=subjectCards().filter(c=>{
     if(category!=="Alle"&&c.category!==category)return false;
     if(difficulty!=="all"&&c.difficulty!==Number(difficulty))return false;
@@ -639,6 +640,8 @@ function filteredCards(){
     if(statusFilter==="unsure"&&statusMap[c.id]!=="unsure")return false;
     if(statusFilter==="review"&&statusMap[c.id]!=="review")return false;
     if(statusFilter==="unmarked"&&statusMap[c.id])return false;
+    if(statusFilter==="due"&&!srsIsDue(c.id,srs,today))return false;
+    if(statusFilter==="today"&&!srsIsDue(c.id,srs,today)&&!(fresh.includes(c.id)&&!srs[c.id]))return false;
     if(search){
       const h=[c.question,c.answer,c.easy,c.technical,c.category,c.topic,c.type,c.source,...(c.tags||[])].join(" ").toLowerCase();
       if(!h.includes(search.toLowerCase()))return false;
@@ -651,6 +654,10 @@ function filteredCards(){
   if(sortMode==="unsureFirst")arr.sort((a,b)=>rankStatus(a,"unsure")-rankStatus(b,"unsure"));
   if(sortMode==="hardFirst")arr.sort((a,b)=>b.difficulty-a.difficulty);
   if(sortMode==="easyFirst")arr.sort((a,b)=>a.difficulty-b.difficulty);
+  if(sortMode==="default"&&(statusFilter==="due"||statusFilter==="today")){   // repetitions first ("Øv igen" before "Usikker"), then new cards
+    const rank=c=>!srsIsDue(c.id,srs,today)?3:statusMap[c.id]==="review"?0:statusMap[c.id]==="unsure"?1:2;
+    arr.sort((a,b)=>rank(a)-rank(b));
+  }
   return arr;
 }
 function setView(view){
@@ -723,6 +730,8 @@ function filterDrawerHTML(){
     </select>
     <select class="select filterStatus">
       <option value="all" ${statusFilter==="all"?"selected":""}>Alle statusser</option>
+      <option value="today" ${statusFilter==="today"?"selected":""}>Dagens session (repetition + nye)</option>
+      <option value="due" ${statusFilter==="due"?"selected":""}>Klar til repetition i dag</option>
       <option value="saved" ${statusFilter==="saved"?"selected":""}>★ Gemte kort</option>
       <option value="review" ${statusFilter==="review"?"selected":""}>Øv igen</option>
       <option value="unsure" ${statusFilter==="unsure"?"selected":""}>Usikker</option>
@@ -752,7 +761,7 @@ function bindDrawer(root,rerender){
 }
 function summaryText(){
   const arr=filteredCards();
-  return `${arr.length} kort${difficulty!=="all"?" · niveau "+difficulty:""}${typeFilter!=="all"?" · "+typeFilter:""}${statusFilter!=="all"?" · "+({saved:"★ Gemte",review:"Øv igen",unsure:"Usikker",known:"Kan",unmarked:"Ikke markeret"}[statusFilter]||statusFilter):""}`;
+  return `${arr.length} kort${difficulty!=="all"?" · niveau "+difficulty:""}${typeFilter!=="all"?" · "+typeFilter:""}${statusFilter!=="all"?" · "+({saved:"★ Gemte",review:"Øv igen",unsure:"Usikker",known:"Kan",unmarked:"Ikke markeret",due:"Klar til repetition",today:"Dagens session"}[statusFilter]||statusFilter):""}`;
 }
 
 /* Study */
@@ -771,7 +780,7 @@ function renderStudy(){
   const drawer=$("#studyDrawer");drawer.innerHTML=filterDrawerHTML();bindDrawer(drawer,renderStudy);
   const arr=filteredCards();
   if(!arr.length){
-    $("#studyCardHost").innerHTML=`<div class="empty">Ingen kort matcher filtrene.</div>`;
+    $("#studyCardHost").innerHTML=studyEmptyHTML();bindStudyEmpty();
     $("#studyCounter").textContent="";$("#studyTopic").textContent="";$("#statusRow").innerHTML="";return;
   }
   if(studyIndex>=arr.length)studyIndex=0;
@@ -801,11 +810,19 @@ function renderStudy(){
     $("#focusCard").querySelectorAll(".explain-tab").forEach(x=>x.classList.toggle("active",x.dataset.mode===mode));
     $("#focusCard").querySelectorAll(".explanation-panel").forEach(x=>x.classList.toggle("active",x.dataset.panel===mode));
   });
-  $("#statusRow").querySelectorAll("[data-st]").forEach(b=>b.onclick=()=>{
-    statusMap[c.id]=statusMap[c.id]===b.dataset.st?"":b.dataset.st;saveAll();renderStudy();
-  });
+  $("#statusRow").querySelectorAll("[data-st]").forEach(b=>b.onclick=()=>markStatus(c,b.dataset.st));
   const saveBtn=$("#statusRow").querySelector("[data-save]");
   if(saveBtn)saveBtn.onclick=()=>{savedMap[c.id]=!savedMap[c.id];if(!savedMap[c.id])delete savedMap[c.id];saveAll();renderStudy()};
+}
+/* Marking a card is also a spaced-repetition review: "Kan" pushes it further out, "Usikker" brings it back
+   tomorrow and "Øv igen" keeps it in today's session. Clicking the same status again on a card that is not
+   due removes the mark (as before). */
+function markStatus(c,st){
+  const session=statusFilter==="due"||statusFilter==="today";
+  const off=statusMap[c.id]===st&&!session&&(st==="review"||!srsIsDue(c.id));
+  statusMap[c.id]=off?"":st;
+  if(!off)srsReview(c.id,st);
+  saveAll();renderStudy();
 }
 function nextCard(delta){const n=filteredCards().length;if(!n)return;studyIndex=(studyIndex+delta+n)%n;renderStudy()}
 
@@ -1320,8 +1337,8 @@ document.addEventListener("keydown",e=>{
   if(e.code==="Space"){e.preventDefault();$("#focusCard")?.classList.toggle("flipped")}
   if(e.key==="ArrowLeft")nextCard(-1);if(e.key==="ArrowRight")nextCard(1);
   if(["1","2","3"].includes(e.key)){
-    const arr=filteredCards();if(!arr.length)return;const c=arr[studyIndex],map={"1":"known","2":"unsure","3":"review"},v=map[e.key];
-    statusMap[c.id]=statusMap[c.id]===v?"":v;saveAll();renderStudy();
+    const arr=filteredCards();if(!arr.length)return;const c=arr[studyIndex],map={"1":"known","2":"unsure","3":"review"};
+    markStatus(c,map[e.key]);
   }
 });
 
