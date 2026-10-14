@@ -12,7 +12,7 @@ rd = lambda n: open(os.path.join(EXT, n), encoding='utf-8').read()
 css, data, gnet, gpy, extjs, accjs = rd('ext.css'), rd('data.js'), rd('guides_net.js'), rd('guides_py.js'), rd('ext.js'), rd('account.js')
 quizjs, netlabjs, podvjs = rd('quiz_net.js'), rd('netlab.js'), rd('podvideo.js')
 srsjs, examdata, examjs, planjs = rd('srs.js'), rd('exam_data.js'), rd('exam.js'), rd('plan.js')
-editorjs = rd('editor.js')
+editorjs, searchjs = rd('editor.js'), rd('search.js')
 css += '\n' + rd('podvideo.css') + '\n' + rd('theme.css')
 iconsjs = rd('icons.js')
 
@@ -99,7 +99,7 @@ syncSubject();
 (function(){const g=new URLSearchParams(location.hash.slice(1)).get("guide");
  if(g&&GUIDES.some(x=>x.id===g))openGuide(g);else setView(currentView);})();
 '''
-script = '\n'.join([data, gnet, gpy, media, quizjs, podvjs, extjs, netlabjs, srsjs, examdata, examjs, planjs, editorjs, accjs, boot])
+script = '\n'.join([data, gnet, gpy, media, quizjs, podvjs, extjs, netlabjs, srsjs, examdata, examjs, planjs, editorjs, searchjs, accjs, boot])
 assert '</script' not in script.lower()
 
 html = open(BASE, encoding='utf-8').read()
