@@ -8,6 +8,11 @@ const pwaDismissed=()=>{try{return +localStorage.getItem("pwa_dismissed")||0}cat
 
 if("serviceWorker" in navigator&&(location.protocol==="https:"||["localhost","127.0.0.1"].includes(location.hostname))){
   addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}));
+  /* the page is shown from the cache; when a newer version has been fetched, offer to switch to it */
+  const hadController=!!navigator.serviceWorker.controller;let offered=false;
+  const offer=()=>{if(offered)return;offered=true;pwaNote(icon("sparkles"),"Der er en ny version af Study Hub.",0,["Opdater",()=>location.reload()])};
+  navigator.serviceWorker.addEventListener("message",e=>{if(e.data?.type==="update")offer()});
+  navigator.serviceWorker.addEventListener("controllerchange",()=>{if(hadController)offer()});
 }
 addEventListener("beforeinstallprompt",e=>{e.preventDefault();pwaPrompt=e;pwaRenderBanner()});
 addEventListener("appinstalled",()=>{pwaPrompt=null;pwaRenderBanner();pwaNote(icon("checkCircle"),"Study Hub er installeret. Du finder den blandt dine apps.")});
@@ -36,7 +41,11 @@ renderHome=function(){_pwaHome();pwaRenderBanner()};
 /* small notices: installed, offline, back online */
 const pwaNoteEl=document.createElement("div");pwaNoteEl.className="pwa-note";pwaNoteEl.hidden=true;pwaNoteEl.setAttribute("role","status");document.body.appendChild(pwaNoteEl);
 let pwaNoteT=0;
-function pwaNote(ic,msg,ms=4500){pwaNoteEl.innerHTML=`${ic}<span>${msg}</span>`;pwaNoteEl.hidden=false;clearTimeout(pwaNoteT);if(ms)pwaNoteT=setTimeout(()=>pwaNoteEl.hidden=true,ms)}
+function pwaNote(ic,msg,ms=4500,action){
+  pwaNoteEl.innerHTML=`${ic}<span>${msg}</span>${action?`<button class="btn run">${esc(action[0])}</button><button class="pwa-x" aria-label="Luk">${icon("x")}</button>`:""}`;
+  pwaNoteEl.hidden=false;clearTimeout(pwaNoteT);if(ms)pwaNoteT=setTimeout(()=>pwaNoteEl.hidden=true,ms);
+  if(action){pwaNoteEl.querySelector(".btn").onclick=action[1];pwaNoteEl.querySelector(".pwa-x").onclick=()=>pwaNoteEl.hidden=true}
+}
 addEventListener("offline",()=>{document.documentElement.classList.add("is-offline");pwaNote(icon("cloud"),"Du er offline. Guides, flashcards og din fremgang virker stadig. Python virker, hvis den har været startet før.",8000)});
 addEventListener("online",()=>{document.documentElement.classList.remove("is-offline");pwaNote(icon("checkCircle"),"Du er online igen.",2500)});
 if(!navigator.onLine)document.documentElement.classList.add("is-offline");

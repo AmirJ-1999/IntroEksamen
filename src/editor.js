@@ -38,6 +38,8 @@ function pyEditor(ta){
     for(const p of ["fontFamily","fontSize","lineHeight","letterSpacing","paddingTop","paddingRight","paddingBottom","paddingLeft","tabSize"])pre.style[p]=cs[p];
     for(const p of ["fontFamily","fontSize","lineHeight","paddingTop","paddingBottom"])nums.style[p]=cs[p];
   };
+  let scrollRaf=0;
+  const queueScroll=()=>{cancelAnimationFrame(scrollRaf);scrollRaf=requestAnimationFrame(scroll)};
   const scroll=()=>{hl.parentElement.scrollTop=ta.scrollTop;hl.parentElement.scrollLeft=ta.scrollLeft;nums.style.transform=`translateY(${-ta.scrollTop}px)`;caret()};
   const caret=()=>{
     const ln=_taValue.get.call(ta).slice(0,ta.selectionStart).split("\n").length;
@@ -50,7 +52,7 @@ function pyEditor(ta){
     hl.innerHTML=pyHighlight(v);
     const n=v.split("\n").length;
     if(n!==lines){lines=n;let h="";for(let i=1;i<=n;i++)h+=`<span${i===errLine?' class="err"':""}>${i}</span>`;nums.innerHTML=h;gutter.style.minWidth=(String(n).length*9+26)+"px"}
-    scroll();
+    queueScroll();
   };
   /* values set from code (reset, switching task, opening the sandbox) redraw too */
   Object.defineProperty(ta,"value",{configurable:true,get(){return _taValue.get.call(this)},set(v){_taValue.set.call(this,v);clearErr();refresh()}});
@@ -111,7 +113,7 @@ function pyEditor(ta){
     }
   });
   const ed={refresh,markError(n){errLine=n;lines=0;wrap.classList.add("has-err");refresh()}};
-  ta._ed=ed;syncStyle();refresh();
+  ta._ed=ed;refresh();      // fonts and padding are read by the ResizeObserver once the editor has a size
   return ed;
 }
 /* mark the error line in the gutter whenever an error with a line number is shown for an editor */

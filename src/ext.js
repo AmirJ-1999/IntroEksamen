@@ -35,7 +35,7 @@ syncSubject=function(){
   _origSync();
   $$('.navbtn[data-view="podcasts"],.navbtn[data-view="netlab"]').forEach(b=>b.style.display=subject==="Netværk"?"":"none");
   $$(".subject-switch-large").forEach(s=>s.dataset.active=subject);
-  requestAnimationFrame(moveNavInd);
+  queueNavInd();
 };
 
 /* ---------- motion: nav icons, sliding indicator, page transitions ---------- */
@@ -49,16 +49,22 @@ function moveNavInd(){
   navInd.style.transform=`translateX(${a.offsetLeft}px)`;
   navInd.style.opacity="1";
 }
-window.addEventListener("resize",moveNavInd);
-document.fonts?.ready.then(moveNavInd);
+window.addEventListener("resize",()=>queueNavInd());
+document.fonts?.ready.then(()=>queueNavInd());
+/* measure the indicator in the next frame, after all DOM changes, so it never forces an extra layout */
+var navIndRaf=0;
+function queueNavInd(){cancelAnimationFrame(navIndRaf);navIndRaf=requestAnimationFrame(moveNavInd)}
+let firstView=true;
 const _innerSetView=setView;
 setView=function(view){
   const prev=currentView;
   _innerSetView(view);
-  moveNavInd();
+  queueNavInd();
   const sec=$("#"+currentView+"View");
+  if(firstView){firstView=false;return}           // first render: show the page straight away, no entrance animation
   if(!sec||(prev===currentView&&sec.classList.contains("view-enter")))return;
-  sec.classList.remove("view-enter");void sec.offsetWidth;sec.classList.add("view-enter");
+  if(sec.classList.contains("view-enter")){sec.classList.remove("view-enter");void sec.offsetWidth}   // only a restart needs a reflow
+  sec.classList.add("view-enter");
   clearTimeout(sec._ve);sec._ve=setTimeout(()=>sec.classList.remove("view-enter"),1200);
 };
 const _origTheme=applyTheme;

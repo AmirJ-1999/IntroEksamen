@@ -854,3 +854,8 @@ html.is-offline .brand .logo{filter:grayscale(.6)}
 @media (display-mode: standalone){.download-btn,#menuDownload{display:none!important}}
 
 @media(max-width:359px){.topnav .brand-text{display:none}}
+
+/* ===== Performance: below-the-fold start page sections skip layout and paint until they are near the screen ===== */
+#homeView .category-grid{content-visibility:auto;contain-intrinsic-size:auto 640px}
+#homeView .progress-grid{content-visibility:auto;contain-intrinsic-size:auto 140px}
+#homeView .quickstart{content-visibility:auto;contain-intrinsic-size:auto 520px}

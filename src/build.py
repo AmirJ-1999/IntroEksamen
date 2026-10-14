@@ -97,7 +97,9 @@ media += 'const MANDATORY_1=' + json.dumps(mand, ensure_ascii=False) + ';\n'
 boot = '''
 syncSubject();
 (function(){const g=new URLSearchParams(location.hash.slice(1)).get("guide");
- if(g&&GUIDES.some(x=>x.id===g))openGuide(g);else setView(currentView);})();
+ /* the page is already at the top on load: skip setView's scroll, which would force an extra full layout */
+ const scrollTo0=window.scrollTo;window.scrollTo=()=>{};
+ try{if(g&&GUIDES.some(x=>x.id===g))openGuide(g);else setView(currentView);}finally{window.scrollTo=scrollTo0}})();
 '''
 script = '\n'.join([data, gnet, gpy, media, quizjs, podvjs, extjs, netlabjs, srsjs, examdata, examjs, planjs, editorjs, searchjs, pwajs, accjs, boot])
 assert '</script' not in script.lower()
@@ -109,7 +111,9 @@ def rep(old, new, count=1):
     html = html.replace(old, new)
 
 fonts = ('<link rel="preconnect" href="https://fonts.googleapis.com">\n<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>\n'
-         '<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">\n')
+         # the font stylesheet doesn't block the first paint: system font first, Inter swaps in when it has loaded
+         '<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" onload="this.onload=null;this.rel=\'stylesheet\'">\n'
+         '<noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"></noscript>\n')
 pwa_head = ('<meta name="description" content="Eksamensforberedelse til IT-Sikkerhed: guides, flashcards, Python Lab, Netværk Lab, podcasts og prøveeksamen.">\n'
             '<meta name="theme-color" content="#f6f8fc">\n<link rel="manifest" href="manifest.webmanifest">\n'
             '<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">\n'
