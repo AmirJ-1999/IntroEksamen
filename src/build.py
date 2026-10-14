@@ -12,7 +12,7 @@ rd = lambda n: open(os.path.join(EXT, n), encoding='utf-8').read()
 css, data, gnet, gpy, extjs, accjs = rd('ext.css'), rd('data.js'), rd('guides_net.js'), rd('guides_py.js'), rd('ext.js'), rd('account.js')
 quizjs, netlabjs, podvjs = rd('quiz_net.js'), rd('netlab.js'), rd('podvideo.js')
 srsjs, examdata, examjs, planjs = rd('srs.js'), rd('exam_data.js'), rd('exam.js'), rd('plan.js')
-editorjs, searchjs = rd('editor.js'), rd('search.js')
+editorjs, searchjs, pwajs = rd('editor.js'), rd('search.js'), rd('pwa.js')
 css += '\n' + rd('podvideo.css') + '\n' + rd('theme.css')
 iconsjs = rd('icons.js')
 
@@ -99,7 +99,7 @@ syncSubject();
 (function(){const g=new URLSearchParams(location.hash.slice(1)).get("guide");
  if(g&&GUIDES.some(x=>x.id===g))openGuide(g);else setView(currentView);})();
 '''
-script = '\n'.join([data, gnet, gpy, media, quizjs, podvjs, extjs, netlabjs, srsjs, examdata, examjs, planjs, editorjs, searchjs, accjs, boot])
+script = '\n'.join([data, gnet, gpy, media, quizjs, podvjs, extjs, netlabjs, srsjs, examdata, examjs, planjs, editorjs, searchjs, pwajs, accjs, boot])
 assert '</script' not in script.lower()
 
 html = open(BASE, encoding='utf-8').read()
@@ -110,7 +110,12 @@ def rep(old, new, count=1):
 
 fonts = ('<link rel="preconnect" href="https://fonts.googleapis.com">\n<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>\n'
          '<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">\n')
-rep('<title>', fonts + '<title>')
+pwa_head = ('<meta name="description" content="Eksamensforberedelse til IT-Sikkerhed: guides, flashcards, Python Lab, Netværk Lab, podcasts og prøveeksamen.">\n'
+            '<meta name="theme-color" content="#f6f8fc">\n<link rel="manifest" href="manifest.webmanifest">\n'
+            '<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">\n'
+            '<meta name="mobile-web-app-capable" content="yes">\n<meta name="apple-mobile-web-app-capable" content="yes">\n'
+            '<meta name="apple-mobile-web-app-title" content="Study Hub">\n<meta name="apple-mobile-web-app-status-bar-style" content="default">\n')
+rep('<title>', fonts + pwa_head + '<title>')
 # icon() must exist before the page's own scripts and templates run
 rep('</script>\n</head>', '</script>\n<script>\n' + iconsjs + '\n</script>\n</head>')
 rep('</style>\n<script>', '\n' + css + '</style>\n<script>')
@@ -187,4 +192,21 @@ account_dialog = '''
 html = html.replace('</main>', '</main>' + account_dialog, 1)
 rep('</script>\n</body>', '</script>\n<script>\n' + script + '\n</script>\n</body>')
 open(OUT, 'w', encoding='utf-8', newline='').write(html)
+
+# installable app: manifest + service worker next to index.html (the worker's cache name follows the build)
+import hashlib
+ROOT = os.path.dirname(os.path.abspath(OUT))
+icon = lambda src, size, purpose: dict(src=src, sizes=f'{size}x{size}', type='image/png', purpose=purpose)
+manifest = dict(
+    name='Study Hub · IT-Sikkerhed Eksamen', short_name='Study Hub', lang='da', dir='ltr',
+    description='Guides, flashcards, Python Lab, Netværk Lab, podcasts og prøveeksamen til IT-Sikkerhed.',
+    id='./', start_url='./', scope='./', display='standalone', orientation='any',
+    background_color='#f3f6fb', theme_color='#f6f8fc', categories=['education'],
+    icons=[icon('icons/icon-192.png', 192, 'any'), icon('icons/icon-512.png', 512, 'any'),
+           icon('icons/maskable-192.png', 192, 'maskable'), icon('icons/maskable-512.png', 512, 'maskable')],
+    shortcuts=[dict(name=n, short_name=sn, url='./#go=' + g, icons=[icon('icons/icon-192.png', 192, 'any')]) for n, sn, g in
+               [('Dagens session', 'Repetition', 'today'), ('Prøveeksamen', 'Eksamen', 'exam'), ('Python Lab', 'Python', 'live'), ('Søg', 'Søg', 'search')]])
+open(os.path.join(ROOT, 'manifest.webmanifest'), 'w', encoding='utf-8', newline='').write(json.dumps(manifest, ensure_ascii=False, indent=1))
+version = hashlib.sha1(html.encode('utf-8')).hexdigest()[:10]
+open(os.path.join(ROOT, 'sw.js'), 'w', encoding='utf-8', newline='').write(rd('sw_template.js').replace('__VERSION__', version))
 print('ok', len(html), 'bytes ·', len(vids), 'videos ·', sum(len(p['lines']) for p in pods), 'transcript lines')

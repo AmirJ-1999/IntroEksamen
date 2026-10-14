@@ -827,3 +827,25 @@ html.sx-lock{overflow:hidden}
   .sx-foot{display:none}
 }
 @media (prefers-reduced-motion:reduce){.sx-panel,.sx-backdrop,.sx-flash{animation:none}}
+
+/* ===== Install as app ===== */
+.pwa-banner{display:flex;align-items:center;gap:16px;margin:0 0 14px;padding:14px 16px;border-radius:20px;border:1px solid color-mix(in srgb,var(--teal) 30%,var(--line));background:linear-gradient(120deg,color-mix(in srgb,var(--teal) 10%,var(--panel)),color-mix(in srgb,var(--blue) 8%,var(--panel)));box-shadow:var(--shadow-sm);animation:riseIn .5s var(--ease)}
+.pwa-icon{flex:0 0 52px;width:52px;height:52px;border-radius:14px;display:grid;place-items:center;background:radial-gradient(circle at 30% 20%,#173a5c,#0b1a2e 55%,#070d18);box-shadow:0 8px 18px -8px rgba(11,26,46,.6)}
+.pwa-icon svg{width:36px;height:36px}
+.pwa-txt{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.pwa-txt b{font-size:15px}
+.pwa-txt>span{font-size:12.5px;line-height:1.5;color:var(--muted)}
+.pwa-ios{display:none;margin:8px 0 0;padding-left:18px;font-size:13px;line-height:1.7}
+.pwa-ios.open{display:block;animation:riseIn .3s var(--ease)}
+.pwa-ios .ic{width:14px;height:14px;vertical-align:-.15em;color:var(--blue)}
+.pwa-act{display:flex;align-items:center;gap:6px}
+.pwa-x{display:grid;place-items:center;width:34px;height:34px;border:0;border-radius:10px;background:transparent;color:var(--muted);cursor:pointer}
+.pwa-x:hover{background:var(--panel);color:var(--text)}
+.pwa-x .ic{width:16px;height:16px}
+.pwa-note{position:fixed;left:50%;bottom:20px;z-index:150;display:flex;align-items:center;gap:10px;max-width:min(560px,calc(100vw - 24px));padding:11px 16px;border-radius:14px;border:1px solid var(--line);background:var(--panel);box-shadow:var(--shadow-lg);font-size:13.5px;line-height:1.45;transform:translateX(-50%);animation:toastIn .35s var(--ease)}
+.pwa-note[hidden]{display:none}
+.pwa-note>.ic{flex:0 0 20px;width:20px;height:20px;color:var(--teal)}
+html.is-offline .brand .logo{filter:grayscale(.6)}
+@media(max-width:560px){.pwa-banner{flex-wrap:wrap;gap:12px}.pwa-act{width:100%;padding-left:68px}.pwa-act .btn{flex:1}}
+/* in the installed app: no "download offline" in the top bar, and room for the phone's status bar */
+@media (display-mode: standalone){.download-btn,#menuDownload{display:none!important}}
