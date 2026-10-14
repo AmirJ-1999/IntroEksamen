@@ -4,7 +4,7 @@
    - Python (Pyodide, versioned on the CDN) and fonts: cached the first time they are used, so Python also
      works offline after it has run once.
    - Podcasts (audio with range requests), YouTube and the sync API are left to the network. */
-const VERSION="0b8f0721a9";
+const VERSION="2bdbeb90d0";
 const SHELL="studyhub-shell-"+VERSION, RUNTIME="studyhub-runtime-v1";
 const SHELL_FILES=["./","./index.html","./manifest.webmanifest","./icons/icon-192.png","./icons/icon-512.png","./icons/maskable-512.png","./icons/apple-touch-icon.png"];
 

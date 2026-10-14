@@ -106,7 +106,7 @@ $("#brandHome").onclick=e=>{
 $("#menuDownload").onclick=()=>{$("#topnav").classList.remove("menu-open");$("#downloadOffline").click()};
 if(location.protocol==="file:")$("#menuDownload").remove();
 // clicking the current theme switches to the other one (on phones only the current one is shown)
-$$("[data-theme-btn]").forEach(b=>b.onclick=()=>applyTheme(b.classList.contains("active")?(b.dataset.themeBtn==="dark"?"light":"dark"):b.dataset.themeBtn));
+$$("[data-theme-btn]").forEach(b=>b.onclick=()=>applyTheme(b.classList.contains("active")?({light:"dark",dark:"auto",auto:"light"})[b.dataset.themeBtn]:b.dataset.themeBtn));
 
 /* ---------- Learn ---------- */
 function guidesFor(s){return GUIDES.filter(g=>g.subject===s)}

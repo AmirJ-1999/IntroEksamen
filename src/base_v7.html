@@ -369,7 +369,8 @@ code{font-family:"SFMono-Regular",Consolas,monospace;background:var(--code-bg);b
 @media(max-width:560px){.download-btn span{display:none}.download-btn{padding:8px 10px}}
 </style>
 <script>
-(function(){try{var t=localStorage.getItem("its_theme");if(t==="dark")document.documentElement.dataset.theme="dark";else document.documentElement.dataset.theme="light";}catch(e){document.documentElement.dataset.theme="light";}})();
+(function(){var d=document.documentElement,m="auto";try{m=localStorage.getItem("its_theme_mode")||(localStorage.getItem("its_theme")==="dark"?"dark":"auto")}catch(e){}
+if(m!=="light"&&m!=="dark")m="auto";d.dataset.themeMode=m;d.dataset.theme=m==="auto"?(window.matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"):m;})();
 </script>
 </head>
 <body>
@@ -409,6 +410,7 @@ code{font-family:"SFMono-Regular",Consolas,monospace;background:var(--code-bg);b
   <div class="theme-toggle" role="group" aria-label="Vælg tema">
     <button data-theme-btn="light" title="Lyst tema"><i data-icon="sun"></i><span>Lys</span></button>
     <button data-theme-btn="dark" title="Mørkt tema"><i data-icon="moon"></i><span>Mørk</span></button>
+    <button data-theme-btn="auto" title="Følg enhedens indstilling"><i data-icon="contrast"></i><span>Auto</span></button>
   </div>
 
   <button class="mobile-menu" id="mobileMenu" aria-label="Menu"><i data-icon="menu"></i><span>Menu</span></button>
@@ -1341,10 +1343,21 @@ document.addEventListener("keydown",e=>{
   }
 });
 
-function applyTheme(t){
-  document.documentElement.dataset.theme=t;
-  try{localStorage.setItem("its_theme",t)}catch(e){}
-  $$("[data-theme-btn]").forEach(b=>{b.classList.toggle("active",b.dataset.themeBtn===t);b.setAttribute("aria-pressed",b.dataset.themeBtn===t)});
+/* Theme: "light", "dark" or "auto" (follows the device's light/dark setting and changes along with it) */
+const darkQuery=window.matchMedia?matchMedia("(prefers-color-scheme: dark)"):null;
+function applyTheme(mode){
+  if(mode!=="light"&&mode!=="dark")mode="auto";
+  const t=mode==="auto"?(darkQuery&&darkQuery.matches?"dark":"light"):mode;
+  document.documentElement.dataset.theme=t;document.documentElement.dataset.themeMode=mode;
+  try{localStorage.setItem("its_theme_mode",mode);localStorage.setItem("its_theme",t)}catch(e){}
+  $$("[data-theme-btn]").forEach(b=>{const on=b.dataset.themeBtn===mode;b.classList.toggle("active",on);b.setAttribute("aria-pressed",on);
+    if(b.dataset.themeBtn==="auto")b.title=`Følg enhedens indstilling (lige nu ${t==="dark"?"mørk":"lys"})`});
+}
+if(darkQuery){
+  const onDeviceTheme=()=>{const d=document.documentElement;if(d.dataset.themeMode==="auto"&&d.dataset.theme!==(darkQuery.matches?"dark":"light"))applyTheme("auto")};
+  darkQuery.addEventListener?darkQuery.addEventListener("change",onDeviceTheme):darkQuery.addListener(onDeviceTheme);
+  /* also when coming back to the tab or app, in case the change happened while it was in the background */
+  addEventListener("focus",onDeviceTheme);document.addEventListener("visibilitychange",onDeviceTheme);
 }
 $$("[data-theme-btn]").forEach(b=>b.onclick=()=>applyTheme(b.dataset.themeBtn));
 
@@ -1368,7 +1381,7 @@ offlineBtn.onclick=async()=>{
     alert("Kunne ikke hente siden til download. Tjek din internetforbindelse og prøv igen.");
   }finally{offlineBtn.disabled=false}
 };
-applyTheme(document.documentElement.dataset.theme==="dark"?"dark":"light");
+applyTheme(document.documentElement.dataset.themeMode||"auto");
 
 syncSubject();setView("home");
 </script>

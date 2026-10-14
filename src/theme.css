@@ -58,7 +58,8 @@ h1{font-weight:800;letter-spacing:-.04em}
 .navbtn.nav-mobile-only{display:none}
 @media(max-width:560px){.topnav.menu-open .navbtn.nav-mobile-only{display:flex}}
 @media(min-width:901px) and (max-width:1640px){.download-btn span{display:none}.download-btn{padding:8px 10px}}
-@media(min-width:901px) and (max-width:1420px){.theme-toggle button span{display:none}.theme-toggle button{padding:6px 9px}.navbtn{padding:7px 9px;gap:6px}}
+@media(min-width:901px) and (max-width:1420px){.navbtn{padding:7px 9px;gap:6px}}
+@media(min-width:901px) and (max-width:1640px){.theme-toggle button span{display:none}.theme-toggle button{padding:6px 9px}}
 @media(min-width:901px) and (max-width:1300px){.navbtn .ic{display:none}.brand small{display:none}.account-btn span{display:none}}
 @media(min-width:901px) and (max-width:1100px){.brand-text{display:none}.topnav{gap:10px}.navbtn{padding:7px 8px;font-size:12.5px}}
 .navbtn.active{color:var(--text);background:transparent;border-color:transparent}
@@ -241,6 +242,8 @@ h1{font-weight:800;letter-spacing:-.04em}
   .start-card:hover,.category-card:hover,.mini-card:hover,.nq-topic:hover,.vid:hover,.btn:hover{transform:none}
 }
 @media(max-width:560px){
+  .topnav{gap:8px}
+  .topnav .download-btn{display:none}
   .mobile-menu span{display:none}
   .mobile-menu{padding:8px 10px}
   .start-card{padding:18px}
@@ -849,3 +852,5 @@ html.is-offline .brand .logo{filter:grayscale(.6)}
 @media(max-width:560px){.pwa-banner{flex-wrap:wrap;gap:12px}.pwa-act{width:100%;padding-left:68px}.pwa-act .btn{flex:1}}
 /* in the installed app: no "download offline" in the top bar, and room for the phone's status bar */
 @media (display-mode: standalone){.download-btn,#menuDownload{display:none!important}}
+
+@media(max-width:359px){.topnav .brand-text{display:none}}

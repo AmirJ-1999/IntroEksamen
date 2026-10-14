@@ -23,7 +23,9 @@ function sxBuild(){
    ["Podcasts","4 afsnit med video og transskription","headphones",()=>setView("podcasts")],
    ["Videoer","Udvalgte videoer pr. emne","playCircle",()=>setView("videos")],
    ["Header-galleri","Alle headers på én side","layers",()=>openGuide("net-headers")],
-   ["Skift tema","Lyst eller mørkt tema","moon",()=>applyTheme(document.documentElement.dataset.theme==="dark"?"light":"dark")]
+   ["Lyst tema","Brug altid lyst tema","sun",()=>applyTheme("light")],
+   ["Mørkt tema","Brug altid mørkt tema","moon",()=>applyTheme("dark")],
+   ["Auto-tema","Følg enhedens lyse/mørke indstilling","contrast",()=>applyTheme("auto")]
   ].forEach(([t,s,ic,go])=>{add("page","page:"+t,t,s,"",go);I[I.length-1].ic=ic});
   /* guides and their sections */
   GUIDES.forEach(g=>{
