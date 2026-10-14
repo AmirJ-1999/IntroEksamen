@@ -35,6 +35,7 @@ function examStart(){
 function exFinish(){
   if(!exam||exam.ended)return;
   exam.ended=Date.now();
+  actLog("e");
   const h=exHist();
   h.unshift({t:exam.ended,mode:exam.mode,secs:Math.round(exElapsed()),
     py:exam.order.includes("py")?{chain:exam.py.chain,pct:exPyScore()}:null,
@@ -293,21 +294,4 @@ const _examSetView=setView;
 setView=function(view){_examSetView(view);if(view==="exam")renderExam();exPill()};
 const _examHome=renderHome;
 renderHome=function(){_examHome();renderHomeToday()};
-function renderHomeToday(){
-  let box=$("#homeToday");
-  if(!box){$("#homeView .quickstart").insertAdjacentHTML("beforebegin",`<div class="home-today" id="homeToday"></div>`);box=$("#homeToday")}
-  const st=srsStats(),last=exHist()[0],running=exam&&!exam.ended,total=st.due+st.fresh;
-  const lastTxt=last?`Sidst: ${[last.py?`Python ${last.py.pct}%`:"",last.net?`Netværk ${last.net.pct}%`:""].filter(Boolean).join(" · ")}`:"Python + Netværk på 20 minutter";
-  box.innerHTML=`<div class="today-card">
-      <span class="today-ic">${icon("rotate")}</span>
-      <div class="today-txt"><small>Dagens repetition · ${esc(subject)}</small><b>${total?`${total} kort klar i dag`:"Færdig for i dag"}</b>
-        <span>${total?`${st.due} til repetition · ${st.fresh} nye kort`:st.next!==null?`Næste repetition ${srsLabel(st.next)}`:"Markér kort, så kommer de igen på det rigtige tidspunkt"}</span></div>
-      <button class="btn ${total?"run":""}" id="todayStart">${total?icon("play")+"Start":icon("cards")+"Alle kort"}</button></div>
-    <div class="today-card">
-      <span class="today-ic exam">${icon("graduation")}</span>
-      <div class="today-txt"><small>Prøveeksamen</small><b>${running?"Eksamen i gang":"Test dig selv som til eksamen"}</b><span>${running?"Fortsæt, hvor du slap":lastTxt}</span></div>
-      <button class="btn" id="todayExam">${icon(running?"play":"arrowRight")}${running?"Fortsæt":"Start"}</button></div>`;
-  $("#todayStart").onclick=()=>{if(total)startTodaySession();else{statusFilter="all";studyIndex=0;setView("study")}};
-  $("#todayExam").onclick=()=>{if(exam?.ended){exam=null;exSave()}setView("exam")};
-}
 if(exam&&!exam.ended)exTickStart();

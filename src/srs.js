@@ -18,7 +18,7 @@ function srsNext(prev,st){
   e.i=Math.min(e.i,180);e.d=srsToday()+e.i;
   return e;
 }
-function srsReview(id,st){const m=srsLoad();m[id]=srsNext(m[id],st);srsSave(m)}
+function srsReview(id,st){const m=srsLoad();m[id]=srsNext(m[id],st);srsSave(m);actLog("c")}
 const srsLabel=days=>days<=0?"i dag":days===1?"i morgen":days<7?`om ${days} dage`:days<30?`om ${Math.round(days/7)} uge${Math.round(days/7)>1?"r":""}`:`om ${Math.round(days/30)} md.`;
 function srsNewToday(subj=subject){
   const today=srsToday();let s;
