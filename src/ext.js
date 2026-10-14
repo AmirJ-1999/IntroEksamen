@@ -67,10 +67,27 @@ setView=function(view){
   sec.classList.add("view-enter");
   clearTimeout(sec._ve);sec._ve=setTimeout(()=>sec.classList.remove("view-enter"),1200);
 };
+/* Theme switch: the browser snapshots the page before and after and animates between the two pictures on the
+   GPU (View Transitions), instead of transitioning the colours of hundreds of elements. From a theme button the
+   new theme spreads as a circle from the button; otherwise (device change, search) it cross-fades.
+   Returns a promise that resolves once the new theme is applied. */
 const _origTheme=applyTheme;
-applyTheme=function(t){
-  const r=document.documentElement;r.classList.add("theme-anim");
-  _origTheme(t);clearTimeout(r._ta);r._ta=setTimeout(()=>r.classList.remove("theme-anim"),500);
+applyTheme=function(t,from){
+  const root=document.documentElement,mode=t==="light"||t==="dark"?t:"auto";
+  const target=mode==="auto"?(matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"):mode;
+  const still=target===root.dataset.theme||!document.startViewTransition||document.visibilityState!=="visible"||matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if(still){_origTheme(t);return Promise.resolve()}
+  const p=from&&from.getBoundingClientRect?from.getBoundingClientRect():null;
+  const x=p?p.left+p.width/2:innerWidth/2,y=p?p.top+p.height/2:0;
+  if(p)root.classList.add("vt-reveal");
+  const vt=document.startViewTransition(()=>_origTheme(t));
+  if(p)vt.ready.then(()=>{
+    const r=Math.hypot(Math.max(x,innerWidth-x),Math.max(y,innerHeight-y));
+    root.animate({clipPath:[`circle(0px at ${x}px ${y}px)`,`circle(${r}px at ${x}px ${y}px)`]},
+      {duration:560,easing:"cubic-bezier(.2,.8,.2,1)",pseudoElement:"::view-transition-new(root)"});
+  }).catch(()=>{});
+  vt.finished.finally(()=>root.classList.remove("vt-reveal"));
+  return vt.updateCallbackDone.catch(()=>{});
 };
 document.addEventListener("pointermove",e=>{
   const c=e.target.closest?.(".start-card,.nq-topic,.category-card");if(!c)return;
@@ -112,7 +129,7 @@ $("#brandHome").onclick=e=>{
 $("#menuDownload").onclick=()=>{$("#topnav").classList.remove("menu-open");$("#downloadOffline").click()};
 if(location.protocol==="file:")$("#menuDownload").remove();
 // clicking the current theme switches to the other one (on phones only the current one is shown)
-$$("[data-theme-btn]").forEach(b=>b.onclick=()=>applyTheme(b.classList.contains("active")?({light:"dark",dark:"auto",auto:"light"})[b.dataset.themeBtn]:b.dataset.themeBtn));
+$$("[data-theme-btn]").forEach(b=>b.onclick=()=>applyTheme(b.classList.contains("active")?({light:"dark",dark:"auto",auto:"light"})[b.dataset.themeBtn]:b.dataset.themeBtn,b));
 
 /* ---------- Learn ---------- */
 function guidesFor(s){return GUIDES.filter(g=>g.subject===s)}

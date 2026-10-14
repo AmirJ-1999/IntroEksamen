@@ -57,7 +57,7 @@ function pwaThemeColor(){
   m.content=document.documentElement.dataset.theme==="dark"?"#080d16":"#f6f8fc";
 }
 const _pwaTheme=applyTheme;
-applyTheme=function(t){_pwaTheme(t);pwaThemeColor()};
+applyTheme=function(...a){const done=_pwaTheme(...a);Promise.resolve(done).then(pwaThemeColor);return done};
 pwaThemeColor();
 
 /* app shortcuts (long-press the icon): ./#go=today|exam|live|search */

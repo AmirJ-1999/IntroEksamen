@@ -233,7 +233,10 @@ h1{font-weight:800;letter-spacing:-.04em}
 .view-enter :is(.quickstart,.category-grid,.progress-grid,.cards-grid,.nq-topics,.pod-list,.vid-grid,.g-grid,.exercise-items,.hero-actions)>:nth-child(8){animation-delay:.34s}
 .view-enter :is(.quickstart,.category-grid,.progress-grid,.cards-grid,.nq-topics,.pod-list,.vid-grid,.g-grid,.exercise-items,.hero-actions)>:nth-child(n+9){animation-delay:.38s}
 /* theme switch: colours glide instead of snapping */
-.theme-anim,.theme-anim *,.theme-anim *::before,.theme-anim *::after{transition:background-color .45s ease,border-color .45s ease,color .45s ease,fill .45s ease,stroke .45s ease!important}
+::view-transition-group(root){animation-duration:.32s;animation-timing-function:ease}
+html.vt-reveal::view-transition-old(root),html.vt-reveal::view-transition-new(root){animation:none;mix-blend-mode:normal}
+html.vt-reveal::view-transition-old(root){z-index:1}
+html.vt-reveal::view-transition-new(root){z-index:2}
 
 @media (prefers-reduced-motion:reduce){
   .view-enter,.view-enter *,.nq-feedback,.account-menu,.account-dialog[open],.topnav.menu-open .nav-center{animation:none!important}
